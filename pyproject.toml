@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "laluzqueopaca"
+version = "0.1.0"
+description = "Base reproducible para deteccion y supresion de reflejos especulares en imagenes endoscopicas."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "Equipo del proyecto" }
+]
+dependencies = [
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "opencv-python>=4.9",
+  "scikit-image>=0.22",
+  "matplotlib>=3.8",
+  "PyYAML>=6.0",
+  "tqdm>=4.66"
+]
+
+[project.optional-dependencies]
+dev = [
+  "ipykernel>=6.29",
+  "jupyter>=1.0",
+  "pytest>=8.1",
+  "ruff>=0.4",
+  "black>=24.3"
+]
+dl = [
+  "torch>=2.2",
+  "torchvision>=0.17"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+

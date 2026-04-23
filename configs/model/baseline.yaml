@@ -1,0 +1,10 @@
+name: brightness_threshold_baseline
+task: specular_highlight_detection
+color_space: hsv
+threshold:
+  value_channel_min: 230
+  saturation_max: 40
+postprocess:
+  min_area: 8
+  closing_kernel: 3
+
