@@ -1,109 +1,110 @@
 # La luz que opaca
 
-Detección y supresión de reflejos especulares en imágenes endoscópicas.
+Corrección de iluminación como preprocesamiento para estimación de profundidad monocular en endoscopía.
 
 ## Descripción
 
-Este repositorio está preparado como base de trabajo para un proyecto de visión por computadora enfocado en uno de los artefactos más críticos en endoscopía: los reflejos especulares. Estos reflejos saturan píxeles, ocultan textura anatómica relevante y degradan tanto la interpretación visual del especialista como el desempeño de modelos de IA para tareas CAD.
+Este repositorio contiene el proyecto integrador de maestría, cuyo objetivo es evaluar si la corrección del gradiente de iluminación del endoscopio mejora el desempeño de modelos de estimación de profundidad monocular en video endoscópico.
 
-El objetivo general del proyecto es construir y evaluar un pipeline reproducible para:
+El pipeline completo es:
 
-1. Detectar regiones con reflejos especulares en imágenes endoscópicas.
-2. Explorar técnicas para su supresión o reconstrucción.
-3. Medir el impacto de esa mitigación sobre tareas posteriores de análisis.
+```
+video endoscópico (RGB crudo)
+        ↓
+  corrección de iluminación   ← contribución del proyecto
+        ↓
+  modelo de profundidad monocular  (MonoIIT / NExF / EndoGaussian)
+        ↓
+  depth map estimado
+        ↓
+  evaluación vs. GT de structured light  (AbsRel, RMSE, Chamfer Distance)
+```
 
-## Situación actual del repositorio
+La hipótesis es que eliminar el gradiente radial de iluminación — más brillante en el centro, oscuro en los bordes — reduce el error de profundidad, especialmente en la periferia de la imagen donde la validez del GT cae más rápido.
 
-Actualmente el repositorio se encuentra en etapa de arranque y exploración. Ya cuenta con:
+## Dataset
 
-- Estructura base de proyecto para investigación en visión por computadora.
-- Organización de datos, configuraciones, código fuente, notebooks, pruebas y reportes.
-- Un baseline inicial muy simple para detección de reflejos por brillo y baja saturación.
-- Un primer notebook de exploración para cargar hasta 10 imágenes y revisar posibles reflejos.
-- Ambiente de trabajo pensado para evolucionar después hacia tareas de detección, segmentación o supresión.
+Se trabaja con el **SCARED dataset** (Structured light endoscopY And Reconstructed Depth), específicamente `dataset_1`, disponible en HuggingFace.
 
-Por ahora, el método definitivo todavía no está cerrado. La prioridad inmediata es entender las entradas, explorar imágenes reales, revisar artefactos y definir con más claridad si el problema se abordará primero como detección, segmentación o restauración.
+| Archivo | Descripción |
+|---|---|
+| `Left_Image.png` | Frame de referencia RGB (1280×1024 px) |
+| `left_depth_map.tiff` | Ground truth de profundidad por structured light |
+| `endoscope_calibration.yaml` | Matriz intrínseca K de la cámara izquierda |
+| `point_cloud.obj` | Nube de puntos 3D en bruto del sistema de captura |
+| `data/rgb.mp4` | Video completo del keyframe |
+| `data/scene_points.tar.gz` | Depth GT para todos los frames del video |
 
-## Dataset inicial de trabajo
+**5 keyframes** con coberturas de GT entre 71.9% (KF5) y 86.8% (KF3). Los píxeles sin GT corresponden a reflejos especulares y bordes de curvatura extrema donde el structured light no puede triangular.
 
-Mientras se prueba la estructura del repositorio y los primeros notebooks, las imágenes iniciales de referencia serán tomadas del dataset oficial Kvasir de Simula:
+Los datos crudos (`data/scared_raw/`) no están en el repositorio por su tamaño (13.4 GB).
 
-- Kvasir: [https://datasets.simula.no/kvasir/](https://datasets.simula.no/kvasir/)
+## EDA
 
-Kvasir es un dataset público de imágenes del tracto gastrointestinal para investigación en detección asistida por computadora. En su sitio oficial se describe como un conjunto de imágenes endoscópicas clasificadas y anotadas por médicos, útil para tareas de aprendizaje automático, visión por computadora y evaluación reproducible. También se indica que su uso está restringido a fines de investigación y educación.
+El notebook [`notebooks/scared_real_eda.ipynb`](notebooks/scared_real_eda.ipynb) contiene el análisis exploratorio completo del dataset:
 
-En este proyecto se usará inicialmente como fuente de imágenes endoscópicas para:
+1. Imágenes RGB — resolución, iluminación, balance de canales
+2. Depth maps — cobertura por keyframe, rango near/far
+3. Estadísticas de profundidad — percentiles P2/P98 para `poses_bounds.npy`
+4. Validez espacial — patrón de viñeteado circular
+5. Nube de puntos 3D interactiva (reproyección desde TIFF + K)
+6. Superficies 3D de depth
+7. Análisis de nube de puntos desde `.obj`
+8. Estadísticas RGB y ranking de dificultad por keyframe
 
-- Aprender a consumir y organizar imágenes reales.
-- Explorar brillo, saturación y regiones con reflejos intensos.
-- Construir baselines tempranos.
-- Preparar un flujo reproducible antes de definir el método final.
+**Hallazgos principales del EDA:**
 
-Nota: Kvasir no es un dataset específico de reflejos especulares anotados, por lo que al inicio funcionará principalmente como fuente de imágenes endoscópicas reales para exploración, prototipos y posibles anotaciones propias.
+- El rango de profundidad varía por keyframe: P2/P98 entre [28.9, 58.6] mm (KF4) y [58.6, 109.6] mm (KF3).
+- KF5 es el keyframe más difícil: mayor porcentaje de especulares (3.79%) y menor textura (varianza Laplaciana = 63).
+- KF4 es el más fácil (score = 0.358). **Se recomienda iniciar experimentos con KF4.**
+- El gradiente de iluminación es visible y medible: la luminancia cae del centro a los bordes de forma consistente en los 5 keyframes.
+- Los archivos `.obj` tienen coordenadas NaN con el parser actual — se requiere inspección del formato antes de usarlos para Chamfer Distance.
 
-## Problema
+Los outputs del EDA (PNGs y CSVs) están en [`outcomes/eda_outputs/`](outcomes/eda_outputs/).
 
-La literatura reciente reporta cuatro retos principales:
+## Variables del experimento
 
-- Escasez de datos médicos etiquetados y restricciones de privacidad.
-- Presencia de artefactos visuales severos, especialmente reflejos especulares.
-- Brecha de dominio entre hospitales, equipos y modalidades como WLI y NBI.
-- Restricciones de tiempo real para apoyo intraoperatorio.
+**Variable independiente:** imagen RGB con o sin corrección de iluminación  
+**Variable dependiente:** error de estimación de profundidad (AbsRel, RMSE, Chamfer Distance)
 
-Este repositorio está organizado para permitir investigación iterativa aunque el método final aún no esté definido.
-
-## Posibles líneas de trabajo
-
-- Detección clásica por umbralado en espacios RGB, HSV o Lab.
-- Segmentación supervisada de reflejos.
-- Inpainting clásico o guiado por máscaras.
-- Restauración con modelos encoder-decoder.
-- Adaptación de dominio entre modalidades o fuentes de datos.
-- Evaluación de impacto en tareas downstream.
+La corrección de iluminación transforma `X_crudo → X_corrected` antes de pasarlo al modelo de profundidad. Todo lo demás (modelo, hiperparámetros, GT) permanece constante para aislar el efecto.
 
 ## Estructura
 
 ```text
 .
-|-- artifacts/              # Salidas temporales de experimentos
-|-- configs/                # Configuraciones versionables
-|   |-- data/
-|   |-- model/
-|   `-- train/
-|-- data/
-|   |-- annotations/        # Máscaras, etiquetas, metadatos
-|   |-- external/           # Datos de terceros
-|   |-- interim/            # Datos limpios o transformados parcialmente
-|   |-- processed/          # Datasets listos para modelado
-|   `-- raw/                # Datos originales
-|-- docs/                   # Notas metodológicas y documentación
-|-- notebooks/              # Exploración y prototipos
-|-- reports/
-|   `-- figures/            # Figuras para entregables
-|-- scripts/                # Scripts de apoyo y pipelines
-|-- src/
-|   `-- laluzqueopaca/
-|       |-- data/           # Carga, validación y preprocesamiento
-|       |-- evaluation/     # Métricas y evaluación
-|       |-- models/         # Baselines y modelos
-|       |-- training/       # Entrenamiento e inferencia
-|       `-- utils/          # Utilidades compartidas
-|-- tests/                  # Pruebas unitarias
-|-- .gitignore
-`-- pyproject.toml
+├── artifacts/              # Salidas temporales de experimentos
+├── configs/                # Configuraciones versionables
+│   ├── data/
+│   ├── model/
+│   └── train/
+├── data/
+│   ├── annotations/        # Máscaras, etiquetas, metadatos
+│   ├── external/
+│   ├── interim/            # Datos parcialmente transformados
+│   ├── processed/          # Datos listos para modelado
+│   └── raw/                # Datos originales (no tracked en git)
+├── docs/                   # Notas metodológicas
+├── notebooks/              # EDA y experimentos
+│   └── scared_real_eda.ipynb
+├── outcomes/
+│   └── eda_outputs/        # PNGs y CSVs del EDA
+├── reports/
+│   └── figures/
+├── scripts/
+├── src/
+│   └── laluzqueopaca/
+│       ├── data/
+│       ├── evaluation/     # Métricas: AbsRel, RMSE, Chamfer
+│       ├── models/
+│       ├── training/
+│       └── utils/
+└── tests/
 ```
 
-## Flujo sugerido
+## Siguientes pasos
 
-1. Conseguir y documentar datasets candidatos.
-2. Definir una tarea base de detección de reflejos.
-3. Implementar un baseline sencillo y reproducible.
-4. Agregar métricas de segmentación y de restauración.
-5. Comparar enfoques clásicos y de aprendizaje profundo.
-
-## Primeros siguientes pasos
-
-- Documentar datasets potenciales en `docs/`.
-- Crear un script de exploración de brillo y saturación.
-- Definir un formato canónico para máscaras de reflejo.
-- Elegir un baseline inicial: detección, supresión o ambos.
+1. Implementar el método de corrección de iluminación sobre los keyframes de SCARED.
+2. Correr MonoIIT sobre las imágenes crudas y corregidas, comparar AbsRel/RMSE.
+3. Inspeccionar el formato de los `.obj` para habilitar evaluación con Chamfer Distance.
+4. Extender el análisis a los frames de `rgb.mp4` + `scene_points.tar.gz` para evaluación temporal.
