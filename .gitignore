@@ -40,6 +40,12 @@ data/annotations/*
 artifacts/*
 reports/figures/*
 
+# SCARED raw data (demasiado pesado para el repo)
+data/scared_raw/
+
+# Outputs pesados del EDA (HTMLs interactivos 3D)
+outcomes/eda_outputs/*.html
+
 # Keep folder structure
 !data/raw/.gitkeep
 !data/interim/.gitkeep
