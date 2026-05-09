@@ -1,0 +1,17 @@
+target,variable,correlation,abs_correlation
+valid_pct,invalid_pct,-1.0,1.0
+valid_pct,depth_median_valid,0.5408,0.5408
+valid_pct,mean_intensity,0.5363,0.5363
+valid_pct,depth_mean_valid,0.509,0.509
+valid_pct,depth_std_valid,0.1258,0.1258
+valid_pct,saturated_255_pct,0.1022,0.1022
+valid_pct,zero_pct,-0.0624,0.0624
+valid_pct,std_intensity,0.062,0.062
+depth_mean_valid,depth_median_valid,0.9913,0.9913
+depth_mean_valid,depth_std_valid,0.6814,0.6814
+depth_mean_valid,invalid_pct,-0.509,0.509
+depth_mean_valid,valid_pct,0.509,0.509
+depth_mean_valid,mean_intensity,0.4071,0.4071
+depth_mean_valid,std_intensity,-0.3443,0.3443
+depth_mean_valid,saturated_255_pct,-0.2879,0.2879
+depth_mean_valid,zero_pct,-0.1266,0.1266
