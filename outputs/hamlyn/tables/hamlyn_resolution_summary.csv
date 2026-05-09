@@ -1,0 +1,11 @@
+sequence,width,height,mode,format,file_role_heuristic,n_files
+rectified01,640,480,I;16,PNG,depth_map,2116
+rectified01,640,480,RGB,JPEG,other_image,2116
+rectified04,360,288,I;16,PNG,depth_map,3146
+rectified04,360,288,RGB,JPEG,other_image,3146
+rectified05,360,288,I;16,PNG,depth_map,1798
+rectified05,360,288,RGB,JPEG,other_image,1798
+rectified06,640,480,I;16,PNG,depth_map,2474
+rectified06,640,480,RGB,JPEG,other_image,2474
+rectified08,640,480,I;16,PNG,depth_map,28786
+rectified08,640,480,RGB,JPEG,other_image,28786

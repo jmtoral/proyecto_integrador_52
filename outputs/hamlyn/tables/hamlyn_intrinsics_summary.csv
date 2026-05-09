@@ -1,0 +1,16 @@
+sequence,path,n_numbers,raw_text
+rectified01,/Users/eldamorales/Documents/Maestría en IA/Proyecto Integrador/proyecto_integrador_52/data/hamlyn/intrinsics/intrinsics_rectified01.txt,12,"383.1901395 0 155.9659519195557 0
+0 383.1901395 124.3335933685303 0
+0 0 1 0"
+rectified04,/Users/eldamorales/Documents/Maestría en IA/Proyecto Integrador/proyecto_integrador_52/data/hamlyn/intrinsics/intrinsics_rectified04.txt,12,"579.05693 0 139.9316005706787 0
+0 579.05693 159.0189905166626 0
+0 0 1 0"
+rectified05,/Users/eldamorales/Documents/Maestría en IA/Proyecto Integrador/proyecto_integrador_52/data/hamlyn/intrinsics/intrinsics_rectified05.txt,12,"579.05693 0 139.9316005706787 0
+0 579.05693 159.0189905166626 0
+0 0 1 0"
+rectified06,/Users/eldamorales/Documents/Maestría en IA/Proyecto Integrador/proyecto_integrador_52/data/hamlyn/intrinsics/intrinsics_rectified06.txt,12,"765.8236885 0 276.4727783203125 0
+0 765.8236885 253.6752815246582 0
+0 0 1 0"
+rectified08,/Users/eldamorales/Documents/Maestría en IA/Proyecto Integrador/proyecto_integrador_52/data/hamlyn/intrinsics/intrinsics_rectified08.txt,12,"765.8236885 0 276.4727783203125 0
+0 765.8236885 253.6752815246582 0
+0 0 1 0"

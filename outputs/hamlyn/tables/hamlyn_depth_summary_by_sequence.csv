@@ -1,0 +1,6 @@
+sequence,n_depth_maps,mean_valid_pct,median_valid_pct,mean_invalid_pct,mean_depth_mm,median_depth_mm,min_depth_mm,max_depth_mm,mean_std_depth_mm
+rectified01,2116,72.83,75.86,27.17,79.483,83.0,9.0,300.0,11.479
+rectified04,3146,53.055,53.807,46.945,43.589,42.0,26.0,300.0,3.393
+rectified05,1798,46.261,46.468,53.739,46.176,47.0,35.0,300.0,3.987
+rectified06,2474,79.267,81.983,20.733,115.676,125.0,21.0,300.0,20.337
+rectified08,28786,35.4,35.206,64.6,70.64,63.0,16.0,300.0,14.356
