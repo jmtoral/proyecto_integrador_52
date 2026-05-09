@@ -1,0 +1,24 @@
+Resumen exploratorio del dataset HAMLYN rectificado
+============================================================
+
+Se identificaron 76,640 archivos descomprimidos dentro de data/hamlyn/extracted.
+El tamaño total aproximado de archivos analizados es de 2,898.07 MB.
+Se inspeccionaron 76,640 archivos de imagen.
+Las secuencias detectadas fueron: rectified01, rectified04, rectified05, rectified06, rectified08.
+
+Imágenes RGB:
+- rectified01: 2,116 imágenes RGB, intensidad media 95.10, saturación promedio 0.001%.
+- rectified04: 3,146 imágenes RGB, intensidad media 74.21, saturación promedio 0.471%.
+- rectified05: 1,798 imágenes RGB, intensidad media 82.56, saturación promedio 0.851%.
+- rectified06: 2,474 imágenes RGB, intensidad media 106.65, saturación promedio 0.012%.
+- rectified08: 28,786 imágenes RGB, intensidad media 81.60, saturación promedio 0.010%.
+
+Mapas de profundidad:
+- rectified01: 2,116 mapas de profundidad, 72.83% de píxeles válidos en promedio, profundidad media 79.48 mm.
+- rectified04: 3,146 mapas de profundidad, 53.05% de píxeles válidos en promedio, profundidad media 43.59 mm.
+- rectified05: 1,798 mapas de profundidad, 46.26% de píxeles válidos en promedio, profundidad media 46.18 mm.
+- rectified06: 2,474 mapas de profundidad, 79.27% de píxeles válidos en promedio, profundidad media 115.68 mm.
+- rectified08: 28,786 mapas de profundidad, 35.40% de píxeles válidos en promedio, profundidad media 70.64 mm.
+
+Interpretación metodológica preliminar:
+HAMLYN rectificado permite trabajar con pares estéreo alineados y mapas de profundidad asociados. Esto facilita el análisis exploratorio, la comparación entre secuencias y la preparación de datos para modelos de estimación de profundidad. A diferencia de SCARED, cuya profundidad de referencia se obtiene mediante luz estructurada, la versión rectificada de HAMLYN debe documentarse como una base preprocesada orientada a facilitar correspondencia estéreo y entrenamiento computacional.
