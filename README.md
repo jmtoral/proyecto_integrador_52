@@ -147,7 +147,7 @@ Todo el dataset puede leerse **directamente del ZIP en memoria** (`io.BytesIO`) 
 | Notebook | Dataset | Contenido |
 |---|---|---|
 | [`00_exploracion_scared.ipynb`](notebooks/00_exploracion_scared.ipynb) | SCARED | Estructura, formatos, dimensiones, rangos de profundidad |
-| [`01_eda_iluminacion.ipynb`](notebooks/01_eda_iluminacion.ipynb) | SCARED | Gradiente radial, INU, especulares, correlación luminancia-GT |
+| [`01_eda_iluminacion.ipynb`](notebooks/01_eda_iluminacion.ipynb) | SCARED | Gradiente radial, CV de luminancia, especulares, correlación luminancia-GT |
 | [`02_hamlyn_eda.ipynb`](notebooks/02_hamlyn_eda.ipynb) | Hamlyn | Exploración de secuencias estéreo in-vivo |
 | [`03_eda_calidad_input.ipynb`](notebooks/03_eda_calidad_input.ipynb) | SCARED | Calidad de video, flujo óptico, poses, cobertura GT en frames |
 
@@ -155,7 +155,7 @@ Todo el dataset puede leerse **directamente del ZIP en memoria** (`io.BytesIO`) 
 - El gradiente radial afecta todos los keyframes: el centro es entre 1.3x y 3.3x más brillante que el borde.
 - El gradiente no es simétrico: el pico de luminancia coincide con el centro óptico (cx=597, cy=520), no con el centro geométrico (640, 512).
 - Existe correlación negativa fuerte entre luminancia y cobertura de GT (r hasta -0.86): las zonas más brillantes son las que menos datos de entrenamiento tienen.
-- El keyframe más problemático es KF5 (INU=0.665, GT válido=71.9%).
+- El keyframe más problemático es KF5 (CV de luminancia=0.665, GT válido=71.9%).
 
 ## Variables del experimento
 

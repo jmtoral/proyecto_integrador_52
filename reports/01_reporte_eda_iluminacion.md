@@ -173,17 +173,17 @@ Este es el hallazgo cuantitativo central del proyecto: si el gradiente de ilumin
 
 ---
 
-## 5. Índice de No-Uniformidad
+## 5. Coeficiente de variación de la luminancia
 
 ### Por qué se calcula
 
 Los análisis anteriores producen múltiples métricas por keyframe: el perfil radial, el ratio centro/borde, el porcentaje de especulares, la correlación con el GT. Para comparar keyframes de forma rápida y para poder decir en el reporte final qué keyframe fue el más problemático, es útil tener un solo número que resuma el estado general de la iluminación.
 
-El Índice de No-Uniformidad (INU) cumple ese rol. Es una métrica estándar de procesamiento de imágenes que mide qué tan variable es la iluminación en relación a su nivel promedio. Un INU de 0 significa iluminación perfectamente plana. Cuanto más alto, más heterogénea es la imagen. Su ventaja sobre el ratio centro/borde es que no asume que el problema es radial: captura cualquier fuente de variabilidad espacial, incluyendo especulares, sombras o bordes oscuros.
+El coeficiente de variación de la luminancia (CV) cumple ese rol. Es una medida estadística estándar definida como el cociente entre la desviación estándar y la media de una variable: `CV = std / mean`. Aplicado a la luminancia de una imagen, mide qué tan variable es la iluminación en relación a su nivel promedio. Un CV de 0 significa iluminación perfectamente plana. Cuanto más alto, más heterogénea es la imagen. Su ventaja sobre el ratio centro/borde es que no asume que el problema es radial: captura cualquier fuente de variabilidad espacial, incluyendo especulares, sombras o bordes oscuros (Gonzalez & Woods, 2018, cap. 3).
 
 ### Metodología
 
-El INU se define como el cociente entre la desviación estándar y la media de la luminancia en toda la imagen: `INU = std(luminancia) / mean(luminancia)`. Se calculó para cada keyframe junto con el ratio centro/borde de la Sección 1 y el porcentaje de especulares de la Sección 3, formando una tabla resumen de indicadores de calidad de iluminación ordenada de mayor a menor INU.
+El CV de luminancia se calcula como `CV = std(luminancia) / mean(luminancia)`. Se calculó para cada keyframe junto con el ratio centro/borde de la Sección 1 y el porcentaje de especulares de la Sección 3, formando una tabla resumen de indicadores de calidad de iluminación ordenada de mayor a menor CV.
 
 ### Resultados
 
@@ -193,11 +193,11 @@ La Figura 5 presenta los tres indicadores como gráficas de barras ordenadas de 
 
 ![Indicadores de iluminación](figures/20_indicadores_iluminacion.png)
 
-*Nota. Elaboración propia. Izquierda: INU (std/mean de luminancia). Centro: ratio luminancia centro/borde. Derecha: porcentaje de especulares detectados. Barras ordenadas de mayor a menor INU.*
+*Nota. Elaboración propia. Izquierda: coeficiente de variación de luminancia (CV = std/mean). Centro: ratio luminancia centro/borde. Derecha: porcentaje de especulares detectados. Barras ordenadas de mayor a menor CV.*
 
-**Tabla 3.** Tabla resumen de indicadores de iluminación por keyframe, ordenada de mayor a menor INU.
+**Tabla 3.** Tabla resumen de indicadores de iluminación por keyframe, ordenada de mayor a menor CV.
 
-| Keyframe | Lum. media | Lum. std | INU | Ratio C/B | Especulares (%) | GT válido (%) |
+| Keyframe | Lum. media | Lum. std | CV (std/mean) | Ratio C/B | Especulares (%) | GT válido (%) |
 |---|---|---|---|---|---|---|
 | KF5 | 93.2 | 61.9 | 0.665 | 2.72x | 0.43 | 71.9 |
 | KF3 | 98.9 | 54.9 | 0.555 | 3.26x | 1.57 | 86.8 |
@@ -205,7 +205,7 @@ La Figura 5 presenta los tres indicadores como gráficas de barras ordenadas de 
 | KF2 | 101.4 | 51.0 | 0.504 | 2.03x | 0.91 | 83.0 |
 | KF1 | 97.6 | 48.0 | 0.492 | 1.33x | 1.12 | 78.4 |
 
-KF5 encabeza el ranking con un INU de 0.665 a pesar de tener la luminancia media más baja (93.2) y el menor porcentaje de especulares (0.43%). Su alta variabilidad interna se debe a que contiene zonas muy oscuras en los bordes y zonas relativamente brillantes en el centro, con una diferencia que la desviación estándar de 61.9 refleja. KF3 y KF4 tienen los ratios C/B más extremos (3.26x y 3.22x) pero una desviación estándar algo menor, lo que los coloca en segundo y tercer lugar. KF1 es el keyframe con iluminación más regular, con un ratio de 1.33x y un INU de 0.492, aunque incluso ese valor está lejos de la uniformidad.
+KF5 encabeza el ranking con un CV de 0.665 a pesar de tener la luminancia media más baja (93.2) y el menor porcentaje de especulares (0.43%). Su alta variabilidad interna se debe a que contiene zonas muy oscuras en los bordes y zonas relativamente brillantes en el centro, con una diferencia que la desviación estándar de 61.9 refleja. KF3 y KF4 tienen los ratios C/B más extremos (3.26x y 3.22x) pero una desviación estándar algo menor, lo que los coloca en segundo y tercer lugar. KF1 es el keyframe con iluminación más regular, con un ratio de 1.33x y un CV de 0.492, aunque incluso ese valor está lejos de la uniformidad.
 
 ---
 
@@ -251,7 +251,7 @@ El análisis sobre los cinco keyframes de `dataset_1` produce cinco hallazgos co
 
 **Quinto**, una corrección simple por división de envolvente gaussiana es suficiente para demostrar que el problema es tratable, pero introduce distorsión de color y amplificación de ruido. Los métodos CLAHE, Retinex y MonoIIF son los candidatos a evaluar en la siguiente etapa del proyecto.
 
-El keyframe más problemático según el INU es KF5 (INU=0.665, GT válido=71.9%) y es el candidato principal para los primeros experimentos de corrección. KF3 y KF4, con los ratios C/B más extremos (>3.2x), son complementos útiles para evaluar si la corrección reduce el error de profundidad bajo condiciones de gradiente severo.
+El keyframe más problemático según el CV es KF5 (CV=0.665, GT válido=71.9%) y es el candidato principal para los primeros experimentos de corrección. KF3 y KF4, con los ratios C/B más extremos (>3.2x), son complementos útiles para evaluar si la corrección reduce el error de profundidad bajo condiciones de gradiente severo.
 
 ---
 
