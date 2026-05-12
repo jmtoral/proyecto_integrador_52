@@ -1,6 +1,70 @@
-# La luz que opaca
+# <center> <font color="#0036a3">Maestría en Inteligencia Artificial Aplicada (MNA)</font> </center>
 
-Corrección de iluminación como preprocesamiento para estimación de profundidad monocular en endoscopía.
+<center>
+
+[![Institución](https://img.shields.io/badge/INSTITUCIÓN-TECNOLÓGICO_DE_MONTERREY-0036a3?style=for-the-badge)](https://tec.mx)
+[![Programa](https://img.shields.io/badge/PROGRAMA-MNA-0036a3?style=for-the-badge)](https://tec.mx)
+[![Materia](https://img.shields.io/badge/MATERIA-PROYECTO_INTEGRADOR-E0A800?style=for-the-badge&logoColor=white)](https://tec.mx)
+
+</center>
+
+<center>
+
+[![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Jupyter](https://img.shields.io/badge/Jupyter-F37626?style=flat-square&logo=jupyter&logoColor=white)](https://jupyter.org/)
+[![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white)](https://numpy.org/)
+[![OpenCV](https://img.shields.io/badge/OpenCV-5C3EE8?style=flat-square&logo=opencv&logoColor=white)](https://opencv.org/)
+[![GitHub](https://img.shields.io/badge/Repo-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/jmtoral/proyecto_integrador_52)
+
+</center>
+
+---
+
+# La luz que opaca
+### Detección y supresión de reflejos especulares en imágenes endoscópicas
+
+**Materia:** Proyecto Integrador — TC5035.10
+
+---
+
+### Equipo Docente
+* **Dra. Grettel Barceló Alonso** | Profesora Titular
+* **Dr. Luis Eduardo Falcón Morales** | Profesor Titular
+* **Mtra. Verónica Sandra Guzmán de Valle** | Profesora Asistente
+
+**Patrocinador:** Dr. Gerardo Camacho
+
+---
+
+## Equipo 52
+
+<table style="width:100%; border:none; border-collapse:collapse;">
+  <tr>
+    <td align="center" style="border:none; width:33%; padding:10px;">
+      <img src="https://ui-avatars.com/api/?name=Elda+Morales&size=140&background=0036a3&color=fff&rounded=true" width="140px" style="border-radius:10px;">
+      <br>
+      <h4>Elda Cristina Morales Sánchez de la Barquera</h4>
+      <code>A00449074</code><br>
+      <small>MNA Student</small>
+    </td>
+    <td align="center" style="border:none; width:33%; padding:10px;">
+      <img src="https://ui-avatars.com/api/?name=Maria+Gutierrez&size=140&background=0036a3&color=fff&rounded=true" width="140px" style="border-radius:10px;">
+      <br>
+      <h4>María Paula Gutiérrez Cervantes</h4>
+      <code>A01747706</code><br>
+      <small>MNA Student</small>
+    </td>
+    <td align="center" style="border:none; width:33%; padding:10px;">
+      <img src="https://ui-avatars.com/api/?name=Jose+Toral&size=140&background=0036a3&color=fff&rounded=true" width="140px" style="border-radius:10px;">
+      <br>
+      <h4>José Manuel Toral Cruz</h4>
+      <code>A01122243</code><br>
+      <small>MNA Student</small>
+    </td>
+  </tr>
+</table>
+
+---
 
 ## Descripción
 
@@ -80,22 +144,18 @@ Todo el dataset puede leerse **directamente del ZIP en memoria** (`io.BytesIO`) 
 
 ## EDA
 
-El notebook [`notebooks/00_exploracion_scared.ipynb`](notebooks/00_exploracion_scared.ipynb) contiene la exploración inicial del dataset SCARED. Responde tres preguntas básicas:
+| Notebook | Dataset | Contenido |
+|---|---|---|
+| [`00_exploracion_scared.ipynb`](notebooks/00_exploracion_scared.ipynb) | SCARED | Estructura, formatos, dimensiones, rangos de profundidad |
+| [`01_eda_iluminacion.ipynb`](notebooks/01_eda_iluminacion.ipynb) | SCARED | Gradiente radial, INU, especulares, correlación luminancia-GT |
+| [`02_hamlyn_eda.ipynb`](notebooks/02_hamlyn_eda.ipynb) | Hamlyn | Exploración de secuencias estéreo in-vivo |
+| [`03_eda_calidad_input.ipynb`](notebooks/03_eda_calidad_input.ipynb) | SCARED | Calidad de video, flujo óptico, poses, cobertura GT en frames |
 
-1. **¿Qué hay en cada ZIP?** — Cantidad de keyframes, archivos y tamaños por dataset.
-2. **¿Cómo se ve cada tipo de archivo?** — Visualización de PNG, TIFF, OBJ, YAML, MP4, TAR.GZ.
-3. **¿Qué dimensiones y rangos tienen los datos?** — Resoluciones, rangos de profundidad, cobertura de GT.
-
-**Hallazgos principales:**
-
-- Resolución de imágenes: **1280×1024 px** en todos los keyframes.
-- El endoscopio opera a **40–130 mm** del tejido según el keyframe.
-- La cobertura de GT varía entre **~70% y ~87%** de los píxeles; el resto son reflejos especulares y bordes de curvatura extrema donde el structured light no puede triangular.
-- El gradiente de iluminación es visible y medible: la luminancia cae del centro hacia los bordes de forma consistente.
-- Los archivos `.obj` tienen vértices parseables directamente de líneas `v x y z`.
-- `dataset_8` y `dataset_9` indexan keyframes desde 0 — no hardcodear nombres de keyframe.
-
-Los outputs del EDA (PNGs y CSVs) están en [`outcomes/eda_outputs/`](outcomes/eda_outputs/).
+**Hallazgos principales del EDA de iluminación (`01_eda_iluminacion`):**
+- El gradiente radial afecta todos los keyframes: el centro es entre 1.3x y 3.3x más brillante que el borde.
+- El gradiente no es simétrico: el pico de luminancia coincide con el centro óptico (cx=597, cy=520), no con el centro geométrico (640, 512).
+- Existe correlación negativa fuerte entre luminancia y cobertura de GT (r hasta -0.86): las zonas más brillantes son las que menos datos de entrenamiento tienen.
+- El keyframe más problemático es KF5 (INU=0.665, GT válido=71.9%).
 
 ## Variables del experimento
 
@@ -121,11 +181,16 @@ La corrección de iluminación transforma `X_crudo → X_corrected` antes de pas
 │   └── raw/                # Datos originales (no tracked en git)
 ├── docs/                   # Notas metodológicas
 ├── notebooks/
-│   └── 00_exploracion_scared.ipynb  # EDA inicial de archivos y formatos
+│   ├── 00_exploracion_scared.ipynb
+│   ├── 01_eda_iluminacion.ipynb
+│   ├── 02_hamlyn_eda.ipynb
+│   └── 03_eda_calidad_input.ipynb
 ├── outcomes/
 │   └── eda_outputs/        # PNGs y CSVs del EDA
 ├── reports/
-│   └── figures/
+│   ├── figures/            # Imágenes para los reportes
+│   ├── 00_reporte_exploracion_scared.md
+│   └── 01_reporte_eda_iluminacion.md
 ├── scripts/
 ├── src/
 │   └── laluzqueopaca/
@@ -139,9 +204,9 @@ La corrección de iluminación transforma `X_crudo → X_corrected` antes de pas
 
 ## Siguientes pasos
 
-1. `01_eda_iluminacion.ipynb` — Análisis cuantitativo del gradiente de iluminación en los keyframes de SCARED.
-2. Implementar el método de corrección de iluminación sobre los keyframes.
-3. Correr MonoIIT sobre las imágenes crudas y corregidas; comparar AbsRel/RMSE.
+1. Implementar los métodos de corrección de iluminación: CLAHE, Retinex, MonoIIF.
+2. Correr NeXF, EndoGaussian y EndoDepthAndMotion sobre imágenes crudas y corregidas.
+3. Comparar AbsRel, RMSE, SSIM, PSNR y Chamfer Distance entre condiciones.
 4. Extender el análisis a los frames de `rgb.mp4` + `scene_points.tar.gz` para evaluación temporal.
 5. Integrar Hamlyn y C3VD para validar la generalización del método.
 
