@@ -55,7 +55,7 @@
       <small>MNA Student</small>
     </td>
     <td align="center" style="border:none; width:33%; padding:10px;">
-      <img src="https://raw.githubusercontent.com/jmtoral/proyecto_integrador_52/main/reports/figures/jmtc.jpg" width="140px" style="border-radius:10px;">
+      <img src="https://raw.githubusercontent.com/jmtoral/proyecto_integrador_52/main/reports/jmtc.jpg" width="140px" style="border-radius:10px;">
       <br>
       <h4>José Manuel Toral Cruz</h4>
       <code>A01122243</code><br>
