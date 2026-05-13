@@ -1,6 +1,6 @@
 # Reporte de Exploración: Dataset C3VDv2
 
-**Notebook:** `notebooks/00_exploracion_c3vdv2.ipynb`
+**Notebook:** `notebooks/04_exploracion_c3vdv2.ipynb`
 **Fecha de ejecución:** 2026-05-11
 **Autor:** Proyecto Integrador — Comparativa de Métodos de Reconstrucción 3D en Colonoscopía
 
