@@ -55,7 +55,7 @@
       <small>MNA Student</small>
     </td>
     <td align="center" style="border:none; width:33%; padding:10px;">
-      <img src="https://ui-avatars.com/api/?name=Jose+Toral&size=140&background=0036a3&color=fff&rounded=true" width="140px" style="border-radius:10px;">
+      <img src="https://raw.githubusercontent.com/jmtoral/proyecto_integrador_52/main/reports/figures/jmtc.jpg" width="140px" style="border-radius:10px;">
       <br>
       <h4>José Manuel Toral Cruz</h4>
       <code>A01122243</code><br>
@@ -66,13 +66,20 @@
 
 ---
 
+## Entregas
+
+### Avance 1 — Análisis Exploratorio de Datos
+
+El reporte ejecutivo del Avance 1 está disponible en [`reports/Avance1.52.pdf`](reports/Avance1.52.pdf). Consolida los hallazgos de los análisis exploratorios sobre los tres datasets y constituye la entrega formal para evaluación docente.
+
+
 ## Descripción
 
-Este repositorio contiene el proyecto integrador de maestría, cuyo objetivo es evaluar si la corrección del gradiente de iluminación del endoscopio mejora el desempeño de modelos de estimación de profundidad monocular en video endoscópico.
+Este repositorio contiene el Proyecto Integrador para la Maestría de Inteligencia Artifical Aplicada. EL objetivo del proyecto es evaluar tres modelos de reconstrucción de imágenes endoscópicas en 3D y evaluar su desempeño con tres datasets. 
 
-Los datos empleados en esta investigación responden a una naturaleza semiestructurada y no tabular. A diferencia de los datasets tabulares convencionales donde cada observación es una fila y cada variable una columna, los datos endoscópicos se organizan como secuencias de video estéreo, mapas de profundidad tridimensionales, nubes de puntos y archivos de calibración de cámara que deben interpretarse conjuntamente para tener significado clínico.
+Los datos empleados en esta investigación responden a una naturaleza semiestructurada y no tabular. A diferencia de los datasets tabulares convencionales donde cada observación es una fila y cada variable una columna, los datos endoscópicos se organizan como secuencias de video estéreo, mapas de profundidad tridimensionales, nubes de puntos y archivos de calibración de cámara que deben interpretarse conjuntamente..
 
-El pipeline completo es:
+El pipeline hasta el momento es el siguiente:
 
 ```
 video endoscópico (RGB crudo)
@@ -86,7 +93,7 @@ video endoscópico (RGB crudo)
   evaluación vs. GT de structured light  (AbsRel, RMSE, Chamfer Distance)
 ```
 
-La hipótesis es que eliminar el gradiente radial de iluminación — más brillante en el centro, oscuro en los bordes — reduce el error de profundidad, especialmente en la periferia de la imagen donde la validez del GT cae más rápido.
+La hipótesis es que eliminar el gradiente radial de iluminación (más brillante en el centro, oscuro en los bordes) reduce el error de profundidad, especialmente en la periferia de la imageb.
 
 ## Datasets
 
@@ -94,7 +101,7 @@ Se trabajan con tres bases de datos clínicas endoscópicas:
 
 ### SCARED
 
-**SCARED** (Structured light endoscopY And Reconstructed Depth) ofrece mapas de profundidad reales capturados con luz estructurada sobre tejido porcino (Allan et al., 2021). Es el dataset principal del proyecto.
+**SCARED** (Structured light endoscopY And Reconstructed Depth) ofrece mapas de profundidad reales capturados con luz estructurada sobre tejido porcino ex-vivo (Allan et al., 2021). Es el dataset principal del proyecto.
 
 El dataset completo (versión extendida en HuggingFace) contiene **9 datasets** de diferentes cerdos o sesiones, cada uno con **5 keyframes** — aproximadamente **45 keyframes** en total, ~250 GB en disco.
 
@@ -126,27 +133,8 @@ Los datos crudos no están en el repositorio por su tamaño.
 
 **C3VD** (Colonoscopy 3D Video Dataset) aporta realismo clínico mediante maniquíes con mapas de referencia a nivel de píxel (Golhar et al., 2025).
 
-## Estructura de archivos y formatos
 
-Entender la organización física de los archivos en carpetas es fundamental para extraer y emparejar sus contenidos correctamente. Cada tipo de archivo tiene un rol específico:
 
-| Tipo | Extensión | Contenido | Cómo se lee |
-|---|---|---|---|
-| Imagen RGB | `.png` | Foto del tejido (uint8, 0–255) | `cv2.imdecode` |
-| Mapa de profundidad | `.tiff` | Coordenadas XYZ por píxel (float32, mm) | `tifffile.imread` |
-| Nube de puntos GT | `.obj` | Vértices 3D en texto plano | Parseo manual de líneas `v ` |
-| Calibración | `.yaml` | Matriz intrínseca K | `cv2.FileStorage` |
-| Video de movimiento | `.mp4` | Frames L+R apilados verticalmente | `cv2.VideoCapture` / ffmpeg |
-| Poses por cuadro | `frame_data.tar.gz` | JSONs con transformaciones de cámara | `tarfile` + `json.load` |
-| Depths warpeados | `scene_points.tar.gz` | TIFFs de profundidad por cuadro de video | `tarfile` + `tifffile` |
-
-Todo el dataset puede leerse **directamente del ZIP en memoria** (`io.BytesIO`) sin extraer nada al disco.
-
-## Entregas
-
-### Avance 1 — Análisis Exploratorio de Datos
-
-El reporte ejecutivo del Avance 1 está disponible en [`reports/Avance1.52.pdf`](reports/Avance1.52.pdf). Consolida los hallazgos de los análisis exploratorios sobre los tres datasets y constituye la entrega formal para evaluación docente.
 
 ## EDA
 
@@ -158,11 +146,6 @@ El reporte ejecutivo del Avance 1 está disponible en [`reports/Avance1.52.pdf`]
 | [`Avance2_Equipo_52_03_eda_calidad_input.ipynb`](notebooks/Avance2_Equipo_52_03_eda_calidad_input.ipynb) | SCARED | Calidad de video, flujo óptico, poses, cobertura GT en frames |
 | [`Avance2_Equipo_52_04_exploracion_C3VDv2.ipynb`](notebooks/Avance2_Equipo_52_04_exploracion_C3VDv2.ipynb) | C3VD | Exploración del dataset de colonoscopía 3D |
 
-**Hallazgos principales del EDA de iluminación (`01_eda_iluminacion`):**
-- El gradiente radial afecta todos los keyframes: el centro es entre 1.3x y 3.3x más brillante que el borde.
-- El gradiente no es simétrico: el pico de luminancia coincide con el centro óptico (cx=597, cy=520), no con el centro geométrico (640, 512).
-- Existe correlación negativa fuerte entre luminancia y cobertura de GT (r hasta -0.86): las zonas más brillantes son las que menos datos de entrenamiento tienen.
-- El keyframe más problemático es KF5 (CV de luminancia=0.665, GT válido=71.9%).
 
 ## Variables del experimento
 
@@ -213,17 +196,16 @@ La corrección de iluminación transforma `X_crudo → X_corrected` antes de pas
 
 ## Siguientes pasos
 
-1. Implementar los métodos de corrección de iluminación: CLAHE, Retinex, MonoIIF.
+1. Implementar los métodos de corrección de iluminación: CLAHE, Retinex, MonoIIT.
 2. Correr NeXF, EndoGaussian y EndoDepthAndMotion sobre imágenes crudas y corregidas.
 3. Comparar AbsRel, RMSE, SSIM, PSNR y Chamfer Distance entre condiciones.
-4. Extender el análisis a los frames de `rgb.mp4` + `scene_points.tar.gz` para evaluación temporal.
-5. Integrar Hamlyn y C3VD para validar la generalización del método.
+4. Integrar Hamlyn y C3VD para validar la generalización del método.
 
 ## Nota sobre uso de inteligencia artificial
 
 El análisis de datos, el código, la interpretación de resultados y las decisiones metodológicas son trabajo del Equipo 52. Para la revisión de estilo en la redacción, la incorporación de buenas prácticas de código y la gestión del repositorio se utilizó [Claude](https://claude.ai) (Anthropic, modelo `claude-sonnet-4-6`) como asistente de productividad.
 
-Todo contenido generado con asistencia de IA fue revisado, validado y aprobado por los integrantes del equipo antes de incorporarse al repositorio. Los autores son responsables de la exactitud técnica y académica de este trabajo.
+*Todo contenido generado con asistencia de IA fue revisado, validado y aprobado por lxs integrantes del equipo antes de incorporarse al repositorio. Lxs autorxs son responsables de la exactitud técnica y académica de este trabajo.*
 
 ## Referencias
 
