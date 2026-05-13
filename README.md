@@ -142,14 +142,21 @@ Entender la organización física de los archivos en carpetas es fundamental par
 
 Todo el dataset puede leerse **directamente del ZIP en memoria** (`io.BytesIO`) sin extraer nada al disco.
 
+## Entregas
+
+### Avance 1 — Análisis Exploratorio de Datos
+
+El reporte ejecutivo del Avance 1 está disponible en [`reports/Avance1.52.pdf`](reports/Avance1.52.pdf). Consolida los hallazgos de los análisis exploratorios sobre los tres datasets y constituye la entrega formal para evaluación docente.
+
 ## EDA
 
 | Notebook | Dataset | Contenido |
 |---|---|---|
-| [`00_exploracion_scared.ipynb`](notebooks/00_exploracion_scared.ipynb) | SCARED | Estructura, formatos, dimensiones, rangos de profundidad |
-| [`01_eda_iluminacion.ipynb`](notebooks/01_eda_iluminacion.ipynb) | SCARED | Gradiente radial, CV de luminancia, especulares, correlación luminancia-GT |
-| [`02_hamlyn_eda.ipynb`](notebooks/02_hamlyn_eda.ipynb) | Hamlyn | Exploración de secuencias estéreo in-vivo |
-| [`03_eda_calidad_input.ipynb`](notebooks/03_eda_calidad_input.ipynb) | SCARED | Calidad de video, flujo óptico, poses, cobertura GT en frames |
+| [`Avance2_Equipo_52_00_exploracion_scared.ipynb`](notebooks/Avance2_Equipo_52_00_exploracion_scared.ipynb) | SCARED | Estructura, formatos, dimensiones, rangos de profundidad |
+| [`Avance2_Equipo_52_01_eda_iluminacion.ipynb`](notebooks/Avance2_Equipo_52_01_eda_iluminacion.ipynb) | SCARED | Gradiente radial, CV de luminancia, especulares, correlación luminancia-GT |
+| [`Avance2_Equipo_52_02_hamlyn_eda.ipynb`](notebooks/Avance2_Equipo_52_02_hamlyn_eda.ipynb) | Hamlyn | Exploración de secuencias estéreo in-vivo |
+| [`Avance2_Equipo_52_03_eda_calidad_input.ipynb`](notebooks/Avance2_Equipo_52_03_eda_calidad_input.ipynb) | SCARED | Calidad de video, flujo óptico, poses, cobertura GT en frames |
+| [`Avance2_Equipo_52_04_exploracion_C3VDv2.ipynb`](notebooks/Avance2_Equipo_52_04_exploracion_C3VDv2.ipynb) | C3VD | Exploración del dataset de colonoscopía 3D |
 
 **Hallazgos principales del EDA de iluminación (`01_eda_iluminacion`):**
 - El gradiente radial afecta todos los keyframes: el centro es entre 1.3x y 3.3x más brillante que el borde.
@@ -181,14 +188,16 @@ La corrección de iluminación transforma `X_crudo → X_corrected` antes de pas
 │   └── raw/                # Datos originales (no tracked en git)
 ├── docs/                   # Notas metodológicas
 ├── notebooks/
-│   ├── 00_exploracion_scared.ipynb
-│   ├── 01_eda_iluminacion.ipynb
-│   ├── 02_hamlyn_eda.ipynb
-│   └── 03_eda_calidad_input.ipynb
+│   ├── Avance2_Equipo_52_00_exploracion_scared.ipynb
+│   ├── Avance2_Equipo_52_01_eda_iluminacion.ipynb
+│   ├── Avance2_Equipo_52_02_hamlyn_eda.ipynb
+│   ├── Avance2_Equipo_52_03_eda_calidad_input.ipynb
+│   └── Avance2_Equipo_52_04_exploracion_C3VDv2.ipynb
 ├── outcomes/
 │   └── eda_outputs/        # PNGs y CSVs del EDA
 ├── reports/
 │   ├── figures/            # Imágenes para los reportes
+│   ├── Avance1.52.pdf      # Reporte ejecutivo Avance 1 (entrega formal)
 │   ├── 00_reporte_exploracion_scared.md
 │   └── 01_reporte_eda_iluminacion.md
 ├── scripts/
@@ -209,6 +218,12 @@ La corrección de iluminación transforma `X_crudo → X_corrected` antes de pas
 3. Comparar AbsRel, RMSE, SSIM, PSNR y Chamfer Distance entre condiciones.
 4. Extender el análisis a los frames de `rgb.mp4` + `scene_points.tar.gz` para evaluación temporal.
 5. Integrar Hamlyn y C3VD para validar la generalización del método.
+
+## Nota sobre uso de inteligencia artificial
+
+El análisis de datos, el código, la interpretación de resultados y las decisiones metodológicas son trabajo del Equipo 52. Para la revisión de estilo en la redacción, la incorporación de buenas prácticas de código y la gestión del repositorio se utilizó [Claude](https://claude.ai) (Anthropic, modelo `claude-sonnet-4-6`) como asistente de productividad.
+
+Todo contenido generado con asistencia de IA fue revisado, validado y aprobado por los integrantes del equipo antes de incorporarse al repositorio. Los autores son responsables de la exactitud técnica y académica de este trabajo.
 
 ## Referencias
 
