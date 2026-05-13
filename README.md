@@ -140,11 +140,11 @@ Los datos crudos no están en el repositorio por su tamaño.
 
 | Notebook | Dataset | Contenido |
 |---|---|---|
-| [`Avance2_Equipo_52_00_exploracion_scared.ipynb`](notebooks/Avance2_Equipo_52_00_exploracion_scared.ipynb) | SCARED | Estructura, formatos, dimensiones, rangos de profundidad |
-| [`Avance2_Equipo_52_01_eda_iluminacion.ipynb`](notebooks/Avance2_Equipo_52_01_eda_iluminacion.ipynb) | SCARED | Gradiente radial, CV de luminancia, especulares, correlación luminancia-GT |
-| [`Avance2_Equipo_52_02_hamlyn_eda.ipynb`](notebooks/Avance2_Equipo_52_02_hamlyn_eda.ipynb) | Hamlyn | Exploración de secuencias estéreo in-vivo |
+| [`Avance1_Equipo52_00_exploracion_scared.ipynb`](notebooks/Avance1_Equipo52_00_exploracion_scared.ipynb) | SCARED | Estructura, formatos, dimensiones, rangos de profundidad |
+| [`Avance1_Equipo52_01_eda_iluminacion.ipynb`](notebooks/Avance1_Equipo52_01_eda_iluminacion.ipynb) | SCARED | Gradiente radial, CV de luminancia, especulares, correlación luminancia-GT |
+| [`Avance1_Equipo52_02_hamlyn_eda.ipynb`](notebooks/Avance1_Equipo52_02_hamlyn_eda.ipynb) | Hamlyn | Exploración de secuencias estéreo in-vivo |
 | [`Avance2_Equipo_52_03_eda_calidad_input.ipynb`](notebooks/Avance2_Equipo_52_03_eda_calidad_input.ipynb) | SCARED | Calidad de video, flujo óptico, poses, cobertura GT en frames |
-| [`Avance2_Equipo_52_04_exploracion_C3VDv2.ipynb`](notebooks/Avance2_Equipo_52_04_exploracion_C3VDv2.ipynb) | C3VD | Exploración del dataset de colonoscopía 3D |
+| [`Avance1_Equipo52_04_exploracion_C3VDv2.ipynb`](notebooks/Avance1_Equipo52_04_exploracion_C3VDv2.ipynb) | C3VD | Exploración del dataset de colonoscopía 3D |
 
 
 ## Variables del experimento
@@ -171,11 +171,11 @@ La corrección de iluminación transforma `X_crudo → X_corrected` antes de pas
 │   └── raw/                # Datos originales (no tracked en git)
 ├── docs/                   # Notas metodológicas
 ├── notebooks/
-│   ├── Avance2_Equipo_52_00_exploracion_scared.ipynb
-│   ├── Avance2_Equipo_52_01_eda_iluminacion.ipynb
-│   ├── Avance2_Equipo_52_02_hamlyn_eda.ipynb
+│   ├── Avance1_Equipo52_00_exploracion_scared.ipynb
+│   ├── Avance1_Equipo52_01_eda_iluminacion.ipynb
+│   ├── Avance1_Equipo52_02_hamlyn_eda.ipynb
 │   ├── Avance2_Equipo_52_03_eda_calidad_input.ipynb
-│   └── Avance2_Equipo_52_04_exploracion_C3VDv2.ipynb
+│   └── Avance1_Equipo52_04_exploracion_C3VDv2.ipynb
 ├── outcomes/
 │   └── eda_outputs/        # PNGs y CSVs del EDA
 ├── reports/
