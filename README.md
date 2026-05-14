@@ -15,6 +15,7 @@
 [![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white)](https://numpy.org/)
 [![OpenCV](https://img.shields.io/badge/OpenCV-5C3EE8?style=flat-square&logo=opencv&logoColor=white)](https://opencv.org/)
 [![GitHub](https://img.shields.io/badge/Repo-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/jmtoral/proyecto_integrador_52)
+[![Sitio Web](https://img.shields.io/badge/Sitio_Web-GitHub_Pages-0036a3?style=flat-square&logo=github&logoColor=white)](https://jmtoral.github.io/proyecto_integrador_52/)
 
 </center>
 
