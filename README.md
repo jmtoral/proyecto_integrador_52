@@ -72,6 +72,10 @@
 
 El reporte ejecutivo del Avance 1 está disponible en [`reports/Avance1.52.pdf`](reports/Avance1.52.pdf). Consolida los hallazgos de los análisis exploratorios sobre los tres datasets y constituye la entrega formal para evaluación docente.
 
+### Avance 2 — Ingeniería de Características
+
+El notebook [`Avance2_52_Feature_Engineering.ipynb`](notebooks/Avance2_52_Feature_Engineering.ipynb) implementa el pipeline completo de ingeniería de características: extracción de features por keyframe (imagen + profundidad + video), transformaciones (cap a 150 mm, log(Z+1), normalización min-max), selección por correlación y varianza, y PCA sobre la nube de puntos 3D. Produce un dataframe de 20 filas × N features (4 datasets × 5 keyframes) como insumo para la fase de modelado.
+
 
 ## Descripción
 
@@ -136,7 +140,9 @@ Los datos crudos no están en el repositorio por su tamaño.
 
 
 
-## EDA
+## Notebooks
+
+### Avance 1 — Análisis Exploratorio de Datos
 
 | Notebook | Dataset | Contenido |
 |---|---|---|
@@ -145,6 +151,12 @@ Los datos crudos no están en el repositorio por su tamaño.
 | [`Avance1_Equipo52_02_hamlyn_eda.ipynb`](notebooks/Avance1_Equipo52_02_hamlyn_eda.ipynb) | Hamlyn | Exploración de secuencias estéreo in-vivo |
 | [`Avance2_Equipo_52_03_eda_calidad_input.ipynb`](notebooks/Avance2_Equipo_52_03_eda_calidad_input.ipynb) | SCARED | Calidad de video, flujo óptico, poses, cobertura GT en frames |
 | [`Avance1_Equipo52_04_exploracion_C3VDv2.ipynb`](notebooks/Avance1_Equipo52_04_exploracion_C3VDv2.ipynb) | C3VD | Exploración del dataset de colonoscopía 3D |
+
+### Avance 2 — Ingeniería de Características
+
+| Notebook | Dataset | Contenido |
+|---|---|---|
+| [`Avance2_52_Feature_Engineering.ipynb`](notebooks/Avance2_52_Feature_Engineering.ipynb) | SCARED | Construcción de dataframe por keyframe, transformaciones (cap, log, min-max), selección y PCA geométrico |
 
 
 ## Variables del experimento
