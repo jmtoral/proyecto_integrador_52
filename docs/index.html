@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La luz que opaca — Equipo 52 · MNA Tec de Monterrey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --m50:#F0F8FE;--m100:#DDEEFC;--m200:#C3E2FA;--m300:#99D0F7;
+  --m400:#69B7F1;--m500:#4599EC;--m700:#2766CB;--m800:#2654A7;
+  --m900:#244984;--m950:#1A2E51;--gold:#E0A800;
+  --ff-serif:'Playfair Display',Georgia,serif;
+  --ff-sans:'Inter',system-ui,sans-serif;
+  --ff-mono:'JetBrains Mono',monospace;
+  --nav-h:64px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--ff-sans);background:var(--m950);color:#e8f4fd;overflow-x:hidden;}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+
+/* ── Nav ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:var(--nav-h);
+  background:rgba(26,46,81,.75);backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(69,153,236,.18);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(1rem,4vw,3rem);transition:background .3s;}
+nav.scrolled{background:rgba(26,46,81,.95);}
+.nav-brand{display:flex;align-items:center;gap:.6rem;}
+.nav-brand .dot{width:10px;height:10px;border-radius:50%;background:var(--m500);box-shadow:0 0 8px var(--m500);}
+.nav-brand span{font-family:var(--ff-mono);font-size:.8rem;color:var(--m300);letter-spacing:.05em;}
+.nav-links{display:flex;gap:1.8rem;list-style:none;}
+.nav-links a{font-size:.82rem;font-weight:500;color:var(--m200);letter-spacing:.04em;transition:color .2s;}
+.nav-links a:hover{color:var(--m400);}
+.nav-cta{background:var(--m500);color:#fff;padding:.45rem 1.1rem;border-radius:6px;
+  font-size:.82rem;font-weight:600;transition:background .2s,transform .15s;}
+.nav-cta:hover{background:var(--m700);transform:translateY(-1px);}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
+.hamburger span{width:24px;height:2px;background:var(--m300);border-radius:2px;transition:.3s;}
+.mobile-menu{display:none;position:fixed;top:var(--nav-h);left:0;right:0;
+  background:rgba(26,46,81,.97);padding:1.5rem 2rem;
+  flex-direction:column;gap:1.2rem;z-index:999;}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{color:var(--m200);font-size:1rem;font-weight:500;}
+@media(max-width:768px){.nav-links,.nav-cta{display:none;}.hamburger{display:flex;}}
+
+/* ── Hero ── */
+#hero{min-height:100vh;
+  background:linear-gradient(135deg,var(--m950) 0%,var(--m900) 50%,#1d3a6e 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:calc(var(--nav-h) + 2rem) 1.5rem 4rem;
+  position:relative;overflow:hidden;}
+#hero::before{content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(69,153,236,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(69,153,236,.07) 1px,transparent 1px);
+  background-size:48px 48px;animation:meshMove 20s linear infinite;}
+#hero::after{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 60%,rgba(39,102,203,.35) 0%,transparent 70%);}
+@keyframes meshMove{from{background-position:0 0;}to{background-position:48px 48px;}}
+.hero-content{position:relative;z-index:1;max-width:900px;}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(69,153,236,.15);border:1px solid rgba(69,153,236,.35);
+  border-radius:999px;padding:.35rem 1rem;margin-bottom:2rem;
+  font-family:var(--ff-mono);font-size:.75rem;color:var(--m300);letter-spacing:.08em;}
+.hero-badge .pulse{width:7px;height:7px;border-radius:50%;background:var(--m400);
+  animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.4);}}
+.hero-title{font-family:var(--ff-serif);font-size:clamp(2.8rem,7vw,5.5rem);
+  font-weight:900;line-height:1.05;color:#fff;margin-bottom:1rem;}
+.hero-title .accent{color:var(--m400);}
+.hero-sub{font-size:clamp(1rem,2.5vw,1.2rem);color:var(--m200);
+  max-width:680px;margin:0 auto 1.5rem;line-height:1.7;}
+.hero-problem{background:rgba(255,255,255,.05);border:1px solid rgba(69,153,236,.2);
+  border-radius:12px;padding:1.2rem 1.8rem;margin:0 auto 2rem;max-width:720px;
+  text-align:left;backdrop-filter:blur(6px);}
+.hero-problem p{font-size:.92rem;color:var(--m200);line-height:1.7;margin-bottom:.6rem;}
+.hero-problem p:last-child{margin-bottom:0;}
+.hero-problem strong{color:var(--m300);}
+.hero-metrics{display:flex;flex-wrap:wrap;justify-content:center;gap:1.2rem;margin-bottom:2.5rem;}
+.metric-chip{background:rgba(255,255,255,.06);border:1px solid rgba(69,153,236,.25);
+  border-radius:10px;padding:.8rem 1.4rem;text-align:center;backdrop-filter:blur(8px);}
+.metric-chip .num{font-family:var(--ff-mono);font-size:1.6rem;font-weight:700;color:var(--m400);}
+.metric-chip .lbl{font-size:.72rem;color:var(--m300);margin-top:.2rem;letter-spacing:.04em;}
+.hero-btns{display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;}
+.btn-primary{background:var(--m500);color:#fff;padding:.75rem 1.8rem;border-radius:8px;
+  font-weight:600;font-size:.95rem;box-shadow:0 4px 20px rgba(69,153,236,.4);
+  transition:background .2s,transform .15s,box-shadow .2s;}
+.btn-primary:hover{background:var(--m700);transform:translateY(-2px);box-shadow:0 6px 28px rgba(39,102,203,.5);}
+.btn-outline{border:1.5px solid var(--m400);color:var(--m300);padding:.75rem 1.8rem;
+  border-radius:8px;font-weight:600;font-size:.95rem;
+  transition:background .2s,color .2s,transform .15s;}
+.btn-outline:hover{background:rgba(69,153,236,.12);color:#fff;transform:translateY(-2px);}
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:.4rem;
+  color:var(--m400);font-size:.72rem;letter-spacing:.08em;animation:bob 2.5s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(6px);}}
+.scroll-hint svg{width:20px;opacity:.7;}
+
+/* ── General sections ── */
+section{padding:5rem clamp(1.2rem,5vw,5rem);}
+.section-label{font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.12em;
+  color:var(--m500);text-transform:uppercase;margin-bottom:.8rem;}
+.section-title{font-family:var(--ff-serif);font-size:clamp(1.8rem,4vw,2.8rem);
+  line-height:1.2;margin-bottom:1rem;}
+.section-body{font-size:1rem;line-height:1.75;max-width:720px;}
+
+/* ── Context (light) ── */
+#context{background:var(--m50);color:var(--m950);}
+#context .section-title{color:var(--m900);}
+#context .section-body{color:var(--m800);}
+.context-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;max-width:1100px;margin:0 auto;}
+@media(max-width:768px){.context-grid{grid-template-columns:1fr;}}
+.data-table{width:100%;border-collapse:collapse;margin-top:1.2rem;font-size:.85rem;}
+.data-table th{background:var(--m200);color:var(--m900);padding:.5rem .8rem;text-align:left;font-family:var(--ff-mono);}
+.data-table td{padding:.45rem .8rem;border-bottom:1px solid var(--m100);color:var(--m800);}
+.data-table tr:hover td{background:var(--m100);}
+.tag-severo{background:#fee2e2;color:#991b1b;border-radius:4px;padding:.1rem .4rem;font-size:.72rem;font-family:var(--ff-mono);}
+.tag-mod{background:#fef3c7;color:#92400e;border-radius:4px;padding:.1rem .4rem;font-size:.72rem;font-family:var(--ff-mono);}
+.tag-leve{background:#d1fae5;color:#065f46;border-radius:4px;padding:.1rem .4rem;font-size:.72rem;font-family:var(--ff-mono);}
+
+/* ── Cards ── */
+#problema{background:var(--m950);}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;margin-top:2.5rem;}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(69,153,236,.2);
+  border-radius:14px;padding:1.8rem;backdrop-filter:blur(6px);
+  transition:transform .25s,border-color .25s,box-shadow .25s;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--m700),var(--m400));
+  transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+.card:hover{transform:translateY(-4px);border-color:rgba(69,153,236,.45);box-shadow:0 12px 36px rgba(0,0,0,.35);}
+.card:hover::before{transform:scaleX(1);}
+.card-icon{font-size:2rem;margin-bottom:1rem;}
+.card h3{font-family:var(--ff-serif);font-size:1.15rem;color:var(--m300);margin-bottom:.6rem;}
+.card p{font-size:.9rem;color:var(--m200);line-height:1.65;}
+.card .stat-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem;}
+.card .stat-pill{background:rgba(69,153,236,.12);border:1px solid rgba(69,153,236,.2);
+  border-radius:4px;padding:.2rem .6rem;font-family:var(--ff-mono);font-size:.72rem;color:var(--m400);}
+
+/* ── Finding box ── */
+.finding-box{background:rgba(69,153,236,.08);border-left:3px solid var(--m500);
+  border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin-top:1.2rem;}
+.finding-box p{font-size:.88rem;color:var(--m200);line-height:1.65;}
+.finding-box strong{color:var(--m300);}
+
+/* ── Pipeline ── */
+#pipeline{background:linear-gradient(180deg,var(--m900) 0%,var(--m950) 100%);}
+.pipeline-flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;
+  gap:0;margin-top:3rem;max-width:1000px;margin-inline:auto;}
+.pipe-step{display:flex;flex-direction:column;align-items:center;text-align:center;
+  flex:1;min-width:130px;max-width:180px;}
+.pipe-bubble{width:72px;height:72px;border-radius:50%;background:rgba(39,102,203,.25);
+  border:2px solid var(--m700);display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;position:relative;box-shadow:0 0 20px rgba(69,153,236,.15);
+  transition:background .3s,box-shadow .3s;}
+.pipe-step:hover .pipe-bubble{background:rgba(69,153,236,.3);box-shadow:0 0 30px rgba(69,153,236,.35);}
+.pipe-label{font-size:.78rem;color:var(--m300);margin-top:.7rem;line-height:1.4;max-width:110px;font-family:var(--ff-mono);}
+.pipe-label strong{display:block;color:var(--m100);font-size:.85rem;margin-bottom:.2rem;}
+.pipe-arrow{color:var(--m700);font-size:1.5rem;padding:0 .4rem;align-self:center;margin-bottom:2.5rem;}
+.pipe-highlight .pipe-bubble{background:rgba(69,153,236,.4);border-color:var(--m400);box-shadow:0 0 30px rgba(69,153,236,.4);}
+.pipe-highlight .pipe-label{color:var(--m200);}
+.pipe-highlight .pipe-label strong{color:var(--m400);}
+
+/* ── Gallery ── */
+#resultados{background:var(--m100);color:var(--m950);}
+#resultados .section-title{color:var(--m900);}
+#resultados .section-body{color:var(--m800);}
+.gallery-tabs{display:flex;flex-wrap:wrap;gap:.6rem;margin:2rem 0 1.5rem;}
+.tab-btn{background:rgba(39,102,203,.08);border:1px solid rgba(39,102,203,.25);
+  color:var(--m800);padding:.45rem 1.1rem;border-radius:6px;
+  font-size:.82rem;font-family:var(--ff-mono);cursor:pointer;
+  transition:background .2s,color .2s,border-color .2s;}
+.tab-btn.active,.tab-btn:hover{background:var(--m700);color:#fff;border-color:var(--m700);}
+.gallery-panel{display:none;}
+.gallery-panel.active{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.2rem;}
+.gallery-item{border-radius:10px;overflow:hidden;border:1px solid rgba(39,102,203,.15);
+  box-shadow:0 4px 16px rgba(36,73,132,.1);transition:transform .25s,box-shadow .25s;
+  background:#fff;cursor:pointer;}
+.gallery-item:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(36,73,132,.18);}
+.gallery-item img{width:100%;height:240px;object-fit:cover;}
+.gallery-caption{padding:.8rem 1rem;font-size:.82rem;color:var(--m800);font-family:var(--ff-mono);}
+.gallery-caption em{display:block;font-style:normal;color:var(--m700);margin-top:.25rem;font-size:.77rem;}
+
+/* ── Findings (light) ── */
+#findings{background:var(--m50);color:var(--m950);}
+#findings .section-title{color:var(--m900);}
+.findings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-top:2rem;}
+.finding-card{background:#fff;border:1px solid var(--m200);border-radius:12px;padding:1.6rem;
+  box-shadow:0 4px 16px rgba(36,73,132,.06);}
+.finding-card .num{font-family:var(--ff-mono);font-size:2rem;font-weight:700;color:var(--m700);display:block;margin-bottom:.4rem;}
+.finding-card h3{font-family:var(--ff-serif);color:var(--m900);font-size:1.05rem;margin-bottom:.5rem;}
+.finding-card p{font-size:.88rem;color:var(--m800);line-height:1.65;}
+
+/* ── Datasets ── */
+#datasets{background:var(--m950);}
+.ds-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-top:2.5rem;}
+.ds-card{background:rgba(255,255,255,.04);border:1px solid rgba(69,153,236,.2);border-radius:14px;padding:1.8rem;}
+.ds-card h3{font-family:var(--ff-mono);color:var(--m400);font-size:1.1rem;margin-bottom:.5rem;}
+.ds-card .ds-tag{display:inline-block;background:rgba(39,102,203,.2);color:var(--m300);
+  font-size:.7rem;padding:.2rem .6rem;border-radius:4px;margin-bottom:.8rem;font-family:var(--ff-mono);}
+.ds-card p{font-size:.9rem;color:var(--m200);line-height:1.65;}
+.ds-stat{display:flex;gap:1.2rem;margin-top:1rem;flex-wrap:wrap;}
+.ds-stat span{font-family:var(--ff-mono);font-size:.75rem;color:var(--m400);}
+
+/* ── Team ── */
+#equipo{background:var(--m50);color:var(--m950);}
+#equipo .section-title{color:var(--m900);}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2rem;margin-top:2.5rem;}
+.team-card{background:#fff;border:1px solid var(--m200);border-radius:16px;padding:2rem 1.5rem;
+  text-align:center;box-shadow:0 4px 20px rgba(36,73,132,.08);
+  transition:transform .25s,box-shadow .25s;}
+.team-card:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(36,73,132,.14);}
+.team-avatar{width:100px;height:100px;border-radius:50%;margin:0 auto 1rem;
+  border:3px solid var(--m300);object-fit:cover;box-shadow:0 4px 16px rgba(39,102,203,.2);}
+.team-card h3{font-family:var(--ff-serif);font-size:1.1rem;color:var(--m900);margin-bottom:.3rem;}
+.team-card .tid{font-family:var(--ff-mono);font-size:.75rem;color:var(--m700);}
+.team-card p{font-size:.85rem;color:var(--m800);margin-top:.5rem;line-height:1.5;}
+.faculty-block{margin-top:3rem;padding-top:2rem;border-top:1px solid var(--m200);}
+.faculty-block h3{font-family:var(--ff-serif);color:var(--m900);margin-bottom:1rem;font-size:1.2rem;}
+.faculty-list{display:flex;flex-wrap:wrap;gap:1rem;}
+.faculty-chip{background:var(--m100);border:1px solid var(--m200);border-radius:8px;
+  padding:.6rem 1.1rem;font-size:.85rem;color:var(--m900);}
+.faculty-chip strong{color:var(--m800);}
+
+/* ── Bibliography ── */
+#biblio{background:var(--m950);}
+.biblio-list{margin-top:2rem;display:flex;flex-direction:column;gap:1.2rem;max-width:900px;}
+.biblio-item{background:rgba(255,255,255,.04);border:1px solid rgba(69,153,236,.15);
+  border-radius:10px;padding:1.2rem 1.5rem;display:grid;grid-template-columns:2.5rem 1fr;gap:.8rem;align-items:start;}
+.biblio-num{font-family:var(--ff-mono);font-size:1rem;font-weight:700;color:var(--m500);padding-top:.1rem;}
+.biblio-text{font-size:.88rem;color:var(--m200);line-height:1.7;}
+.biblio-text em{color:var(--m300);}
+.biblio-text a{color:var(--m400);text-decoration:underline;text-underline-offset:3px;}
+.biblio-text a:hover{color:var(--m300);}
+.biblio-tag{display:inline-block;background:rgba(39,102,203,.2);color:var(--m300);
+  font-family:var(--ff-mono);font-size:.68rem;padding:.15rem .5rem;border-radius:3px;margin-top:.4rem;}
+
+/* ── Footer ── */
+footer{background:#111d33;border-top:1px solid rgba(69,153,236,.1);
+  padding:2.5rem clamp(1.2rem,5vw,5rem);
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;}
+footer .brand{font-family:var(--ff-mono);font-size:.8rem;color:var(--m400);}
+footer .links{display:flex;gap:1.5rem;}
+footer .links a{font-size:.82rem;color:var(--m400);transition:color .2s;}
+footer .links a:hover{color:var(--m300);}
+footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;margin-top:.5rem;}
+
+/* ── Reveal ── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* ── Lightbox ── */
+.lightbox{position:fixed;inset:0;background:rgba(10,18,36,.92);z-index:2000;
+  display:none;align-items:center;justify-content:center;padding:1rem;}
+.lightbox.open{display:flex;}
+.lightbox img{max-height:90vh;max-width:95vw;border-radius:10px;box-shadow:0 0 60px rgba(0,0,0,.7);}
+.lightbox-close{position:absolute;top:1.5rem;right:1.5rem;color:var(--m300);
+  font-size:2rem;cursor:pointer;width:44px;height:44px;display:flex;
+  align-items:center;justify-content:center;border-radius:50%;
+  background:rgba(255,255,255,.08);transition:background .2s;}
+.lightbox-close:hover{background:rgba(255,255,255,.15);}
+</style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav id="nav">
+  <div class="nav-brand"><div class="dot"></div><span>Equipo 52 · MNA · TC5035.10</span></div>
+  <ul class="nav-links">
+    <li><a href="#context">El problema</a></li>
+    <li><a href="#problema">Artefactos</a></li>
+    <li><a href="#findings">Hallazgos</a></li>
+    <li><a href="#resultados">EDA</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#equipo">Equipo</a></li>
+    <li><a href="#biblio">Referencias</a></li>
+  </ul>
+  <a href="https://github.com/jmtoral/proyecto_integrador_52" target="_blank" class="nav-cta">GitHub →</a>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#context"   onclick="closeMobile()">El problema</a>
+  <a href="#problema"  onclick="closeMobile()">Artefactos</a>
+  <a href="#findings"  onclick="closeMobile()">Hallazgos</a>
+  <a href="#resultados" onclick="closeMobile()">EDA</a>
+  <a href="#pipeline"  onclick="closeMobile()">Pipeline</a>
+  <a href="#equipo"    onclick="closeMobile()">Equipo</a>
+  <a href="#biblio"    onclick="closeMobile()">Referencias</a>
+  <a href="https://github.com/jmtoral/proyecto_integrador_52" target="_blank">GitHub →</a>
+</div>
+
+<!-- ── Hero ── -->
+<section id="hero">
+  <div class="hero-content">
+    <div class="hero-badge"><span class="pulse"></span> Proyecto Integrador · MNA Tec de Monterrey · 2026</div>
+    <h1 class="hero-title">La luz que<br><span class="accent">opaca</span></h1>
+    <p class="hero-sub">Detección y supresión de reflejos especulares en imágenes endoscópicas para mejorar la estimación de profundidad 3D en cirugía laparoscópica.</p>
+
+    <div class="hero-problem">
+      <p><strong>El problema en una oración:</strong> el endoscopio lleva su propia fuente de luz, lo que produce imágenes con el centro 2–3× más brillante que los bordes — y ese gradiente no es información del tejido, es un artefacto del instrumento que los modelos de IA confunden con textura real.</p>
+      <p>Los modelos de profundidad monocular (NeXF, EndoGaussian, EndoDepthAndMotion) aprenden este patrón sistemático y lo incorporan como "conocimiento" sobre la escena. El resultado es que el mapa de profundidad estimado hereda el sesgo de iluminación del endoscopio, con errores mayores en la periferia donde la luz es más débil. <strong>La hipótesis del proyecto es que corregir la iluminación antes de entrenar reduce ese error de forma medible.</strong></p>
+    </div>
+
+    <div class="hero-metrics">
+      <div class="metric-chip"><div class="num">3.26×</div><div class="lbl">Ratio centro/borde máx.</div></div>
+      <div class="metric-chip"><div class="num">−0.86</div><div class="lbl">Correlación lum. vs GT</div></div>
+      <div class="metric-chip"><div class="num">~22%</div><div class="lbl">GT faltante por keyframe</div></div>
+      <div class="metric-chip"><div class="num">229 GB</div><div class="lbl">Dataset SCARED total</div></div>
+    </div>
+    <div class="hero-btns">
+      <a href="#findings" class="btn-primary">Ver hallazgos EDA</a>
+      <a href="https://github.com/jmtoral/proyecto_integrador_52" target="_blank" class="btn-outline">Repositorio GitHub</a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+</section>
+
+<!-- ── Context ── -->
+<section id="context">
+  <div class="context-grid">
+    <div class="reveal">
+      <div class="section-label">// contexto</div>
+      <h2 class="section-title">¿Qué es SCARED y por qué importa la iluminación?</h2>
+      <p class="section-body">
+        El dataset <strong>SCARED</strong> (<em>Stereo Correspondence and Reconstruction of Endoscopic Data</em>, MICCAI 2019) contiene imágenes RGB estéreo de tejido porcino ex-vivo iluminado con un endoscopio laparoscópico da Vinci, junto con mapas de profundidad de ground truth capturados con luz estructurada.
+      </p>
+      <br>
+      <p class="section-body">
+        Cada keyframe incluye: un par estéreo RGB 1280×1024 px, un TIFF float32 con coordenadas XYZ en mm, una nube de puntos OBJ y un video del procedimiento. La profundidad del tejido oscila entre <strong>35 y 176 mm</strong>, con una mediana de ~58 mm. La cobertura del ground truth varía entre 72% y 87% según el keyframe — el resto son zonas donde el sensor no pudo triangular.
+      </p>
+      <br>
+      <p class="section-body">
+        El gradiente de iluminación radial es el artefacto central del proyecto. No es ruido aleatorio: es un patrón determinista y reproducible generado por la geometría coaxial del endoscopio. La cámara izquierda tiene su centro óptico en <strong>cx=597, cy=520</strong> (calibración YAML), desplazado 43 px del centro geométrico (640, 512), lo que hace el gradiente asimétrico y exige estimación explícita de la envolvente de iluminación para corregirlo.
+      </p>
+      <div class="finding-box">
+        <p><strong>Hallazgo estructural:</strong> <code>dataset_8</code> y <code>dataset_9</code> indexan sus keyframes desde 0 (<code>keyframe_0…keyframe_4</code>) en lugar de desde 1, a diferencia de los datasets 1–7. Todo código debe manejar esto programáticamente para evitar errores silenciosos.</p>
+      </div>
+    </div>
+    <div class="reveal">
+      <img src="img/12_illumination_gradient.png" alt="Gradiente de iluminación endoscópica"
+           style="border-radius:12px;box-shadow:0 8px 32px rgba(36,73,132,.15);border:1px solid var(--m200);margin-bottom:1.2rem;">
+      <h4 style="color:var(--m900);font-size:.9rem;margin-bottom:.8rem;font-family:var(--ff-mono);">Volumetría del dataset</h4>
+      <table class="data-table">
+        <thead><tr><th>Dataset</th><th>Keyframes</th><th>Tamaño</th></tr></thead>
+        <tbody>
+          <tr><td>dataset_1 – 7</td><td>kf_1 … kf_5</td><td>~25 GB c/u</td></tr>
+          <tr><td>dataset_8 – 9</td><td>kf_0 … kf_4</td><td>~26 GB c/u</td></tr>
+          <tr><td><strong>TOTAL</strong></td><td><strong>45 keyframes</strong></td><td><strong>229 GB</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── Artefactos ── -->
+<section id="problema">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label reveal">// artefactos de iluminación</div>
+    <h2 class="section-title reveal">Tres fenómenos que distorsionan la profundidad</h2>
+    <p class="section-body reveal" style="color:var(--m200);">Identificados y cuantificados sobre los cinco keyframes del dataset_1 en el EDA de iluminación.</p>
+    <div class="cards-grid">
+      <div class="card reveal">
+        <div class="card-icon">🔦</div>
+        <h3>Gradiente radial de iluminación</h3>
+        <p>El endoscopio ilumina desde el centro. El ratio entre la luminancia del centro y la del borde varía entre 1.33× (leve) y 3.26× (severo) según el keyframe. El gradiente no es simétrico: el pico de luminancia se alinea con el centro óptico (cx=597, cy=520), no con el geométrico (640, 512).</p>
+        <div class="stat-row">
+          <span class="stat-pill">KF1: 1.33× <span class="tag-leve">leve</span></span>
+          <span class="stat-pill">KF3: 3.26× <span class="tag-severo">severo</span></span>
+          <span class="stat-pill">KF5: 2.72× <span class="tag-severo">severo</span></span>
+        </div>
+      </div>
+      <div class="card reveal">
+        <div class="card-icon">✨</div>
+        <h3>Reflejos especulares</h3>
+        <p>Los tejidos húmedos reflejan especularmente la luz. Se detectan como píxeles donde los tres canales RGB superan 240 simultáneamente (un solo canal alto es tejido vascular, no especular). La fracción de especulares es baja (0.4–1.6%), pero coinciden con zonas sin ground truth.</p>
+        <div class="stat-row">
+          <span class="stat-pill">KF1: 1.12%</span>
+          <span class="stat-pill">KF3: 1.57%</span>
+          <span class="stat-pill">KF5: 0.43%</span>
+        </div>
+      </div>
+      <div class="card reveal">
+        <div class="card-icon">🕳️</div>
+        <h3>Ground truth incompleto</h3>
+        <p>El sensor de luz estructurada no cubre el 100% de los píxeles. El GT faltante (13–28% según keyframe) se concentra en zonas de curvatura extrema del tejido donde el ángulo de incidencia es demasiado oblicuo. Los especulares explican solo parte de esta pérdida.</p>
+        <div class="stat-row">
+          <span class="stat-pill">KF1: 21.6% sin GT</span>
+          <span class="stat-pill">KF4: 27.0% sin GT</span>
+          <span class="stat-pill">KF5: 28.1% sin GT</span>
+        </div>
+      </div>
+      <div class="card reveal">
+        <div class="card-icon">📊</div>
+        <h3>CV de luminancia (heterogeneidad)</h3>
+        <p>El coeficiente de variación (CV = std/mean) resume en un solo número la heterogeneidad de la iluminación de cada keyframe. KF5 encabeza el ranking (CV=0.665) no por tener más especulares, sino porque sus bordes son muy oscuros y su centro relativamente brillante.</p>
+        <div class="stat-row">
+          <span class="stat-pill">KF5: CV=0.665</span>
+          <span class="stat-pill">KF3: CV=0.555</span>
+          <span class="stat-pill">KF1: CV=0.492</span>
+        </div>
+      </div>
+      <div class="card reveal">
+        <div class="card-icon">📐</div>
+        <h3>Asimetría del centro óptico</h3>
+        <p>El centro óptico real (cx=597, cy=520) está desplazado ~43 px respecto al centro geométrico del sensor (640, 512). Cualquier corrección radial que asuma simetría desde el centro geométrico sub-corregirá el lado izquierdo y sobre-corregirá el derecho.</p>
+        <div class="stat-row">
+          <span class="stat-pill">Δx = 43 px</span>
+          <span class="stat-pill">Δy = 8 px</span>
+          <span class="stat-pill">fx=1035.3 fy=1035.1</span>
+        </div>
+      </div>
+      <div class="card reveal">
+        <div class="card-icon">🔄</div>
+        <h3>Drift temporal de iluminación</h3>
+        <p>El video rgb.mp4 de cada keyframe contiene ~197 frames. La luminancia varía frame a frame a medida que el cirujano mueve el endoscopio (video_lum_std) y aparecen picos de especularidad (video_sat_max) que el keyframe estático no captura. Cada keyframe es una muestra de un proceso dinámico.</p>
+        <div class="stat-row">
+          <span class="stat-pill">~197 frames/keyframe</span>
+          <span class="stat-pill">33 MB por MP4</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Hallazgos cuantitativos ── -->
+<section id="findings">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label reveal">// hallazgos clave</div>
+    <h2 class="section-title reveal">Cinco resultados del EDA con implicaciones directas</h2>
+    <p class="section-body reveal" style="color:var(--m800);">Extraídos de los reportes de exploración e iluminación sobre el dataset_1 (5 keyframes, SCARED 2019).</p>
+    <div class="findings-grid">
+      <div class="finding-card reveal">
+        <span class="num">1°</span>
+        <h3>El gradiente es sistemático y cuantificable</h3>
+        <p>Todos los keyframes muestran el mismo patrón descendente desde el centro hacia los bordes. El ratio centro/borde oscila entre 1.33× y 3.26×. Un gradiente de esa magnitud introduce un sesgo estructural en cualquier modelo que aprenda directamente de estas imágenes sin preprocesamiento.</p>
+      </div>
+      <div class="finding-card reveal">
+        <span class="num">2°</span>
+        <h3>El gradiente no es simétrico</h3>
+        <p>El manchón de máxima luminancia está desplazado hacia el centro óptico de la cámara (cx=597, cy=520), no hacia el centro geométrico (640, 512). Esto invalida los métodos de corrección que asumen simetría radial y exige estimación explícita de la envolvente de iluminación.</p>
+      </div>
+      <div class="finding-card reveal">
+        <span class="num">3°</span>
+        <h3>Correlación negativa fuerte: luz ↕ GT</h3>
+        <p>En 4 de 5 keyframes la correlación de Pearson entre luminancia y cobertura GT por distancia radial es negativa y significativa. Las zonas más brillantes son exactamente donde menos datos de profundidad hay. Este es el argumento cuantitativo central para incluir corrección de iluminación antes del entrenamiento.</p>
+        <table class="data-table" style="margin-top:.8rem;">
+          <thead><tr><th>KF</th><th>r (Pearson)</th></tr></thead>
+          <tbody>
+            <tr><td>KF2</td><td><strong>−0.857</strong></td></tr>
+            <tr><td>KF3</td><td>−0.842</td></tr>
+            <tr><td>KF4</td><td>−0.828</td></tr>
+            <tr><td>KF1</td><td>−0.659</td></tr>
+            <tr><td>KF5</td><td>−0.062 (excepción)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="finding-card reveal">
+        <span class="num">4°</span>
+        <h3>Los especulares no explican toda la pérdida de GT</h3>
+        <p>El solapamiento entre la máscara de especulares y la máscara de GT faltante varía de 8.7% (KF2) a 38.2% (KF5). La mayor parte del GT faltante corresponde a curvatura extrema del tejido, no a reflejos. La corrección de iluminación no recuperará ese GT, pero sí reducirá el sesgo del modelo en las zonas donde sí hay GT.</p>
+      </div>
+      <div class="finding-card reveal">
+        <span class="num">5°</span>
+        <h3>La corrección simple funciona, pero tiene efectos secundarios</h3>
+        <p>Una corrección por división de envolvente gaussiana (σ=60 px) sobre KF5 demuestra que el problema es tratable. El tejido oscuro del borde recupera textura visible. Sin embargo, introduce distorsión de color (la envolvente de luminancia no corrige igual los tres canales RGB) y amplifica ruido en los bordes. Esto motiva evaluar CLAHE, Retinex y MonoIIT.</p>
+      </div>
+      <div class="finding-card reveal">
+        <span class="num">6°</span>
+        <h3>Tabla resumen de indicadores por keyframe</h3>
+        <table class="data-table">
+          <thead><tr><th>KF</th><th>CV</th><th>C/B</th><th>Especulares</th><th>GT válido</th></tr></thead>
+          <tbody>
+            <tr><td>KF5</td><td>0.665</td><td>2.72×</td><td>0.43%</td><td>71.9%</td></tr>
+            <tr><td>KF3</td><td>0.555</td><td>3.26×</td><td>1.57%</td><td>86.8%</td></tr>
+            <tr><td>KF4</td><td>0.521</td><td>3.22×</td><td>0.71%</td><td>73.0%</td></tr>
+            <tr><td>KF2</td><td>0.504</td><td>2.03×</td><td>0.91%</td><td>83.0%</td></tr>
+            <tr><td>KF1</td><td>0.492</td><td>1.33×</td><td>1.12%</td><td>78.4%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Galería EDA ── -->
+<section id="resultados">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label reveal">// análisis exploratorio</div>
+    <h2 class="section-title reveal">Visualizaciones del EDA</h2>
+    <p class="section-body reveal">Generadas sobre dataset_1, 5 keyframes. Haz clic en cualquier imagen para ampliarla.</p>
+    <div class="gallery-tabs reveal">
+      <button class="tab-btn active" onclick="showTab('iluminacion',event)">Iluminación</button>
+      <button class="tab-btn" onclick="showTab('profundidad',event)">Profundidad</button>
+      <button class="tab-btn" onclick="showTab('especulares',event)">Especulares</button>
+      <button class="tab-btn" onclick="showTab('correccion',event)">Corrección</button>
+    </div>
+    <div id="tab-iluminacion" class="gallery-panel active reveal">
+      <div class="gallery-item" onclick="openLightbox('img/16_perfil_radial.png')">
+        <img src="img/16_perfil_radial.png" alt="Perfil radial de luminancia">
+        <div class="gallery-caption">Fig. 16 — Perfil radial de luminancia por keyframe<em>Centro más brillante que borde en todos los KF. Ratio hasta 3.26×.</em></div>
+      </div>
+      <div class="gallery-item" onclick="openLightbox('img/17_mapa_gradiente.png')">
+        <img src="img/17_mapa_gradiente.png" alt="Mapa de gradiente de iluminación">
+        <div class="gallery-caption">Fig. 17 — Mapa 2D del gradiente de iluminación<em>Manchón brillante alineado con cx=597, cy=520 (centro óptico, no geométrico).</em></div>
+      </div>
+      <div class="gallery-item" onclick="openLightbox('img/20_indicadores_iluminacion.png')">
+        <img src="img/20_indicadores_iluminacion.png" alt="Indicadores de iluminación - CV">
+        <div class="gallery-caption">Fig. 20 — Indicadores de iluminación (CV, ratio C/B, especulares)<em>KF5 encabeza el ranking con CV=0.665 pese a tener menos especulares.</em></div>
+      </div>
+      <div class="gallery-item" onclick="openLightbox('img/15_luminance_profiles.png')">
+        <img src="img/15_luminance_profiles.png" alt="Perfiles de luminancia BT.601">
+        <div class="gallery-caption">Fig. 15 — Perfiles de luminancia (Y = 0.299R + 0.587G + 0.114B)<em>Luminancia ITU-R BT.601. Refleja lo que el modelo "ve" al procesar la imagen.</em></div>
+      </div>
+    </div>
+    <div id="tab-profundidad" class="gallery-panel reveal">
+      <div class="gallery-item" onclick="openLightbox('img/02_depth_maps.png')">
+        <img src="img/02_depth_maps.png" alt="Mapas de profundidad GT">
+        <div class="gallery-caption">Fig. 02 — Mapas de profundidad GT (luz estructurada)<em>Canal Z del TIFF float32. Rango 35–176 mm. Ceros = sin medición.</em></div>
+      </div>
+      <div class="gallery-item" onclick="openLightbox('img/04_spatial_validity.png')">
+        <img src="img/04_spatial_validity.png" alt="Cobertura espacial del GT">
+        <div class="gallery-caption">Fig. 04 — Cobertura espacial del ground truth<em>GT faltante concentrado en bordes y zonas de curvatura extrema.</em></div>
+      </div>
+      <div class="gallery-item" onclick="openLightbox('img/01_rgb_keyframes.png')">
+        <img src="img/01_rgb_keyframes.png" alt="Keyframes RGB">
+        <div class="gallery-caption">Fig. 01 — Keyframes RGB del dataset_1<em>1280×1024 px, uint8. Gradiente radial visible a simple vista.</em></div>
+      </div>
+      <div class="gallery-item" onclick="openLightbox('img/19_correlacion_lum_gt.png')">
+        <img src="img/19_correlacion_lum_gt.png" alt="Correlación luminancia vs GT">
+        <div class="gallery-caption">Fig. 19 — Correlación luminancia vs cobertura GT (Pearson r)<em>r entre −0.66 y −0.86 en 4 de 5 KF. Las zonas más brillantes tienen menos GT.</em></div>
+      </div>
+    </div>
+    <div id="tab-especulares" class="gallery-panel reveal">
+      <div class="gallery-item" onclick="openLightbox('img/11_speculars.png')">
+        <img src="img/11_speculars.png" alt="Detección de especulares">
+        <div class="gallery-caption">Fig. 11 — Detección de reflejos especulares<em>Detectados donde los 3 canales RGB &gt; 240 simultáneamente.</em></div>
+      </div>
+      <div class="gallery-item" onclick="openLightbox('img/18_especulares.png')">
+        <img src="img/18_especulares.png" alt="Análisis de especulares por keyframe">
+        <div class="gallery-caption">Fig. 18 — Especulares y cobertura GT por keyframe<em>Solapamiento especular-GT faltante varía: 8.7% (KF2) a 38.2% (KF5).</em></div>
+      </div>
+    </div>
+    <div id="tab-correccion" class="gallery-panel reveal">
+      <div class="gallery-item" onclick="openLightbox('img/21_correccion_demo.png')">
+        <img src="img/21_correccion_demo.png" alt="Demo de corrección de iluminación">
+        <div class="gallery-caption">Fig. 21 — Corrección por división de envolvente gaussiana (KF5)<em>Izquierda: original. Centro: corregido (σ=60 px). Derecha: diferencia ×3.</em></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Pipeline ── -->
+<section id="pipeline">
+  <div style="max-width:1100px;margin:0 auto;text-align:center;">
+    <div class="section-label reveal">// metodología</div>
+    <h2 class="section-title reveal">Pipeline de corrección</h2>
+    <p class="section-body reveal" style="color:var(--m200);margin:0 auto 3rem;text-align:center;">La corrección de iluminación se inserta como preprocesamiento antes del modelo. Todo lo demás permanece constante para aislar su efecto sobre AbsRel, RMSE y Chamfer Distance.</p>
+    <div class="pipeline-flow reveal">
+      <div class="pipe-step">
+        <div class="pipe-bubble">🎥</div>
+        <div class="pipe-label"><strong>Video RGB</strong>crudo del endoscopio</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step pipe-highlight">
+        <div class="pipe-bubble">💡</div>
+        <div class="pipe-label"><strong>Corrección</strong>CLAHE / Retinex / MonoIIT</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-bubble">🧠</div>
+        <div class="pipe-label"><strong>Modelo</strong>NeXF / EndoGaussian / EDM</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-bubble">🗺️</div>
+        <div class="pipe-label"><strong>Depth map</strong>estimado</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-bubble">📊</div>
+        <div class="pipe-label"><strong>Evaluación</strong>AbsRel · RMSE · Chamfer</div>
+      </div>
+    </div>
+    <div class="cards-grid" style="margin-top:2rem;text-align:left;">
+      <div class="card reveal">
+        <div class="card-icon">📐</div>
+        <h3>Variable independiente</h3>
+        <p>Imagen RGB con o sin corrección de iluminación (X<sub>crudo</sub> → X<sub>corrected</sub>). Tres métodos a comparar: CLAHE, Retinex y MonoIIT.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-icon">📏</div>
+        <h3>Variable dependiente</h3>
+        <p>Error de estimación de profundidad: AbsRel, RMSE, SSIM, PSNR y Chamfer Distance contra el GT de luz estructurada del TIFF.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-icon">🔒</div>
+        <h3>Control experimental</h3>
+        <p>Modelo, hiperparámetros y ground truth constantes. Solo varía el preprocesamiento. Tres datasets para validar generalización: SCARED, Hamlyn y C3VD.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Datasets ── -->
+<section id="datasets" style="background:var(--m950);">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label reveal">// datos</div>
+    <h2 class="section-title reveal">Tres datasets clínicos</h2>
+    <div class="ds-grid">
+      <div class="ds-card reveal">
+        <h3>SCARED</h3>
+        <span class="ds-tag">dataset principal · MICCAI 2019</span>
+        <p>Stereo Correspondence and Reconstruction of Endoscopic Data. Mapas de profundidad reales por luz estructurada sobre tejido porcino ex-vivo. El único dataset con GT de profundidad pixel-perfecto para todas las métricas.</p>
+        <div class="ds-stat"><span>229 GB</span><span>45 keyframes</span><span>1280×1024 px</span><span>35–176 mm</span></div>
+      </div>
+      <div class="ds-card reveal">
+        <h3>Hamlyn</h3>
+        <span class="ds-tag">validación in-vivo</span>
+        <p>Secuencias endoscópicas estéreo in-vivo (Recasens et al., 2021). Complementa SCARED con tejido real y condiciones clínicas más variadas, incluyendo movimiento del instrumento y cambios de iluminación.</p>
+        <div class="ds-stat"><span>Estéreo</span><span>In-vivo</span><span>Multi-secuencia</span></div>
+      </div>
+      <div class="ds-card reveal">
+        <h3>C3VD</h3>
+        <span class="ds-tag">colonoscopia 3D</span>
+        <p>Colonoscopy 3D Video Dataset (Golhar et al., 2025). Maniquíes con mapas de referencia a nivel de píxel. Superficies de color variable que ponen a prueba la robustez de la corrección ante diferentes propiedades del tejido.</p>
+        <div class="ds-stat"><span>Maniquí</span><span>GT por píxel</span><span>3D video</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Team ── -->
+<section id="equipo">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label reveal">// equipo 52</div>
+    <h2 class="section-title reveal">Quiénes somos</h2>
+    <div class="team-grid">
+      <div class="team-card reveal">
+        <img src="https://ui-avatars.com/api/?name=Elda+Morales&size=200&background=2766CB&color=fff&rounded=true" alt="Elda Morales" class="team-avatar">
+        <h3>Elda Cristina Morales<br>Sánchez de la Barquera</h3>
+        <div class="tid">A00449074</div>
+        <p>MNA Student · Tec de Monterrey</p>
+      </div>
+      <div class="team-card reveal">
+        <img src="https://ui-avatars.com/api/?name=Maria+Gutierrez&size=200&background=2766CB&color=fff&rounded=true" alt="María Gutiérrez" class="team-avatar">
+        <h3>María Paula Gutiérrez<br>Cervantes</h3>
+        <div class="tid">A01747706</div>
+        <p>MNA Student · Tec de Monterrey</p>
+      </div>
+      <div class="team-card reveal">
+        <img src="img/jmtc.jpg" alt="José Manuel Toral Cruz" class="team-avatar">
+        <h3>José Manuel<br>Toral Cruz</h3>
+        <div class="tid">A01122243</div>
+        <p>MNA Student · Tec de Monterrey</p>
+      </div>
+    </div>
+    <div class="faculty-block reveal">
+      <h3>Equipo Docente</h3>
+      <div class="faculty-list">
+        <div class="faculty-chip"><strong>Dra. Grettel Barceló Alonso</strong> · Profesora Titular</div>
+        <div class="faculty-chip"><strong>Dr. Luis Eduardo Falcón Morales</strong> · Profesor Titular</div>
+        <div class="faculty-chip"><strong>Mtra. Verónica Sandra Guzmán de Valle</strong> · Profesora Asistente</div>
+        <div class="faculty-chip"><strong>Dr. Gerardo Camacho</strong> · Patrocinador</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Bibliography ── -->
+<section id="biblio">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label reveal">// referencias</div>
+    <h2 class="section-title reveal">Bibliografía</h2>
+    <p class="section-body reveal" style="color:var(--m200);">Referencias académicas que fundamentan el diseño del proyecto, los datasets utilizados y los métodos de análisis.</p>
+    <div class="biblio-list">
+
+      <div class="biblio-item reveal">
+        <div class="biblio-num">1</div>
+        <div class="biblio-text">
+          Allan, M., Mcleod, J., Wang, C., Rosenthal, J. C., Hu, Z., Gard, N., … Speidel, S. (2021). Stereo correspondence and reconstruction of endoscopic data challenge. <em>arXiv:2101.01133</em>.
+          <span class="biblio-tag">Dataset SCARED</span>
+        </div>
+      </div>
+
+      <div class="biblio-item reveal">
+        <div class="biblio-num">2</div>
+        <div class="biblio-text">
+          Recasens, D., Lamarca, J., Fácil, J. M., Montiel, J. M. M., &amp; Civera, J. (2021). Endo-Depth-and-Motion: Reconstruction and tracking in a surgical setting using depth prediction. <em>IEEE Robotics and Automation Letters, 6</em>(4), 7319–7326. <a href="https://doi.org/10.1109/LRA.2021.3097317" target="_blank">https://doi.org/10.1109/LRA.2021.3097317</a>
+          <span class="biblio-tag">Dataset Hamlyn · Modelo EDM</span>
+        </div>
+      </div>
+
+      <div class="biblio-item reveal">
+        <div class="biblio-num">3</div>
+        <div class="biblio-text">
+          Golhar, M., Bobrow, T. L., Khoshknab, M. P., Krit, P., Ngamruengphong, S., &amp; Durr, N. J. (2025). C3VD: Colonoscopy 3D Video Dataset enabling robust benchmarking. <em>arXiv:2206.01023</em>.
+          <span class="biblio-tag">Dataset C3VD</span>
+        </div>
+      </div>
+
+      <div class="biblio-item reveal">
+        <div class="biblio-num">4</div>
+        <div class="biblio-text">
+          Cui, B., Islam, M., Bai, L., &amp; Ren, H. (2024). Surgical-DINO: Adapter learning of foundation models for depth estimation in endoscopic surgery. <em>International Journal of Computer Assisted Radiology and Surgery, 19</em>(6), 1013–1020. <a href="https://doi.org/10.1007/s11548-024-03083-5" target="_blank">https://doi.org/10.1007/s11548-024-03083-5</a>
+          <span class="biblio-tag">Motivación: corrección mejora depth</span>
+        </div>
+      </div>
+
+      <div class="biblio-item reveal">
+        <div class="biblio-num">5</div>
+        <div class="biblio-text">
+          Yu, B., Chen, W., Zhong, Q., &amp; Zhang, H. (2021). Specular highlight detection based on color distribution for endoscopic images. <em>Frontiers in Physics, 8</em>, 616930. <a href="https://doi.org/10.3389/fphy.2020.616930" target="_blank">https://doi.org/10.3389/fphy.2020.616930</a>
+          <span class="biblio-tag">Criterio detección especulares</span>
+        </div>
+      </div>
+
+      <div class="biblio-item reveal">
+        <div class="biblio-num">6</div>
+        <div class="biblio-text">
+          Stoyanov, D., Visentini Scarzanella, M., Pratt, P., &amp; Yang, G.-Z. (2010). Real-time stereo reconstruction in robotically assisted minimally invasive surgery. En <em>MICCAI 2010</em> (LNCS, vol. 6361, pp. 275–282). Springer. <a href="https://doi.org/10.1007/978-3-642-15705-9_34" target="_blank">https://doi.org/10.1007/978-3-642-15705-9_34</a>
+          <span class="biblio-tag">Gradiente radial en endoscopía</span>
+        </div>
+      </div>
+
+      <div class="biblio-item reveal">
+        <div class="biblio-num">7</div>
+        <div class="biblio-text">
+          Gonzalez, R. C., &amp; Woods, R. E. (2018). <em>Digital image processing</em> (4.ª ed.). Pearson.
+          <span class="biblio-tag">CV de luminancia · homomorphic filtering · shading correction</span>
+        </div>
+      </div>
+
+      <div class="biblio-item reveal">
+        <div class="biblio-num">8</div>
+        <div class="biblio-text">
+          Land, E. H., &amp; McCann, J. J. (1971). Lightness and Retinex theory. <em>Journal of the Optical Society of America, 61</em>(1), 1–11.
+          <span class="biblio-tag">Base teórica Retinex · corrección por envolvente</span>
+        </div>
+      </div>
+
+      <div class="biblio-item reveal">
+        <div class="biblio-num">9</div>
+        <div class="biblio-text">
+          Jolliffe, I. T. (2002). <em>Principal component analysis</em> (2nd ed.). Springer.
+          <span class="biblio-tag">PCA sobre nube de puntos 3D</span>
+        </div>
+      </div>
+
+      <div class="biblio-item reveal">
+        <div class="biblio-num">10</div>
+        <div class="biblio-text">
+          Visengeriyeva, L., Hamza, A., Bär, I., Plauth, M., &amp; Löser, A. (2023). <em>CRISP-ML(Q): A machine learning process model with quality assurance methodology</em>. <a href="https://ml-ops.org/content/crisp-ml" target="_blank">https://ml-ops.org/content/crisp-ml</a>
+          <span class="biblio-tag">Framework CRISP-ML(Q)</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="brand">La luz que opaca · Equipo 52 · MNA Tec de Monterrey · 2026</div>
+  <div class="links">
+    <a href="https://github.com/jmtoral/proyecto_integrador_52" target="_blank">GitHub</a>
+    <a href="#biblio">Referencias</a>
+    <a href="https://tec.mx" target="_blank">Tec de Monterrey</a>
+  </div>
+  <div class="copy">Sitio generado con asistencia de Claude (Anthropic, claude-sonnet-4-6). Análisis, código e interpretación: Equipo 52.</div>
+</footer>
+
+<!-- ── Lightbox ── -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <div class="lightbox-close" onclick="closeLightbox()">✕</div>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 40));
+
+// Hamburger
+document.getElementById('hamburger').addEventListener('click', () =>
+  document.getElementById('mobileMenu').classList.toggle('open'));
+function closeMobile() { document.getElementById('mobileMenu').classList.remove('open'); }
+
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const siblings = Array.from(e.target.parentElement.querySelectorAll('.reveal:not(.visible)'));
+    const delay = Math.min(siblings.indexOf(e.target) * 90, 360);
+    setTimeout(() => e.target.classList.add('visible'), delay);
+    observer.unobserve(e.target);
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Gallery tabs
+function showTab(name, e) {
+  document.querySelectorAll('.gallery-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  e.target.classList.add('active');
+}
+
+// Lightbox
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+</script>
+</body>
+</html>
