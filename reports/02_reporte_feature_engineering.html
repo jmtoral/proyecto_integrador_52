@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reporte FE — Avance 2 · Equipo 52 · MNA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<style>
+:root {
+  --m50:#F0F8FE;--m100:#DDEEFC;--m200:#C3E2FA;--m300:#99D0F7;
+  --m400:#69B7F1;--m500:#4599EC;--m700:#2766CB;--m800:#2654A7;
+  --m900:#244984;--m950:#1A2E51;--gold:#E0A800;
+  --ff-serif:'Playfair Display',Georgia,serif;
+  --ff-sans:'Inter',system-ui,sans-serif;
+  --ff-mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--ff-sans);
+  background:var(--m950);
+  color:#e8f4fd;
+  line-height:1.75;
+  padding:0;
+}
+
+/* ── Layout ── */
+.page-wrap{max-width:900px;margin:0 auto;padding:4rem 2rem 6rem;}
+
+/* ── Header ── */
+.doc-header{
+  background:linear-gradient(135deg,var(--m950) 0%,var(--m900) 100%);
+  border-bottom:2px solid var(--m700);
+  padding:3rem 2rem 2.5rem;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.doc-header::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(69,153,236,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(69,153,236,.07) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.doc-header-inner{position:relative;z-index:1;}
+.doc-badge{
+  display:inline-block;background:rgba(69,153,236,.15);
+  border:1px solid rgba(69,153,236,.35);border-radius:999px;
+  padding:.3rem 1rem;font-family:var(--ff-mono);font-size:.72rem;
+  color:var(--m300);letter-spacing:.08em;margin-bottom:1.2rem;
+}
+.doc-header h1{
+  font-family:var(--ff-serif);font-size:clamp(1.8rem,4vw,2.8rem);
+  color:#fff;line-height:1.2;margin-bottom:.5rem;
+}
+.doc-header h2{
+  font-family:var(--ff-sans);font-size:1rem;font-weight:400;
+  color:var(--m300);border:none;padding:0;margin:0;
+}
+.doc-meta{
+  display:flex;flex-wrap:wrap;justify-content:center;gap:.8rem;
+  margin-top:1.5rem;
+}
+.meta-chip{
+  background:rgba(255,255,255,.06);border:1px solid rgba(69,153,236,.2);
+  border-radius:8px;padding:.4rem 1rem;font-family:var(--ff-mono);
+  font-size:.75rem;color:var(--m300);
+}
+
+/* ── TOC ── */
+.toc-box{
+  background:rgba(69,153,236,.07);
+  border:1px solid rgba(69,153,236,.2);
+  border-radius:12px;padding:1.5rem 1.8rem;
+  margin:2.5rem 0;
+}
+.toc-box h4{
+  font-family:var(--ff-mono);font-size:.75rem;letter-spacing:.1em;
+  color:var(--m400);text-transform:uppercase;margin-bottom:1rem;
+}
+.toc-box ol{margin-left:1.2rem;}
+.toc-box li{margin:.3rem 0;}
+.toc-box a{color:var(--m300);text-decoration:none;font-size:.88rem;}
+.toc-box a:hover{color:var(--m400);text-decoration:underline;}
+
+/* ── Typography ── */
+h1,h2,h3,h4,h5{font-family:var(--ff-serif);line-height:1.25;}
+h1{display:none;}  /* handled by doc-header */
+h2{
+  font-size:clamp(1.4rem,3vw,1.9rem);color:#fff;
+  border-bottom:2px solid var(--m700);
+  padding-bottom:.5rem;margin:3.5rem 0 1.2rem;
+}
+h2:first-of-type{margin-top:2rem;}
+h3{font-size:1.2rem;color:var(--m300);margin:2.2rem 0 .8rem;}
+h4{font-size:1rem;font-family:var(--ff-mono);color:var(--m400);
+  font-weight:600;margin:1.5rem 0 .5rem;}
+p{margin:.7rem 0;font-size:.95rem;color:var(--m200);line-height:1.75;}
+strong{color:var(--m100);}
+em{color:var(--m300);}
+hr{border:none;border-top:1px solid rgba(69,153,236,.2);margin:2.5rem 0;}
+a{color:var(--m400);text-decoration:underline;text-underline-offset:3px;}
+a:hover{color:var(--m300);}
+
+/* ── Code ── */
+code{
+  font-family:var(--ff-mono);font-size:.83em;
+  background:rgba(69,153,236,.12);border:1px solid rgba(69,153,236,.2);
+  border-radius:4px;padding:.1em .35em;color:var(--m300);
+}
+pre{
+  background:rgba(0,0,0,.4);border:1px solid rgba(69,153,236,.2);
+  border-radius:10px;padding:1.3rem 1.5rem;overflow-x:auto;
+  margin:1.2rem 0;
+}
+pre code{
+  background:none;border:none;padding:0;color:#c3e2fa;
+  font-size:.83rem;line-height:1.6;
+}
+
+/* ── Tables ── */
+table{
+  width:100%;border-collapse:collapse;margin:1.2rem 0;
+  font-size:.85rem;
+}
+thead th{
+  background:rgba(39,102,203,.3);color:var(--m100);
+  font-family:var(--ff-mono);font-size:.78rem;
+  padding:.6rem .9rem;text-align:left;letter-spacing:.04em;
+  border-bottom:2px solid var(--m700);
+}
+tbody td{
+  padding:.5rem .9rem;border-bottom:1px solid rgba(69,153,236,.12);
+  color:var(--m200);vertical-align:top;line-height:1.55;
+}
+tbody tr:hover td{background:rgba(69,153,236,.06);}
+tbody tr:last-child td{border-bottom:none;}
+
+/* ── Lists ── */
+ul,ol{margin:.6rem 0 .6rem 1.6rem;color:var(--m200);}
+li{margin:.3rem 0;font-size:.92rem;line-height:1.65;}
+li strong{color:var(--m100);}
+
+/* ── Blockquote ── */
+blockquote{
+  border-left:3px solid var(--m500);
+  background:rgba(69,153,236,.07);
+  border-radius:0 8px 8px 0;
+  padding:.9rem 1.2rem;margin:1.2rem 0;
+}
+blockquote p{color:var(--m200);font-size:.9rem;margin:0;}
+
+/* ── Mermaid ── */
+.mermaid{
+  background:rgba(0,0,0,.3);border:1px solid rgba(69,153,236,.25);
+  border-radius:12px;padding:2rem;margin:1.5rem 0;
+  overflow-x:auto;text-align:center;
+}
+
+/* ── Section number pills ── */
+h2::before{
+  content:attr(data-num);
+  font-family:var(--ff-mono);font-size:.7rem;
+  background:var(--m700);color:#fff;
+  border-radius:4px;padding:.15rem .5rem;
+  margin-right:.6rem;vertical-align:middle;letter-spacing:.04em;
+}
+
+/* ── Footer ── */
+.doc-footer{
+  margin-top:5rem;padding-top:2rem;
+  border-top:1px solid rgba(69,153,236,.15);
+  text-align:center;
+}
+.doc-footer p{font-size:.78rem;color:var(--m700);}
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <div class="doc-header-inner">
+    <div class="doc-badge">TC5035.10 · Proyecto Integrador · MNA Tec de Monterrey</div>
+    <h1>Reporte de Ingeniería de Características — Avance 2</h1>
+    <h2>Equipo 52 · 2026</h2>
+    <div class="doc-meta">
+      <span class="meta-chip">📓 Avance2_52_Feature_Engineering.ipynb</span>
+      <span class="meta-chip">📊 20 keyframes · 20 features</span>
+      <span class="meta-chip">🧪 Dataset SCARED</span>
+      <span class="meta-chip">🔀 Train ds1–2 · Test ds8–9</span>
+    </div>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+<div class="toc-box">
+  <h4>// Contenido</h4>
+  <ol>
+    <li><a href="#prop-sito-del-notebook">Propósito del notebook</a></li>
+    <li><a href="#sipoc-del-proceso">SIPOC del proceso</a></li>
+    <li><a href="#estructura-del-dataset">Estructura del dataset</a></li>
+    <li><a href="#features-construidas">Features construidas</a></li>
+    <li><a href="#transformaciones-de-preprocesamiento">Transformaciones de preprocesamiento</a></li>
+    <li><a href="#selecci-n-de-caracter-sticas">Selección de características</a></li>
+    <li><a href="#features-de-video">Features de video</a></li>
+    <li><a href="#flujo-completo-de-datos-crudos-a-resultados">Flujo completo</a></li>
+    <li><a href="#limitaciones-y-notas-metodol-gicas">Limitaciones</a></li>
+    <li><a href="#artefactos-producidos">Artefactos producidos</a></li>
+    <li><a href="#diagrama-del-flujo-de-consumo-mermaid">Diagrama Mermaid</a></li>
+    <li><a href="#prompt-para-ia-de-generaci-n-de-im-genes">Prompt para IA de imagen</a></li>
+    <li><a href="#referencias">Referencias</a></li>
+  </ol>
+</div>
+
+<h1 id="reporte-de-ingenieria-de-caracteristicas-avance-2">Reporte de Ingeniería de Características — Avance 2</h1>
+<h2 id="proyecto-integrador-tc503510-equipo-52-mna">Proyecto Integrador TC5035.10 · Equipo 52 · MNA</h2>
+<p><strong>Archivo de referencia:</strong> <code>notebooks/Avance2_52_Feature_Engineering.ipynb</code><br />
+<strong>Dataset principal:</strong> SCARED (Structured light endoscopY And Reconstructed Depth)<br />
+<strong>Observaciones:</strong> 20 keyframes (4 datasets × 5 keyframes)<br />
+<strong>Split:</strong> train = datasets 1–2 (cerdo A), test = datasets 8–9 (cerdo C)</p>
+<hr />
+<h2 id="1-proposito-del-notebook">1. Propósito del notebook</h2>
+<p>Este notebook <strong>no entrena ningún modelo</strong>. Su función es doble:</p>
+<ol>
+<li><strong>Diagnóstico de calidad de datos</strong>: construir una representación tabular de los 20 keyframes con features estadísticas que permitan identificar cuáles son los mejores y peores candidatos para el experimento.</li>
+<li><strong>Definir el pipeline de preprocesamiento</strong> que se reutilizará directamente en el training loop de los tres modelos de profundidad (NeXF, EndoGaussian, EndoDepthAndMotion).</li>
+</ol>
+<p>La pregunta que responde es: <em>¿qué tan buenas son las entradas antes de tocar un solo modelo?</em></p>
+<hr />
+<h2 id="2-sipoc-del-proceso">2. SIPOC del proceso</h2>
+<table>
+<thead>
+<tr>
+<th>Elemento</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Suppliers</strong></td>
+<td>Dataset SCARED (HuggingFace, ~250 GB) · Sensor da Vinci (luz estructurada) · Calibración de cámara YAML</td>
+</tr>
+<tr>
+<td><strong>Inputs</strong></td>
+<td><code>Left_Image.png</code> (RGB 1280×1024) · <code>left_depth_map.tiff</code> (float32, mm) · <code>point_cloud.obj</code> (vértices XYZ) · <code>data/rgb.mp4</code> (video del keyframe)</td>
+</tr>
+<tr>
+<td><strong>Process</strong></td>
+<td>Extracción de features por keyframe · Features derivadas · Viñeteado gaussiano · Features de video · Supresión de especulares · Cap 150 mm · log(Z+1) · Normalización min-max · Correlación Pearson · VarianceThreshold · PCA geométrico</td>
+</tr>
+<tr>
+<td><strong>Outputs</strong></td>
+<td><code>df</code> (20 × 24) · pipeline de preprocesamiento de tensores · <code>vignette_score</code> · <code>inpaint_ssim</code> · lista de features seleccionadas</td>
+</tr>
+<tr>
+<td><strong>Customers</strong></td>
+<td>Training loops de NeXF, EndoGaussian y EndoDepthAndMotion · Evaluación AbsRel/RMSE/Chamfer en Avance 3</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-estructura-del-dataset">3. Estructura del dataset</h2>
+<h3 id="31-disponibilidad-de-datos">3.1 Disponibilidad de datos</h3>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Tamaño en disco</th>
+<th>Split</th>
+<th>Sujeto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dataset_1</td>
+<td>~20 GB</td>
+<td>train</td>
+<td>cerdo A</td>
+</tr>
+<tr>
+<td>dataset_2</td>
+<td>~20 GB</td>
+<td>train</td>
+<td>cerdo A</td>
+</tr>
+<tr>
+<td>dataset_8</td>
+<td>~22 GB</td>
+<td>test</td>
+<td>cerdo C</td>
+</tr>
+<tr>
+<td>dataset_9</td>
+<td>~20 GB</td>
+<td>test</td>
+<td>cerdo C</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>~82.6 GB</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>Cada dataset tiene 5 keyframes, para un total de <strong>20 observaciones</strong>. El dataset completo SCARED tiene 9 datasets (~250 GB); este proyecto usa los 4 con GT de luz estructurada de alta calidad.</p>
+<h3 id="32-ground-truth-que-es-y-por-que-es-incompleto">3.2 Ground Truth: qué es y por qué es incompleto</h3>
+<p>El <strong>ground truth de profundidad</strong> es el mapa de distancias reales en milímetros capturado por el sensor de luz estructurada integrado en el sistema da Vinci. El sensor proyecta un patrón de luz estructurada sobre el tejido y triangula la posición 3D de cada píxel.</p>
+<p><strong>Por qué el GT es incompleto (13–28% de píxeles inválidos por keyframe):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Causa</th>
+<th>Mecanismo</th>
+<th>Consecuencia</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reflejos especulares</td>
+<td>El tejido húmedo refleja la luz especularmente; el sensor no puede triangular</td>
+<td>Píxeles inválidos en zonas brillantes (centro de imagen)</td>
+</tr>
+<tr>
+<td>Ángulos oblicuos</td>
+<td>Superficies casi paralelas al rayo de luz no retornan señal</td>
+<td>Píxeles inválidos en bordes y pliegues del tejido</td>
+</tr>
+<tr>
+<td>Viñeteado</td>
+<td>El endoscopio tiene iluminación radial; los bordes reciben menos luz</td>
+<td>Patrón radial de invalidez que sigue una gaussiana</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Implicación para el modelado:</strong> el AbsRel se calcula solo sobre píxeles con GT válido. Un modelo que falla más en zonas sin GT (bordes) penaliza menos en la métrica. La corrección de iluminación puede mejorar la validez del GT indirectamente al reducir los reflejos.</p>
+<h3 id="33-keyframes-vs-videos-completos">3.3 Keyframes vs. videos completos</h3>
+<p>Los modelos de profundidad consumen <strong>keyframes</strong>, no videos completos. La razón técnica:</p>
+<ul>
+<li>El sensor de luz estructurada da Vinci requiere una <strong>exposición estática</strong> para capturar el mapa de profundidad con precisión. Durante el movimiento del endoscopio la señal es borrosa.</li>
+<li>Cada keyframe es un momento de quietud donde el sensor logró capturar un GT de alta calidad.</li>
+<li>Los videos <code>rgb.mp4</code> <strong>no tienen GT por frame</strong> — son RGB puro del mismo escenario. Se usan aquí solo para extraer features de drift temporal de luminancia.</li>
+</ul>
+<hr />
+<h2 id="4-features-construidas">4. Features construidas</h2>
+<h3 id="41-tabla-completa-de-features">4.1 Tabla completa de features</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Fuente</th>
+<th>Unidad</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>depth_median</code></td>
+<td>TIFF canal Z</td>
+<td>mm</td>
+<td>Profundidad mediana de píxeles válidos</td>
+</tr>
+<tr>
+<td><code>depth_p5</code></td>
+<td>TIFF canal Z</td>
+<td>mm</td>
+<td>Percentil 5 de profundidad (superficies más cercanas)</td>
+</tr>
+<tr>
+<td><code>depth_p95</code></td>
+<td>TIFF canal Z</td>
+<td>mm</td>
+<td>Percentil 95 de profundidad (superficies más lejanas)</td>
+</tr>
+<tr>
+<td><code>depth_range</code></td>
+<td>TIFF canal Z</td>
+<td>mm</td>
+<td>Rango intercuartílico de profundidad (p95 − p5)</td>
+</tr>
+<tr>
+<td><code>depth_valid_pct</code></td>
+<td>TIFF canal Z</td>
+<td>%</td>
+<td>Fracción de píxeles con GT válido (Z &gt; 0 y Z &lt; 150)</td>
+</tr>
+<tr>
+<td><code>lum_mean</code></td>
+<td>RGB</td>
+<td>[0,255]</td>
+<td>Luminancia media de la imagen</td>
+</tr>
+<tr>
+<td><code>lum_std</code></td>
+<td>RGB</td>
+<td>[0,255]</td>
+<td>Dispersión de luminancia (heterogeneidad de iluminación)</td>
+</tr>
+<tr>
+<td><code>sat_pct</code></td>
+<td>RGB</td>
+<td>%</td>
+<td>Fracción de píxeles saturados (cualquier canal &gt; 240)</td>
+</tr>
+<tr>
+<td><code>laplacian_var</code></td>
+<td>RGB</td>
+<td>px²</td>
+<td>Varianza del Laplaciano (proxy de nitidez / detalle de textura)</td>
+</tr>
+<tr>
+<td><code>r_mean</code></td>
+<td>RGB</td>
+<td>[0,255]</td>
+<td>Media del canal rojo</td>
+</tr>
+<tr>
+<td><code>g_mean</code></td>
+<td>RGB</td>
+<td>[0,255]</td>
+<td>Media del canal verde</td>
+</tr>
+<tr>
+<td><code>b_mean</code></td>
+<td>RGB</td>
+<td>[0,255]</td>
+<td>Media del canal azul</td>
+</tr>
+<tr>
+<td><code>rb_balance</code></td>
+<td>RGB</td>
+<td>ratio</td>
+<td>r_mean / b_mean (balance de temperatura de color del tejido)</td>
+</tr>
+<tr>
+<td><code>log_depth_median</code></td>
+<td>TIFF</td>
+<td>log(mm+1)</td>
+<td>Transformación logarítmica de depth_median</td>
+</tr>
+<tr>
+<td><code>texture_depth_ratio</code></td>
+<td>RGB + TIFF</td>
+<td>—</td>
+<td>laplacian_var / depth_median (textura relativa a distancia)</td>
+</tr>
+<tr>
+<td><code>lum_contrast_ratio</code></td>
+<td>RGB</td>
+<td>—</td>
+<td>lum_std / lum_mean (contraste relativo de iluminación)</td>
+</tr>
+<tr>
+<td><code>vignette_score</code></td>
+<td>TIFF</td>
+<td>[0,1]</td>
+<td>Cobertura GT en 25% central de imagen (gaussiana ajustada)</td>
+</tr>
+<tr>
+<td><code>video_lum_std</code></td>
+<td>MP4</td>
+<td>[0,255]</td>
+<td>Desviación estándar de luminancia a través de frames del video</td>
+</tr>
+<tr>
+<td><code>video_sat_max</code></td>
+<td>MP4</td>
+<td>%</td>
+<td>Máxima saturación de píxeles en cualquier frame del video</td>
+</tr>
+<tr>
+<td><code>inpaint_ssim</code></td>
+<td>RGB</td>
+<td>[0,1]</td>
+<td>SSIM entre imagen original e imagen con especulares inpainted</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Metadatos (no features):</strong> <code>dataset_id</code>, <code>keyframe_id</code>, <code>split</code>, <code>cerdo_id</code></p>
+<h3 id="42-features-de-diagnostico-criticas">4.2 Features de diagnóstico críticas</h3>
+<p>Tres features concentran la mayor información diagnóstica para el experimento:</p>
+<p><strong><code>sat_pct</code></strong> — Porcentaje de píxeles saturados. Mide directamente la severidad de los reflejos especulares. Si <code>sat_pct</code> es alto, la imagen tiene muchos píxeles donde los modelos no pueden inferir estructura de tejido. La hipótesis principal del proyecto predice que un modelo entrenado con imágenes de <code>sat_pct</code> bajo tendrá menor AbsRel.</p>
+<p><strong><code>depth_valid_pct</code></strong> — Porcentaje de GT válido. La correlación negativa observada con <code>sat_pct</code> (r ≈ −0.6) confirma que los reflejos especulares están causando directamente la invalidez del GT. Keyframes con <code>depth_valid_pct</code> &lt; 75% deben tratarse con cautela en la evaluación.</p>
+<p><strong><code>inpaint_ssim</code></strong> — SSIM tras supresión de especulares. Un SSIM de 0.99 indica que los especulares son localmente pequeños y el inpainting los rellena bien sin distorsionar la estructura. Un SSIM de 0.87 indica que los especulares son grandes y la supresión modifica estructuralmente la imagen — estos keyframes son los candidatos más difíciles para el baseline.</p>
+<h3 id="43-vineteado-gaussiano-vignette_score">4.3 Viñeteado gaussiano (<code>vignette_score</code>)</h3>
+<p>El perfil de validez del GT sigue una distribución gaussiana radial: alta cobertura en el centro, baja en los bordes. El <code>vignette_score</code> es la cobertura media en el 25% central de la imagen (radio normalizado &lt; 0.5) según el ajuste gaussiano.</p>
+<ul>
+<li><strong>Score cercano a 1.0</strong>: el GT es completo en el centro — buena señal de entrenamiento.</li>
+<li><strong>Score &lt; 0.60</strong>: el viñeteado afecta incluso el centro — keyframe problemático.</li>
+</ul>
+<p>Este score predice qué keyframes se beneficiarán más de la corrección de iluminación radial.</p>
+<hr />
+<h2 id="5-transformaciones-de-preprocesamiento">5. Transformaciones de preprocesamiento</h2>
+<h3 id="51-cap-a-150-mm">5.1 Cap a 150 mm</h3>
+<p>Distancias mayores a 150 mm son físicamente imposibles en laparoscopía con sistema da Vinci. Valores Z &gt; 150 en el TIFF son artefactos de reconstrucción (reflexiones especulares, oclusiones). Se reemplazan por <code>NaN</code> antes de cualquier cálculo.</p>
+<pre><code class="language-python">Z_capped = np.where((Z &gt; 0) &amp; (Z &lt; 150), Z, np.nan)
+</code></pre>
+<p><strong>Impacto:</strong> reduce el rango efectivo de 0–∞ a 0–150 mm; elimina outliers que distorsionarían el log y la normalización.</p>
+<h3 id="52-transformacion-logaritmica-logz1">5.2 Transformación logarítmica log(Z+1)</h3>
+<p>La distribución de profundidades tiene sesgo positivo (la mayoría entre 20–80 mm, cola hasta 150 mm). La transformación log comprime la cola derecha y hace la distribución más simétrica, lo que beneficia los optimizadores de los modelos profundos.</p>
+<pre><code class="language-python">Z_log = np.log1p(Z_capped)   # log(Z + 1)
+</code></pre>
+<p><strong>Rango resultante:</strong> log(1) = 0 a log(151) ≈ 5.02.</p>
+<h3 id="53-normalizacion-min-max">5.3 Normalización min-max</h3>
+<pre><code class="language-python">scaler = MinMaxScaler()
+scaler.fit(df_train[NUMERIC_FEATS])        # SOLO sobre datasets 1 y 2
+df_scaled = scaler.transform(df[NUMERIC_FEATS])
+</code></pre>
+<p><strong>Regla crítica:</strong> el scaler se ajusta exclusivamente sobre los datos de train (datasets 1 y 2). Aplicarlo sobre el dataset completo constituiría data leakage — el modelo "vería" la distribución del test antes de evaluar.</p>
+<hr />
+<h2 id="6-seleccion-de-caracteristicas">6. Selección de características</h2>
+<h3 id="61-correlacion-de-pearson">6.1 Correlación de Pearson</h3>
+<p>Features con |r| &gt; 0.8 son redundantes. El análisis identificó:</p>
+<ul>
+<li><code>log_depth_median</code> ↔ <code>depth_median</code>: r ≈ 1.0 (transformación monótona — misma información)</li>
+<li><code>r_mean</code>, <code>g_mean</code>, <code>b_mean</code>: altamente intercorrelacionados (los canales RGB del tejido porcino varían juntos)</li>
+</ul>
+<p><strong>Decisión:</strong> eliminar <code>log_depth_median</code> y los canales RGB individuales en análisis de diagnóstico secundarios. Mantener <code>lum_mean</code> (derivado de los tres canales) y <code>rb_balance</code> (captura la variación de temperatura de color independientemente de la luminancia).</p>
+<h3 id="62-variancethreshold">6.2 VarianceThreshold</h3>
+<p>Features con varianza &lt; 0.01 sobre los 20 keyframes son casi constantes y no aportan información discriminativa.</p>
+<p><strong>Eliminadas:</strong> <code>video_lum_std</code> y <code>video_sat_max</code> no pasan el umbral en 15/20 keyframes (5 keyframes no tienen video). Al incluir NaN imputados como 0, la varianza colapsa artificialmente. <strong>Estas features SÍ son útiles</strong> para los 15 keyframes que tienen video — la eliminación es un artefacto del tamaño muestral pequeño.</p>
+<p><strong>Decisión:</strong> mantener <code>video_lum_std</code> y <code>video_sat_max</code> en el dataframe completo, pero excluirlas de análisis que requieren completitud.</p>
+<h3 id="63-pca-geometrico-nube-de-puntos">6.3 PCA geométrico (nube de puntos)</h3>
+<p>El PCA sobre los vértices XYZ del <code>point_cloud.obj</code> extrae la orientación y extensión del tejido en el espacio 3D:</p>
+<table>
+<thead>
+<tr>
+<th>Eje PC</th>
+<th>Varianza explicada</th>
+<th>Interpretación</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PC1</td>
+<td>~85%</td>
+<td>Eje principal del tejido (mayor extensión)</td>
+</tr>
+<tr>
+<td>PC2</td>
+<td>~12%</td>
+<td>Eje secundario (curvatura del tejido)</td>
+</tr>
+<tr>
+<td>PC3</td>
+<td>~3%</td>
+<td>Profundidad perpendicular al plano del tejido</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Centro de masa (dataset_1/keyframe_1):</strong> X=3.5 mm, Y=−1.8 mm, Z=60.6 mm — el tejido está a ~60 mm del endoscopio, ligeramente descentrado.</p>
+<p><strong>Para qué sirve:</strong> los vectores propios del PCA permiten transformar la nube de puntos al sistema de referencia del tejido, lo que puede mejorar la evaluación de Chamfer Distance al alinear ambas nubes (estimada vs. GT) antes de calcular la distancia.</p>
+<hr />
+<h2 id="7-features-de-video">7. Features de video</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Descripción</th>
+<th>Keyframes con dato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>video_lum_std</code></td>
+<td>Drift de luminancia entre frames del video. Valores altos indican que la iluminación varía mientras el endoscopio se mueve.</td>
+<td>15/20</td>
+</tr>
+<tr>
+<td><code>video_sat_max</code></td>
+<td>Peor caso de saturación en cualquier frame del video. Si es &gt; 30%, hay al menos un frame donde los especulares son severos.</td>
+<td>15/20</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Keyframes sin video (5 de 20):</strong> los zips de dataset_1/kf4, dataset_1/kf5, dataset_2/kf5, dataset_8/kf4, dataset_9/kf4 no contienen <code>data/rgb.mp4</code>. No es un error de código — los archivos genuinamente no están en el zip (error de logging en la captura original de SCARED).</p>
+<p><strong>Hallazgo notable:</strong> dataset_2/keyframe_4 tiene <code>video_sat_max</code> = 40.6% — el frame más especular del conjunto de datos. Este keyframe es el candidato más difícil para el baseline sin corrección.</p>
+<hr />
+<h2 id="8-flujo-completo-de-datos-crudos-a-resultados">8. Flujo completo: de datos crudos a resultados</h2>
+<pre><code>DATOS CRUDOS (SCARED)
+Left_Image.png  +  left_depth_map.tiff (GT)
+        |
+        |  [este notebook define qué hacer aquí:]
+        |  • cap a 150 mm
+        |  • log(Z+1)
+        |  • min-max (fit en train)
+        v
+CORRECCIÓN DE IMAGEN           ← variable independiente del experimento
+        |
+        |-- [A] Sin corrección     baseline
+        |-- [B] CLAHE              ecualización adaptativa local
+        |-- [C] Retinex            separación iluminación/reflectancia
+        |-- [D] MonoIIT            red neuronal de corrección
+        |
+        v  X_corrected (misma resolución, distintos píxeles)
+        |
+        +------------+------------+
+        |            |            |
+      NeXF    EndoGaussian    EndoDepthAndMotion
+        |            |            |
+        +------------+------------+
+        |
+        v  depth_map_estimado (float, mm)
+        |
+EVALUACIÓN vs. GT (datasets 8 y 9)
+        |-- AbsRel  ← métrica primaria para elegir ganador
+        |-- RMSE
+        |-- Chamfer Distance
+        |
+        v
+TABLA DE RESULTADOS (3 modelos × 4 métodos = 12 celdas)
+Ganador = celda con menor AbsRel en test
+</code></pre>
+<h3 id="que-aporta-este-notebook-a-ese-flujo">Qué aporta este notebook a ese flujo</h3>
+<table>
+<thead>
+<tr>
+<th>Decisión en Avance 3</th>
+<th>Insumo de este notebook</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>¿Qué keyframes usar para validación cualitativa?</td>
+<td><code>depth_valid_pct</code> + <code>sat_pct</code>: preferir kf con &gt; 80% GT válido y &lt; 5% saturación</td>
+</tr>
+<tr>
+<td>¿Cómo preprocesar el GT antes de calcular AbsRel?</td>
+<td>Cap 150 mm + log(Z+1), definidos y justificados en Sección 2</td>
+</tr>
+<tr>
+<td>¿El scaler se ajusta sobre test?</td>
+<td>No — <code>MinMaxScaler</code> fit exclusivamente en datasets 1–2</td>
+</tr>
+<tr>
+<td>¿Qué keyframes son más difíciles para el baseline?</td>
+<td><code>inpaint_ssim</code> &lt; 0.90 y <code>sat_pct</code> &gt; 10% — candidatos con mayor ganancia potencial de corrección</td>
+</tr>
+<tr>
+<td>¿Hay drift de iluminación en el video?</td>
+<td><code>video_lum_std</code> &gt; 10: variabilidad temporal relevante (el endoscopio se mueve durante la grabación)</td>
+</tr>
+<tr>
+<td>¿Cómo alinear nubes de puntos para Chamfer?</td>
+<td>Vectores propios del PCA geométrico como sistema de referencia del tejido</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-limitaciones-y-notas-metodologicas">9. Limitaciones y notas metodológicas</h2>
+<table>
+<thead>
+<tr>
+<th>Limitación</th>
+<th>Descripción</th>
+<th>Impacto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>n = 20 keyframes</td>
+<td>El subconjunto analizado es 20 de 45 disponibles. El umbral de significancia para correlación de Pearson es r &gt; 0.44 (α = 0.05, n = 20).</td>
+<td>Correlaciones menores a 0.44 pueden ser espurias</td>
+</tr>
+<tr>
+<td>5 keyframes sin video</td>
+<td>Los features <code>video_lum_std</code> y <code>video_sat_max</code> están disponibles solo en 15/20 keyframes</td>
+<td>No usar estas features como criterio de inclusión/exclusión de keyframes</td>
+</tr>
+<tr>
+<td>GT incompleto</td>
+<td>13–28% de píxeles inválidos por keyframe</td>
+<td>El AbsRel se calcula solo sobre píxeles válidos — no penaliza el borde donde el GT falta</td>
+</tr>
+<tr>
+<td>Train/test mismos cerdo diferente</td>
+<td>Los datasets de train (cerdo A) y test (cerdo C) son sujetos biológicamente diferentes</td>
+<td>La generalización entre sujetos es parte de la evaluación, no un problema a eliminar</td>
+</tr>
+<tr>
+<td><code>log_depth_median</code> redundante</td>
+<td>Correlación ≈ 1.0 con <code>depth_median</code></td>
+<td>Excluir de análisis de diagnóstico; el log se aplica a los tensores, no al dataframe</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-artefactos-producidos">10. Artefactos producidos</h2>
+<table>
+<thead>
+<tr>
+<th>Artefacto</th>
+<th>Ubicación</th>
+<th>Uso en Avance 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dataframe <code>df</code> (20 × 24)</td>
+<td>En memoria (exportable a CSV)</td>
+<td>Selección de keyframes de referencia y diagnóstico</td>
+</tr>
+<tr>
+<td>Pipeline tensorial (cap + log + scaler)</td>
+<td>Definido en celdas 2a–2c</td>
+<td>Aplicar a cada imagen/GT antes de pasar a los modelos</td>
+</tr>
+<tr>
+<td><code>vignette_score</code> por keyframe</td>
+<td>Columna en <code>df</code></td>
+<td>Ponderar métricas de evaluación por zona de imagen</td>
+</tr>
+<tr>
+<td><code>inpaint_ssim</code> por keyframe</td>
+<td>Columna en <code>df</code></td>
+<td>Identificar los keyframes más difíciles para el baseline</td>
+</tr>
+<tr>
+<td>Figura demo de inpainting (<code>21_correccion_demo.png</code>)</td>
+<td><code>outcomes/eda_outputs/</code></td>
+<td>Ilustración en reporte/presentación</td>
+</tr>
+<tr>
+<td>PCA geométrico (vectores propios)</td>
+<td>Resultado de celda 3c</td>
+<td>Referencia para alineación de nubes en Chamfer Distance</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="11-diagrama-del-flujo-de-consumo-mermaid">11. Diagrama del flujo de consumo (Mermaid)</h2>
+<p>Diagrama reproducible en cualquier visor Mermaid (GitHub, Mermaid Live, Notion, etc.).</p>
+<div class="mermaid">flowchart TD
+    A[("🗄️ SCARED\nkeyframes RGB + GT TIFF\ndatasets 1, 2, 8, 9")] --> B
+
+    subgraph FE["Avance 2 — Ingeniería de Características"]
+        direction TB
+        B["Extracción de features\nsat_pct · depth_valid_pct\nvignette_score · inpaint_ssim\nvideo_lum_std · video_sat_max"]
+        B --> C["Preprocesamiento de tensores\ncap 150 mm · log(Z+1)\nmin-max (fit en train)"]
+        C --> D["Selección de features\nPearson r > 0.44\nVarianceThreshold 0.01\nPCA geométrico"]
+    end
+
+    D --> SPLIT{Split}
+    SPLIT -->|"train\ndatasets 1–2"| CORR
+    SPLIT -->|"test\ndatasets 8–9"| EVAL
+
+    subgraph CORR["Corrección de iluminación\nvariable independiente"]
+        direction LR
+        E1["Sin corrección\nbaseline"]
+        E2["CLAHE\necual. adaptativa"]
+        E3["Retinex\nilum/reflectancia"]
+        E4["MonoIIT\nred neuronal"]
+    end
+
+    CORR --> MOD
+
+    subgraph MOD["Modelos de profundidad"]
+        direction LR
+        M1["NeXF\nNeural Radiance Fields"]
+        M2["EndoGaussian\nGaussian Splatting"]
+        M3["EndoDepthAndMotion\nPose + depth"]
+    end
+
+    MOD --> G["depth_map_estimado\nfloat32 · mm"]
+    G --> EVAL["Evaluación vs. GT\nAbsRel · RMSE · Chamfer Distance"]
+
+    EVAL --> H[("🏆 Tabla de resultados\n3 modelos × 4 métodos\n= 12 celdas de AbsRel\nGanador = min AbsRel en test")]
+
+    style FE fill:#1e3a5f,stroke:#4599ec,color:#e8f4fd
+    style CORR fill:#1a2e51,stroke:#4599ec,color:#e8f4fd
+    style MOD fill:#1a2e51,stroke:#4599ec,color:#e8f4fd
+    style H fill:#2766cb,stroke:#4599ec,color:#fff
+</div>
+<h2 id="referencias">Referencias</h2>
+<ul>
+<li>Allan, M., et al. (2021). Stereo Correspondence and Reconstruction of Endoscopic Data Challenge. <em>arXiv:2101.01133</em>.</li>
+<li>Visengeriyeva, L., et al. (2023). <em>CRISP-ML(Q): A Machine Learning Process Model with Quality Assurance Methodology</em>. https://ml-ops.org/content/crisp-ml</li>
+<li>Recasens, D., et al. (2021). Endo-Depth-and-Motion: Reconstruction and Tracking in a Surgical Setting Using Depth Prediction. <em>IEEE RA-L</em>.</li>
+</ul>
+
+<div class="doc-footer">
+  <p>Reporte generado por Equipo 52 · MNA TC5035.10 · Tec de Monterrey · 2026</p>
+  <p style="margin-top:.3rem;">Con asistencia de Claude (Anthropic, claude-sonnet-4-6). Análisis, código e interpretación: Equipo 52.</p>
+</div>
+
+</div>
+
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'dark',
+  themeVariables: {
+    primaryColor: '#2766CB',
+    primaryTextColor: '#e8f4fd',
+    primaryBorderColor: '#4599EC',
+    lineColor: '#4599EC',
+    secondaryColor: '#1A2E51',
+    tertiaryColor: '#244984',
+    background: '#1A2E51',
+    mainBkg: '#244984',
+    nodeBorder: '#4599EC',
+    clusterBkg: '#1e3a5f',
+    titleColor: '#e8f4fd',
+    edgeLabelBackground: '#1A2E51',
+    fontFamily: 'JetBrains Mono, monospace',
+  },
+});
+</script>
+
+</body>
+</html>
