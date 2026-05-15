@@ -222,6 +222,10 @@ La corrección de iluminación transforma `X_crudo → X_corrected` antes de pas
 3. Comparar AbsRel, RMSE, SSIM, PSNR y Chamfer Distance entre condiciones.
 4. Integrar Hamlyn y C3VD para validar la generalización del método.
 
+## Agradecimientos
+
+El Equipo 52 agradece la orientación y asesoría técnica del **Dr. Gilberto Ochoa Ruiz** y del **Dr. Ricardo Espinosa Loera** (Tecnológico de Monterrey), cuyas contribuciones al campo de la visión por computadora y el procesamiento de imágenes médicas enriquecieron el diseño metodológico de este proyecto.
+
 ## Nota sobre uso de inteligencia artificial
 
 El análisis de datos, el código, la interpretación de resultados y las decisiones metodológicas son trabajo del Equipo 52. Para la revisión de estilo en la redacción, la incorporación de buenas prácticas de código y la gestión del repositorio se utilizó [Claude](https://claude.ai) (Anthropic, modelo `claude-sonnet-4-6`) como asistente de productividad.

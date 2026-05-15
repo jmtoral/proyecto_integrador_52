@@ -286,27 +286,23 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
 <nav id="nav">
   <div class="nav-brand"><div class="dot"></div><span>Equipo 52 · MNA · TC5035.10</span></div>
   <ul class="nav-links">
+    <li><a href="#avances">Avances</a></li>
     <li><a href="#context">El problema</a></li>
     <li><a href="#datasets">Datos</a></li>
     <li><a href="#findings">Hallazgos EDA</a></li>
-    <li><a href="#gt">Ground Truth</a></li>
-    <li><a href="#resultados">Visualizaciones</a></li>
     <li><a href="#pipeline">Metodología</a></li>
     <li><a href="#equipo">Equipo</a></li>
-    <li><a href="#biblio">Referencias</a></li>
   </ul>
   <a href="https://github.com/jmtoral/proyecto_integrador_52" target="_blank" class="nav-cta">GitHub →</a>
   <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
+  <a href="#avances"    onclick="closeMobile()">Avances</a>
   <a href="#context"    onclick="closeMobile()">El problema</a>
   <a href="#datasets"   onclick="closeMobile()">Datos</a>
   <a href="#findings"   onclick="closeMobile()">Hallazgos EDA</a>
-  <a href="#gt"         onclick="closeMobile()">Ground Truth</a>
-  <a href="#resultados" onclick="closeMobile()">Visualizaciones</a>
   <a href="#pipeline"   onclick="closeMobile()">Metodología</a>
   <a href="#equipo"     onclick="closeMobile()">Equipo</a>
-  <a href="#biblio"     onclick="closeMobile()">Referencias</a>
   <a href="https://github.com/jmtoral/proyecto_integrador_52" target="_blank">GitHub →</a>
 </div>
 
@@ -339,7 +335,23 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
   </div>
 </section>
 
-<!-- ── Datasets (segunda sección) ── -->
+<!-- ── Avances PDF (segunda sección) ── -->
+<section id="avances" style="background:var(--m900);padding-top:5rem;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label reveal">// entregas</div>
+    <h2 class="section-title reveal" style="color:#fff;">Avances del proyecto</h2>
+    <p class="section-body reveal" style="color:var(--m200);max-width:720px;">Reportes formales entregados al equipo docente. Cada avance consolida los hallazgos de la etapa correspondiente y constituye la evidencia evaluable del proyecto.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:1.2rem;margin-top:2.5rem;">
+      <a href="reports/Avance1.52.pdf" target="_blank" class="btn-primary" style="display:inline-flex;align-items:center;gap:.6rem;font-size:1rem;padding:.9rem 2rem;">
+        <span style="font-size:1.3rem;">📄</span>
+        <span><strong>Avance 1</strong> — Análisis Exploratorio de Datos<br><small style="font-weight:400;opacity:.85;">PDF · Reporte ejecutivo EDA</small></span>
+      </a>
+    </div>
+    <p style="margin-top:1.5rem;font-size:.82rem;color:var(--m500);font-family:var(--ff-mono);">// Avance 2 y siguientes se publicarán conforme se completen las etapas del proyecto.</p>
+  </div>
+</section>
+
+<!-- ── Datasets (tercera sección) ── -->
 <section id="datasets" style="background:var(--m950);padding-top:5rem;">
   <div style="max-width:1100px;margin:0 auto;">
     <div class="section-label reveal">// datos</div>
@@ -715,6 +727,14 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
         <div class="faculty-chip"><strong>Dr. Luis Eduardo Falcón Morales</strong> · Profesor Titular</div>
         <div class="faculty-chip"><strong>Mtra. Verónica Sandra Guzmán de Valle</strong> · Profesora Asistente</div>
         <div class="faculty-chip"><strong>Dr. Gerardo Camacho</strong> · Patrocinador</div>
+      </div>
+    </div>
+    <div class="faculty-block reveal" style="margin-top:2rem;">
+      <h3>Agradecimientos — Asesores técnicos</h3>
+      <p style="font-size:.9rem;color:var(--m800);margin-bottom:1rem;line-height:1.7;">El Equipo 52 agradece la orientación y asesoría técnica de los siguientes investigadores del Tecnológico de Monterrey, cuyas contribuciones al campo de la visión por computadora y el procesamiento de imágenes médicas enriquecieron el diseño metodológico de este proyecto.</p>
+      <div class="faculty-list">
+        <div class="faculty-chip"><strong>Dr. Gilberto Ochoa Ruiz</strong> · Asesor técnico · Tec de Monterrey</div>
+        <div class="faculty-chip"><strong>Dr. Ricardo Espinosa Loera</strong> · Asesor técnico · Tec de Monterrey</div>
       </div>
     </div>
   </div>
