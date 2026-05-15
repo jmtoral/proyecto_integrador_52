@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>reporte_eda_iluminacion</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="01_reporte_eda_iluminacion_files/libs/clipboard/clipboard.min.js"></script>
+<script src="01_reporte_eda_iluminacion_files/libs/quarto-html/quarto.js"></script>
+<script src="01_reporte_eda_iluminacion_files/libs/quarto-html/popper.min.js"></script>
+<script src="01_reporte_eda_iluminacion_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="01_reporte_eda_iluminacion_files/libs/quarto-html/anchor.min.js"></script>
+<link href="01_reporte_eda_iluminacion_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="01_reporte_eda_iluminacion_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="01_reporte_eda_iluminacion_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="01_reporte_eda_iluminacion_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="01_reporte_eda_iluminacion_files/libs/bootstrap/bootstrap-8a79a254b8e706d3c925cde0a310d4f0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="reporte-eda-01-iluminación-no-uniforme-en-endoscopía" class="level1">
+<h1>Reporte EDA 01 — Iluminación no uniforme en endoscopía</h1>
+<p><strong>Notebook:</strong> <code>notebooks/01_eda_iluminacion.ipynb</code><br>
+<strong>Fecha de ejecución:</strong> 2026-05-11<br>
+<strong>Dataset:</strong> SCARED — <code>dataset_1</code>, keyframes 1 a 5<br>
+<strong>Autores:</strong> Equipo 52 — Proyecto Integrador TC5035.10</p>
+<hr>
+<section id="introducción" class="level2">
+<h2 class="anchored" data-anchor-id="introducción">Introducción</h2>
+<p>El análisis exploratorio del notebook <code>00_exploracion_scared.ipynb</code> caracterizó la estructura física del dataset SCARED: qué archivos contiene cada keyframe, qué dimensiones tienen las imágenes, qué rangos de valores almacena el mapa de profundidad y cómo está calibrada la cámara. Ese análisis respondió la pregunta de qué hay en los datos y cómo leerlos.</p>
+<p>Este notebook parte de ese conocimiento y hace una pregunta diferente: qué tan problemáticas son las imágenes RGB como entrada para un modelo de profundidad. La distinción importa porque un modelo no ve el dataset como una colección de archivos sino como una secuencia de píxeles con valores de intensidad. Si esos valores contienen un artefacto sistemático que no tiene relación con la escena, el modelo lo aprende como si fuera información real, y eso degrada su capacidad de generalizar.</p>
+<p>El artefacto en cuestión es el gradiente de iluminación radial: el endoscopio lleva su fuente de luz coaxial al lente, lo que produce imágenes más brillantes en el centro y más oscuras hacia los bordes. Ese gradiente no es información del tejido. Es una propiedad del instrumento. El objetivo de este análisis es cuantificar su severidad, identificar en qué keyframes es más grave y establecer si existe una correlación entre ese gradiente y la pérdida de datos de ground truth, que es el argumento central que justifica una etapa de corrección antes del entrenamiento.</p>
+<hr>
+</section>
+<section id="perfil-radial-de-luminancia" class="level2">
+<h2 class="anchored" data-anchor-id="perfil-radial-de-luminancia">1. Perfil radial de luminancia</h2>
+<section id="por-qué-se-calcula" class="level3">
+<h3 class="anchored" data-anchor-id="por-qué-se-calcula">Por qué se calcula</h3>
+<p>Antes de proponer cualquier corrección es necesario describir la forma del problema. El gradiente de iluminación podría ser uniforme en todos los keyframes o variar según el movimiento del endoscopio. Podría caer suavemente o de forma abrupta. Podría afectar por igual el centro y la periferia o concentrarse en los bordes.</p>
+<p>La luminancia es la forma estándar de medir el brillo percibido en una imagen a color. No es simplemente el promedio de los tres canales RGB sino una combinación ponderada que reproduce la sensibilidad del ojo humano a cada color (formula ITU-R BT.601: <code>Y = 0.299*R + 0.587*G + 0.114*B</code>). Se usa en lugar del brillo bruto porque refleja mejor lo que el modelo “ve” al procesar la imagen.</p>
+<p>El perfil radial convierte ese mapa 2D de luminancia en una curva 1D agrupando los píxeles por distancia al centro. Esto permite comparar keyframes de forma directa sin que las diferencias de contenido del tejido (que cambia entre keyframes) contaminen la comparación.</p>
+</section>
+<section id="metodología" class="level3">
+<h3 class="anchored" data-anchor-id="metodología">Metodología</h3>
+<p>Para cada píxel de la imagen se calculó su distancia en píxeles al centro geométrico. El centro geométrico es simplemente el punto medio del sensor: con imágenes de 1280x1024 píxeles, ese punto es (640, 512), es decir, la mitad del ancho y la mitad del alto. No es una estimación ni un parámetro de calibración — es una propiedad de la resolución de la imagen. Los píxeles se agruparon en anillos de 5 píxeles de anchura y se promedió la luminancia de todos los píxeles dentro de cada anillo. El resultado es un perfil unidimensional que muestra cuánta luz recibe el sensor en función de la distancia al centro. Este procedimiento se repitió para los cinco keyframes de <code>dataset_1</code>.</p>
+</section>
+<section id="resultados" class="level3">
+<h3 class="anchored" data-anchor-id="resultados">Resultados</h3>
+<p>La Figura 1 muestra los perfiles radiales de luminancia para los cinco keyframes. Todas las curvas comparten la misma forma: parten de valores altos en el centro (entre 140 y 180 unidades sobre una escala de 0 a 255) y descienden de forma continua hacia los bordes, donde llegan a valores de entre 40 y 80 unidades. La caída es gradual y no presenta discontinuidades, lo que confirma que el origen es óptico y no una variación del tejido.</p>
+<p><strong>Figura 1.</strong> Perfil radial de luminancia y ratio centro/borde por keyframe.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/16_perfil_radial.png" class="img-fluid figure-img"></p>
+<figcaption>Perfil radial de luminancia</figcaption>
+</figure>
+</div>
+<p><em>Nota. Elaboración propia. Izquierda: perfil de luminancia promedio por distancia radial para los cinco keyframes de dataset_1. Derecha: ratio entre la luminancia del centro y la del borde de cada keyframe.</em></p>
+<p>La gráfica de barras de la derecha resume la severidad del gradiente mediante el ratio entre la luminancia promedio del centro y la del borde:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Keyframe</th>
+<th>Ratio centro/borde</th>
+<th>Clasificación</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>KF1</td>
+<td>1.33x</td>
+<td>Leve</td>
+</tr>
+<tr class="even">
+<td>KF2</td>
+<td>2.03x</td>
+<td>Moderado</td>
+</tr>
+<tr class="odd">
+<td>KF3</td>
+<td>3.26x</td>
+<td>Severo</td>
+</tr>
+<tr class="even">
+<td>KF4</td>
+<td>3.22x</td>
+<td>Severo</td>
+</tr>
+<tr class="odd">
+<td>KF5</td>
+<td>2.72x</td>
+<td>Severo</td>
+</tr>
+</tbody>
+</table>
+<p>En KF3 y KF4 el centro es más de tres veces más brillante que el borde. Para un modelo de visión, esto equivale a recibir información de “textura” que en realidad representa casi en su totalidad la geometría del sistema óptico y no las propiedades del tejido. Si el modelo aprende esta correlación, no generalizará a condiciones distintas de iluminación.</p>
+<hr>
+</section>
+</section>
+<section id="mapa-2d-del-gradiente-de-iluminación" class="level2">
+<h2 class="anchored" data-anchor-id="mapa-2d-del-gradiente-de-iluminación">2. Mapa 2D del gradiente de iluminación</h2>
+<section id="por-qué-se-calcula-1" class="level3">
+<h3 class="anchored" data-anchor-id="por-qué-se-calcula-1">Por qué se calcula</h3>
+<p>El perfil radial de la sección anterior asume implícitamente que el gradiente es simétrico respecto al centro geométrico del sensor. Pero eso no tiene por qué ser cierto. La fuente de luz del endoscopio no apunta necesariamente al centro del sensor — está montada alrededor del lente, y pequeñas asimetrías en el montaje o la óptica desplazan el punto de máxima intensidad.</p>
+<p>Para verificar si el gradiente es simétrico o no, y para saber dónde está realmente su máximo, es necesario ver el mapa 2D completo sin reducirlo a un perfil promedio. Ese mapa también es la entrada que necesitaría cualquier algoritmo de corrección: si sabemos dónde es la iluminación alta y dónde es baja, podemos estimar cuánto amplificar cada zona para uniformizar la imagen.</p>
+</section>
+<section id="cómo-se-determinó-el-centro-óptico" class="level3">
+<h3 class="anchored" data-anchor-id="cómo-se-determinó-el-centro-óptico">Cómo se determinó el centro óptico</h3>
+<p>Las imágenes del dataset SCARED tienen resolución 1280x1024 píxeles. El centro geométrico del sensor es por definición el punto (640, 512): la mitad exacta del ancho y del alto. Ese punto no depende de calibración alguna.</p>
+<p>El centro óptico, en cambio, es el punto de la imagen donde la proyección del eje óptico de la lente intersecta el plano del sensor. Es un parámetro de calibración que figura en el archivo <code>endoscope_calibration.yaml</code> de cada keyframe del dataset. Ese archivo almacena la matriz intrínseca de la cámara izquierda en formato OpenCV:</p>
+<pre><code>K = [[fx,  0, cx],
+     [ 0, fy, cy],
+     [ 0,  0,  1]]</code></pre>
+<p>Los valores leídos directamente de <code>dataset_1/keyframe_1/endoscope_calibration.yaml</code> son <code>cx = 597.0</code> y <code>cy = 520.4</code>. El desplazamiento respecto al centro geométrico es de 43 píxeles en horizontal y 8 píxeles en vertical. Este desplazamiento es esperado en lentes endoscópicos donde el montaje del sistema óptico raramente queda perfectamente centrado sobre el sensor.</p>
+</section>
+<section id="metodología-1" class="level3">
+<h3 class="anchored" data-anchor-id="metodología-1">Metodología</h3>
+<p>Se calculó la luminancia promedio píxel a píxel entre los cinco keyframes. El resultado es un mapa que captura el patrón de iluminación estable a lo largo de la sesión, independientemente del movimiento del tejido. Promediar varios keyframes tiene una ventaja importante: el tejido cambia de posición entre captures, así que al promediar se cancela la contribución del tejido y queda solo lo que es constante, es decir, la iluminación del instrumento. Sobre ese promedio se aplicó un filtro gaussiano con desviación estándar de 40 píxeles para eliminar cualquier textura residual que el promedio no haya cancelado completamente, dejando únicamente la envolvente de baja frecuencia. El cociente entre el valor máximo de esa envolvente y cada píxel constituye el mapa de corrección estimado: indica cuánto habría que amplificar cada zona para igualarla al punto más brillante.</p>
+</section>
+<section id="resultados-1" class="level3">
+<h3 class="anchored" data-anchor-id="resultados-1">Resultados</h3>
+<p>La Figura 2 presenta los tres mapas resultantes: el promedio bruto de luminancia, la envolvente suavizada y el mapa de corrección.</p>
+<p><strong>Figura 2.</strong> Mapa 2D del gradiente de iluminación y factor de corrección estimado.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/17_mapa_gradiente.png" class="img-fluid figure-img"></p>
+<figcaption>Mapa 2D del gradiente</figcaption>
+</figure>
+</div>
+<p><em>Nota. Elaboración propia. Izquierda: luminancia promedio entre los cinco keyframes. Centro: envolvente de iluminación suavizada (sigma=40). Derecha: mapa de corrección, donde el rojo indica zonas que requieren mayor amplificación.</em></p>
+<p>El manchon brillante en la imagen central no está centrado en el punto geométrico (640, 512), marcado con una cruz azul, sino desplazado hacia la zona superior derecha, próxima al centro óptico de la cámara izquierda (cx=597, cy=520), marcado con una cruz roja. La coincidencia entre el pico de luminancia y el centro óptico obtenido de la calibración confirma que el desplazamiento no es un artefacto del análisis sino una propiedad real del sistema óptico.</p>
+<p>El mapa de corrección muestra que las zonas de los bordes inferiores requieren amplificarse entre 2x y 3x para igualar el brillo del centro. Una corrección radial simétrica no es suficiente porque el gradiente no es simétrico. Cualquier método que asuma que la fuente de luz está exactamente en el centro geométrico va a sub-corregir el lado izquierdo y sobre-corregir el derecho.</p>
+<hr>
+</section>
+</section>
+<section id="especulares-y-cobertura-de-ground-truth" class="level2">
+<h2 class="anchored" data-anchor-id="especulares-y-cobertura-de-ground-truth">3. Especulares y cobertura de ground truth</h2>
+<section id="por-qué-se-calculan" class="level3">
+<h3 class="anchored" data-anchor-id="por-qué-se-calculan">Por qué se calculan</h3>
+<p>Hasta aquí el análisis describió el gradiente como un problema continuo y suave. Pero hay un segundo fenómeno de iluminación que actúa de forma puntual y discreta: los reflejos especulares. Son manchas brillantes que aparecen cuando la superficie húmeda del tejido actúa como espejo y devuelve la luz del endoscopio directamente hacia el sensor sin dispersión. En esas zonas el sensor se satura y no registra información del tejido sino solo luz.</p>
+<p>El motivo por el que esto importa para el proyecto es que el proyector de luz estructurada que genera el ground truth de profundidad tampoco puede triangular en esas zonas: la reflexión especular impide que el patrón de luz estructurada sea visible. El resultado es que los píxeles especulares no tienen profundidad en el archivo TIFF, y si el modelo intenta predecir profundidad en esas zonas, no tiene ninguna referencia contra la que compararse ni aprender.</p>
+<p>Cuantificar cuántos especulares hay, dónde están y qué fracción de la pérdida de ground truth explican permite entender si el problema de datos faltantes es principalmente un problema de iluminación (que la corrección podría mitigar) o un problema estructural del tejido (que requiere otro tratamiento).</p>
+</section>
+<section id="metodología-2" class="level3">
+<h3 class="anchored" data-anchor-id="metodología-2">Metodología</h3>
+<p>Se detectaron los reflejos especulares como píxeles donde los tres canales RGB superan simultáneamente el valor 240, cerca del máximo de 255. La condición de los tres canales simultáneamente es importante: un píxel con solo el canal rojo alto no es un especular sino tejido vascular muy rojo, que es normal en endoscopía. Un especular verdadero satura por igual los tres canales porque la reflexión especular no tiene color propio. Adicionalmente, se calculó la cobertura de ground truth como el porcentaje de píxeles con valor Z mayor a cero en el mapa TIFF. Finalmente, se midió el solapamiento entre la máscara de especulares y la máscara de píxeles sin GT para cuantificar en qué medida los especulares explican la pérdida de datos de profundidad.</p>
+</section>
+<section id="resultados-2" class="level3">
+<h3 class="anchored" data-anchor-id="resultados-2">Resultados</h3>
+<p>La Figura 3 muestra las imágenes RGB con los especulares detectados en cian (fila superior) y las máscaras de cobertura de GT en verde y rojo (fila inferior).</p>
+<p><strong>Figura 3.</strong> Especulares detectados y cobertura de ground truth de profundidad por keyframe.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/18_especulares.png" class="img-fluid figure-img"></p>
+<figcaption>Especulares y cobertura GT</figcaption>
+</figure>
+</div>
+<p><em>Nota. Elaboración propia. Fila superior: imagen RGB con especulares detectados en cian (umbral R, G, B &gt; 240). Fila inferior: máscara de cobertura de ground truth (verde = profundidad válida, rojo = sin medición).</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Keyframe</th>
+<th>Especulares (%)</th>
+<th>Sin GT (%)</th>
+<th>Solapamiento (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>KF1</td>
+<td>1.12</td>
+<td>21.6</td>
+<td>21.4</td>
+</tr>
+<tr class="even">
+<td>KF2</td>
+<td>0.91</td>
+<td>17.0</td>
+<td>8.7</td>
+</tr>
+<tr class="odd">
+<td>KF3</td>
+<td>1.57</td>
+<td>13.2</td>
+<td>13.5</td>
+</tr>
+<tr class="even">
+<td>KF4</td>
+<td>0.71</td>
+<td>27.0</td>
+<td>14.6</td>
+</tr>
+<tr class="odd">
+<td>KF5</td>
+<td>0.43</td>
+<td>28.1</td>
+<td>38.2</td>
+</tr>
+</tbody>
+</table>
+<p>El porcentaje de especulares es bajo en todos los keyframes (entre 0.43% y 1.57%), pero la pérdida de ground truth es alta: entre el 13.2% y el 28.1% de los píxeles no tienen profundidad medida. El solapamiento variable entre ambas máscaras (de 8.7% en KF2 a 38.2% en KF5) indica que los especulares no son la causa principal de la pérdida de GT en este dataset. La mayor parte del GT faltante corresponde a zonas de curvatura extrema del tejido donde el ángulo de incidencia del proyector de luz estructurada es demasiado oblicuo para permitir triangulación, lo que no se refleja necesariamente en saturación visible de los canales RGB.</p>
+<p>Para el proyecto esto significa que la corrección de iluminación no recuperará el GT perdido por curvatura, pero sí reducirá la confusión del modelo en las zonas donde sí hay GT disponible y la iluminación distorsiona la señal.</p>
+<hr>
+</section>
+</section>
+<section id="correlación-luminancia-y-cobertura-de-ground-truth" class="level2">
+<h2 class="anchored" data-anchor-id="correlación-luminancia-y-cobertura-de-ground-truth">4. Correlación luminancia y cobertura de ground truth</h2>
+<section id="por-qué-se-calcula-2" class="level3">
+<h3 class="anchored" data-anchor-id="por-qué-se-calcula-2">Por qué se calcula</h3>
+<p>Las secciones anteriores describen dos fenómenos por separado: el gradiente de iluminación y la pérdida de ground truth. Esta sección pregunta si ambos fenómenos están relacionados espacialmente. Si lo están, significa que la iluminación no solo distorsiona la señal visual sino que también predice dónde el modelo no va a tener datos para aprender. Eso convertiría el gradiente en un problema doble: introduce sesgo en las zonas donde sí hay GT, y concentra la ausencia de GT precisamente en las zonas de mayor sesgo.</p>
+<p>El coeficiente de correlación de Pearson mide si dos variables suben y bajan juntas. Un valor cercano a -1 significa que cuando una sube, la otra baja, de forma sistemática. Aplicado a luminancia y cobertura de GT por distancia radial, un r cercano a -1 diría que las zonas más brillantes son las que menos GT tienen.</p>
+</section>
+<section id="metodología-3" class="level3">
+<h3 class="anchored" data-anchor-id="metodología-3">Metodología</h3>
+<p>Utilizando los mismos anillos radiales de la Sección 1, se calculó en paralelo la luminancia promedio y el porcentaje de píxeles con GT válido para cada bin de distancia. Se obtuvieron dos curvas por keyframe y se calculó el coeficiente de correlación de Pearson entre ellas para cuantificar si las zonas más brillantes tienden a tener más o menos GT disponible.</p>
+</section>
+<section id="resultados-3" class="level3">
+<h3 class="anchored" data-anchor-id="resultados-3">Resultados</h3>
+<p>La Figura 4 superpone las curvas de luminancia (naranja, eje izquierdo) y de cobertura de GT (azul discontinuo, eje derecho) para cada keyframe.</p>
+<p><strong>Figura 4.</strong> Correlación entre luminancia y cobertura de ground truth por distancia radial.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/19_correlacion_lum_gt.png" class="img-fluid figure-img"></p>
+<figcaption>Correlación luminancia y GT</figcaption>
+</figure>
+</div>
+<p><em>Nota. Elaboración propia. Cada subgráfica muestra la luminancia promedio (naranja, eje izquierdo) y el porcentaje de píxeles con GT válido (azul, eje derecho) en función de la distancia al centro. El coeficiente r de Pearson se indica en el título de cada subgráfica.</em></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Keyframe</th>
+<th>Correlación de Pearson (r)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>KF1</td>
+<td>-0.659</td>
+</tr>
+<tr class="even">
+<td>KF2</td>
+<td>-0.857</td>
+</tr>
+<tr class="odd">
+<td>KF3</td>
+<td>-0.842</td>
+</tr>
+<tr class="even">
+<td>KF4</td>
+<td>-0.828</td>
+</tr>
+<tr class="odd">
+<td>KF5</td>
+<td>-0.062</td>
+</tr>
+</tbody>
+</table>
+<p>En cuatro de los cinco keyframes la correlación es negativa y moderada a fuerte. Esto significa que las zonas más brillantes de la imagen son, en promedio, exactamente las zonas con menos datos de ground truth disponibles. La curva de luminancia (naranja) sube mientras la de GT (azul) baja, y viceversa. El mecanismo es el siguiente: el gradiente de iluminación concentra el máximo de brillo en el centro, que es también la zona con mayor probabilidad de reflejos especulares por ser la más directamente iluminada; esos especulares impiden la triangulación del proyector de luz estructurada, generando los píxeles NaN en el TIFF.</p>
+<p>KF5 es la excepción con r cercano a cero, lo que sugiere que en ese keyframe la posición del tejido o el ángulo de captura distribuyen la pérdida de GT de forma más uniforme a lo largo del radio, independientemente del gradiente.</p>
+<p>Este es el hallazgo cuantitativo central del proyecto: si el gradiente de iluminación predice sistemáticamente dónde fallan los datos de entrenamiento, corregirlo reduce el sesgo espacial del modelo hacia las zonas brillantes del centro.</p>
+<hr>
+</section>
+</section>
+<section id="índice-de-no-uniformidad" class="level2">
+<h2 class="anchored" data-anchor-id="índice-de-no-uniformidad">5. Índice de No-Uniformidad</h2>
+<section id="por-qué-se-calcula-3" class="level3">
+<h3 class="anchored" data-anchor-id="por-qué-se-calcula-3">Por qué se calcula</h3>
+<p>Los análisis anteriores producen múltiples métricas por keyframe: el perfil radial, el ratio centro/borde, el porcentaje de especulares, la correlación con el GT. Para comparar keyframes de forma rápida y para poder decir en el reporte final qué keyframe fue el más problemático, es útil tener un solo número que resuma el estado general de la iluminación.</p>
+<p>El Índice de No-Uniformidad (INU) cumple ese rol. Es una métrica estándar de procesamiento de imágenes que mide qué tan variable es la iluminación en relación a su nivel promedio. Un INU de 0 significa iluminación perfectamente plana. Cuanto más alto, más heterogénea es la imagen. Su ventaja sobre el ratio centro/borde es que no asume que el problema es radial: captura cualquier fuente de variabilidad espacial, incluyendo especulares, sombras o bordes oscuros.</p>
+</section>
+<section id="metodología-4" class="level3">
+<h3 class="anchored" data-anchor-id="metodología-4">Metodología</h3>
+<p>El INU se define como el cociente entre la desviación estándar y la media de la luminancia en toda la imagen: <code>INU = std(luminancia) / mean(luminancia)</code>. Se calculó para cada keyframe junto con el ratio centro/borde de la Sección 1 y el porcentaje de especulares de la Sección 3, formando una tabla resumen de indicadores de calidad de iluminación ordenada de mayor a menor INU.</p>
+</section>
+<section id="resultados-4" class="level3">
+<h3 class="anchored" data-anchor-id="resultados-4">Resultados</h3>
+<p>La Figura 5 presenta los tres indicadores como gráficas de barras ordenadas de mayor a menor INU.</p>
+<p><strong>Figura 5.</strong> Resumen de indicadores de iluminación por keyframe.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/20_indicadores_iluminacion.png" class="img-fluid figure-img"></p>
+<figcaption>Indicadores de iluminación</figcaption>
+</figure>
+</div>
+<p><em>Nota. Elaboración propia. Izquierda: INU (std/mean de luminancia). Centro: ratio luminancia centro/borde. Derecha: porcentaje de especulares detectados. Barras ordenadas de mayor a menor INU.</em></p>
+<p><strong>Tabla 3.</strong> Tabla resumen de indicadores de iluminación por keyframe, ordenada de mayor a menor INU.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Keyframe</th>
+<th>Lum. media</th>
+<th>Lum. std</th>
+<th>INU</th>
+<th>Ratio C/B</th>
+<th>Especulares (%)</th>
+<th>GT válido (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>KF5</td>
+<td>93.2</td>
+<td>61.9</td>
+<td>0.665</td>
+<td>2.72x</td>
+<td>0.43</td>
+<td>71.9</td>
+</tr>
+<tr class="even">
+<td>KF3</td>
+<td>98.9</td>
+<td>54.9</td>
+<td>0.555</td>
+<td>3.26x</td>
+<td>1.57</td>
+<td>86.8</td>
+</tr>
+<tr class="odd">
+<td>KF4</td>
+<td>97.4</td>
+<td>50.7</td>
+<td>0.521</td>
+<td>3.22x</td>
+<td>0.71</td>
+<td>73.0</td>
+</tr>
+<tr class="even">
+<td>KF2</td>
+<td>101.4</td>
+<td>51.0</td>
+<td>0.504</td>
+<td>2.03x</td>
+<td>0.91</td>
+<td>83.0</td>
+</tr>
+<tr class="odd">
+<td>KF1</td>
+<td>97.6</td>
+<td>48.0</td>
+<td>0.492</td>
+<td>1.33x</td>
+<td>1.12</td>
+<td>78.4</td>
+</tr>
+</tbody>
+</table>
+<p>KF5 encabeza el ranking con un INU de 0.665 a pesar de tener la luminancia media más baja (93.2) y el menor porcentaje de especulares (0.43%). Su alta variabilidad interna se debe a que contiene zonas muy oscuras en los bordes y zonas relativamente brillantes en el centro, con una diferencia que la desviación estándar de 61.9 refleja. KF3 y KF4 tienen los ratios C/B más extremos (3.26x y 3.22x) pero una desviación estándar algo menor, lo que los coloca en segundo y tercer lugar. KF1 es el keyframe con iluminación más regular, con un ratio de 1.33x y un INU de 0.492, aunque incluso ese valor está lejos de la uniformidad.</p>
+<hr>
+</section>
+</section>
+<section id="demostración-cualitativa-de-corrección" class="level2">
+<h2 class="anchored" data-anchor-id="demostración-cualitativa-de-corrección">6. Demostración cualitativa de corrección</h2>
+<section id="por-qué-se-incluye" class="level3">
+<h3 class="anchored" data-anchor-id="por-qué-se-incluye">Por qué se incluye</h3>
+<p>Hasta aquí el análisis describió el problema pero no propuso solución. Esta sección sirve para un propósito específico: demostrar que el problema es tratable con medios simples antes de invertir esfuerzo en métodos más complejos. Si una corrección básica no produce ninguna mejora visible, sería una señal de que el problema está mal planteado. Si produce mejora visible, justifica buscar métodos más sofisticados.</p>
+<p>La corrección por división de envolvente es la más simple posible: se estima dónde hay más y menos luz, y se divide la imagen por ese mapa para nivelarla. No es el método definitivo del proyecto sino una prueba de concepto que establece una línea base cualitativa.</p>
+</section>
+<section id="metodología-5" class="level3">
+<h3 class="anchored" data-anchor-id="metodología-5">Metodología</h3>
+<p>Se aplicó la corrección sobre KF5, el keyframe de mayor INU. Se estimó la envolvente de iluminación de ese keyframe específico aplicando un filtro gaussiano con desviación estándar de 60 píxeles sobre su luminancia, se normalizó al rango [0, 1] y se dividió cada canal RGB por esa envolvente. Los valores resultantes se recortaron al rango [0, 255]. Se calculó el INU antes y después de la corrección para tener una medida cuantitativa del cambio, además de la comparación visual.</p>
+</section>
+<section id="resultados-5" class="level3">
+<h3 class="anchored" data-anchor-id="resultados-5">Resultados</h3>
+<p>La Figura 6 muestra la imagen original de KF5, la imagen corregida y el mapa de diferencias absolutas amplificado tres veces para facilitar la visualización.</p>
+<p><strong>Figura 6.</strong> Demostración cualitativa de corrección de iluminación sobre KF5.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/21_correccion_demo.png" class="img-fluid figure-img"></p>
+<figcaption>Demostración de corrección</figcaption>
+</figure>
+</div>
+<p><em>Nota. Elaboración propia. Izquierda: imagen original de KF5. Centro: imagen corregida por división de envolvente gaussiana (sigma=60). Derecha: diferencia absoluta amplificada por un factor de 3, donde el amarillo indica mayor cambio.</em></p>
+<p>La imagen corregida muestra que el tejido del borde inferior izquierdo, prácticamente negro en la original, recupera detalle y textura visible. Los cambios más grandes ocurren en los bordes (color amarillo en el mapa de diferencias), donde la envolvente era baja y la corrección más agresiva. El centro cambia poco porque ya era brillante y la envolvente es alta ahí.</p>
+<p>El cambio de tonalidad hacia colores más fríos en la imagen corregida (más rosa y azul) es un artefacto de aplicar la corrección de forma independiente canal por canal: la envolvente estimada sobre la luminancia no corrige igual los tres canales RGB, lo que modifica el balance de color. Los métodos que se evaluarán en etapas posteriores del proyecto (CLAHE, Retinex, MonoIIF) abordan específicamente este problema aplicando la corrección de forma que preserve el balance de color y no amplifique el ruido del sensor en los bordes.</p>
+<hr>
+</section>
+</section>
+<section id="resumen-ejecutivo" class="level2">
+<h2 class="anchored" data-anchor-id="resumen-ejecutivo">7. Resumen ejecutivo</h2>
+<p>El análisis sobre los cinco keyframes de <code>dataset_1</code> produce cinco hallazgos concretos con implicaciones directas para el diseño del pipeline de entrenamiento:</p>
+<p><strong>Primero</strong>, el gradiente radial de iluminación es sistemático y afecta a todos los keyframes sin excepción. El ratio entre la luminancia del centro y la del borde oscila entre 1.33x en el keyframe menos afectado y 3.26x en el más afectado. Un gradiente de esa magnitud introduce un sesgo estructural en cualquier modelo que aprenda directamente de estas imágenes.</p>
+<p><strong>Segundo</strong>, el gradiente no es simétrico. El manchon de máxima luminancia está desplazado hacia el centro óptico de la cámara (cx=597, cy=520), obtenido del archivo de calibración <code>endoscope_calibration.yaml</code>, y no hacia el centro geométrico del sensor (640, 512), que es simplemente la mitad de la resolución de la imagen. Esto invalida los métodos de corrección que asumen simetría radial y exige estimación explícita de la envolvente de iluminación.</p>
+<p><strong>Tercero</strong>, existe una correlación negativa fuerte entre luminancia y cobertura de ground truth en cuatro de los cinco keyframes (r entre -0.66 y -0.86). Las zonas más brillantes son las que más frecuentemente carecen de datos de profundidad válidos. Este hallazgo es el argumento cuantitativo principal para incluir una etapa de corrección antes del entrenamiento.</p>
+<p><strong>Cuarto</strong>, la pérdida de ground truth (13% a 28% según el keyframe) se explica solo parcialmente por los especulares detectados (0.43% a 1.57%). La curvatura del tejido contribuye con la mayor parte de la pérdida. La corrección de iluminación no recuperará ese GT faltante, pero sí reducirá el sesgo del modelo en las zonas donde sí hay GT disponible.</p>
+<p><strong>Quinto</strong>, una corrección simple por división de envolvente gaussiana es suficiente para demostrar que el problema es tratable, pero introduce distorsión de color y amplificación de ruido. Los métodos CLAHE, Retinex y MonoIIF son los candidatos a evaluar en la siguiente etapa del proyecto.</p>
+<p>El keyframe más problemático según el INU es KF5 (INU=0.665, GT válido=71.9%) y es el candidato principal para los primeros experimentos de corrección. KF3 y KF4, con los ratios C/B más extremos (&gt;3.2x), son complementos útiles para evaluar si la corrección reduce el error de profundidad bajo condiciones de gradiente severo.</p>
+<hr>
+</section>
+<section id="referencias" class="level2">
+<h2 class="anchored" data-anchor-id="referencias">Referencias</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Referencia APA</th>
+<th>Sección relevante</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Allan, M., Mcleod, J., Wang, C., Rosenthal, J. C., Hu, Z., Gard, N., … Speidel, S. (2021). <em>Stereo correspondence and reconstruction of endoscopic data challenge</em>. arXiv:2101.01133.</td>
+<td>Dataset SCARED, interpretación de NaN en depth maps</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Gonzalez, R. C., &amp; Woods, R. E. (2018). <em>Digital image processing</em> (4.ª ed.). Pearson.</td>
+<td>Shading correction, INU, homomorphic filtering (caps. 3, 5, 6)</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Land, E. H., &amp; McCann, J. J. (1971). Lightness and Retinex theory. <em>Journal of the Optical Society of America</em>, <em>61</em>(1), 1–11.</td>
+<td>Base teórica de la corrección por división de envolvente</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Yu, B., Chen, W., Zhong, Q., &amp; Zhang, H. (2021). Specular highlight detection based on color distribution for endoscopic images. <em>Frontiers in Physics</em>, <em>8</em>, 616930. https://doi.org/10.3389/fphy.2020.616930</td>
+<td>Criterio de detección de especulares (tres canales &gt; umbral)</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Stoyanov, D., Visentini Scarzanella, M., Pratt, P., &amp; Yang, G.-Z. (2010). Real-time stereo reconstruction in robotically assisted minimally invasive surgery. En T. Jiang et al.&nbsp;(Eds.), <em>Medical Image Computing and Computer-Assisted Intervention – MICCAI 2010</em> (LNCS, vol.&nbsp;6361, pp.&nbsp;275–282). Springer. https://doi.org/10.1007/978-3-642-15705-9_34</td>
+<td>Gradiente radial como artefacto dominante en endoscopía</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Cui, B., Islam, M., Bai, L., &amp; Ren, H. (2024). Surgical-DINO: Adapter learning of foundation models for depth estimation in endoscopic surgery. <em>International Journal of Computer Assisted Radiology and Surgery</em>, <em>19</em>(6), 1013–1020. https://doi.org/10.1007/s11548-024-03083-5</td>
+<td>Motivación del proyecto: corrección de iluminación mejora depth</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><em>Reporte generado a partir de los outputs de <code>notebooks/01_eda_iluminacion.ipynb</code>. Imágenes en <code>outcomes/eda_outputs/</code>.</em></p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

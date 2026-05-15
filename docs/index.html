@@ -163,6 +163,23 @@ section{padding:5rem clamp(1.2rem,5vw,5rem);}
 .pipe-highlight .pipe-label{color:var(--m200);}
 .pipe-highlight .pipe-label strong{color:var(--m400);}
 
+/* ── GT section ── */
+#gt{background:var(--m900);}
+.gt-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;max-width:1100px;margin:0 auto;}
+@media(max-width:768px){.gt-grid{grid-template-columns:1fr;}}
+.gt-why-list{margin-top:1.2rem;display:flex;flex-direction:column;gap:.9rem;}
+.gt-why-item{display:grid;grid-template-columns:2rem 1fr;gap:.6rem;align-items:start;}
+.gt-why-num{font-family:var(--ff-mono);font-weight:700;color:var(--m400);font-size:1rem;padding-top:.05rem;}
+.gt-why-text{font-size:.9rem;color:var(--m200);line-height:1.65;}
+.gt-why-text strong{color:var(--m300);}
+.kf-vs-video{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+.kv-card{background:rgba(255,255,255,.05);border:1px solid rgba(69,153,236,.2);border-radius:10px;padding:1.2rem;}
+.kv-card .kv-label{font-family:var(--ff-mono);font-size:.75rem;color:var(--m400);letter-spacing:.06em;margin-bottom:.5rem;}
+.kv-card p{font-size:.85rem;color:var(--m200);line-height:1.6;}
+.kv-card ul{margin:.5rem 0 0 1rem;font-size:.83rem;color:var(--m200);line-height:1.7;}
+.kv-card.highlight{border-color:rgba(224,168,0,.4);background:rgba(224,168,0,.06);}
+.kv-card.highlight .kv-label{color:var(--m-gold, var(--gold));}
+
 /* ── Gallery ── */
 #resultados{background:var(--m100);color:var(--m950);}
 #resultados .section-title{color:var(--m900);}
@@ -270,10 +287,11 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
   <div class="nav-brand"><div class="dot"></div><span>Equipo 52 · MNA · TC5035.10</span></div>
   <ul class="nav-links">
     <li><a href="#context">El problema</a></li>
-    <li><a href="#problema">Artefactos</a></li>
-    <li><a href="#findings">Hallazgos</a></li>
-    <li><a href="#resultados">EDA</a></li>
-    <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#datasets">Datos</a></li>
+    <li><a href="#findings">Hallazgos EDA</a></li>
+    <li><a href="#gt">Ground Truth</a></li>
+    <li><a href="#resultados">Visualizaciones</a></li>
+    <li><a href="#pipeline">Metodología</a></li>
     <li><a href="#equipo">Equipo</a></li>
     <li><a href="#biblio">Referencias</a></li>
   </ul>
@@ -281,13 +299,14 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
   <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#context"   onclick="closeMobile()">El problema</a>
-  <a href="#problema"  onclick="closeMobile()">Artefactos</a>
-  <a href="#findings"  onclick="closeMobile()">Hallazgos</a>
-  <a href="#resultados" onclick="closeMobile()">EDA</a>
-  <a href="#pipeline"  onclick="closeMobile()">Pipeline</a>
-  <a href="#equipo"    onclick="closeMobile()">Equipo</a>
-  <a href="#biblio"    onclick="closeMobile()">Referencias</a>
+  <a href="#context"    onclick="closeMobile()">El problema</a>
+  <a href="#datasets"   onclick="closeMobile()">Datos</a>
+  <a href="#findings"   onclick="closeMobile()">Hallazgos EDA</a>
+  <a href="#gt"         onclick="closeMobile()">Ground Truth</a>
+  <a href="#resultados" onclick="closeMobile()">Visualizaciones</a>
+  <a href="#pipeline"   onclick="closeMobile()">Metodología</a>
+  <a href="#equipo"     onclick="closeMobile()">Equipo</a>
+  <a href="#biblio"     onclick="closeMobile()">Referencias</a>
   <a href="https://github.com/jmtoral/proyecto_integrador_52" target="_blank">GitHub →</a>
 </div>
 
@@ -300,7 +319,7 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
 
     <div class="hero-problem">
       <p><strong>El problema en una oración:</strong> el endoscopio lleva su propia fuente de luz, lo que produce imágenes con el centro 2–3× más brillante que los bordes — y ese gradiente no es información del tejido, es un artefacto del instrumento que los modelos de IA confunden con textura real.</p>
-      <p>Los modelos de profundidad monocular (NeXF, EndoGaussian, EndoDepthAndMotion) aprenden este patrón sistemático y lo incorporan como "conocimiento" sobre la escena. El resultado es que el mapa de profundidad estimado hereda el sesgo de iluminación del endoscopio, con errores mayores en la periferia donde la luz es más débil. <strong>La hipótesis del proyecto es que corregir la iluminación antes de entrenar reduce ese error de forma medible.</strong></p>
+      <p><strong>La pregunta de investigación:</strong> ¿corregir la iluminación antes de entrenar reduce el error de estimación de profundidad de forma medible? Para responderla, evaluamos <strong>tres modelos de profundidad</strong> (NeXF, EndoGaussian y EndoDepthAndMotion) con y sin corrección previa, y comparamos cuál combinación modelo + corrección produce el menor error frente al ground truth de luz estructurada.</p>
     </div>
 
     <div class="hero-metrics">
@@ -317,6 +336,35 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
   <div class="scroll-hint">
     <span>Scroll</span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+</section>
+
+<!-- ── Datasets (segunda sección) ── -->
+<section id="datasets" style="background:var(--m950);padding-top:5rem;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label reveal">// datos</div>
+    <h2 class="section-title reveal">Tres datasets clínicos, un experimento controlado</h2>
+    <p class="section-body reveal" style="color:var(--m200);max-width:720px;">Evaluamos los tres modelos de profundidad sobre los mismos datasets, variando únicamente el preprocesamiento de iluminación. El GT de SCARED es la referencia de verdad; Hamlyn y C3VD validan la generalización.</p>
+    <div class="ds-grid">
+      <div class="ds-card reveal">
+        <h3>SCARED</h3>
+        <span class="ds-tag">dataset principal · MICCAI 2019</span>
+        <p>Stereo Correspondence and Reconstruction of Endoscopic Data. Imágenes RGB estéreo de tejido porcino ex-vivo con mapas de profundidad capturados por luz estructurada. Es el único dataset del proyecto con GT de profundidad pixel-perfecto — la referencia contra la que se miden AbsRel, RMSE y Chamfer Distance.</p>
+        <div class="ds-stat"><span>229 GB</span><span>45 keyframes</span><span>1280×1024 px</span><span>35–176 mm</span></div>
+      </div>
+      <div class="ds-card reveal">
+        <h3>Hamlyn</h3>
+        <span class="ds-tag">validación in-vivo</span>
+        <p>Secuencias endoscópicas estéreo in-vivo (Recasens et al., 2021). Valida que la corrección de iluminación funciona en tejido real con condiciones clínicas más variadas: movimiento del instrumento, cambios de iluminación y escenas dinámicas.</p>
+        <div class="ds-stat"><span>Estéreo</span><span>In-vivo</span><span>Multi-secuencia</span></div>
+      </div>
+      <div class="ds-card reveal">
+        <h3>C3VD</h3>
+        <span class="ds-tag">colonoscopia 3D</span>
+        <p>Colonoscopy 3D Video Dataset (Golhar et al., 2025). Maniquíes con mapas de referencia a nivel de píxel. Superficies de color variable que ponen a prueba la robustez de los tres modelos ante propiedades del tejido distintas a SCARED.</p>
+        <div class="ds-stat"><span>Maniquí</span><span>GT por píxel</span><span>3D video</span></div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -337,9 +385,6 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
       <p class="section-body">
         El gradiente de iluminación radial es el artefacto central del proyecto. No es ruido aleatorio: es un patrón determinista y reproducible generado por la geometría coaxial del endoscopio. La cámara izquierda tiene su centro óptico en <strong>cx=597, cy=520</strong> (calibración YAML), desplazado 43 px del centro geométrico (640, 512), lo que hace el gradiente asimétrico y exige estimación explícita de la envolvente de iluminación para corregirlo.
       </p>
-      <div class="finding-box">
-        <p><strong>Hallazgo estructural:</strong> <code>dataset_8</code> y <code>dataset_9</code> indexan sus keyframes desde 0 (<code>keyframe_0…keyframe_4</code>) en lugar de desde 1, a diferencia de los datasets 1–7. Todo código debe manejar esto programáticamente para evitar errores silenciosos.</p>
-      </div>
     </div>
     <div class="reveal">
       <img src="img/12_illumination_gradient.png" alt="Gradiente de iluminación endoscópica"
@@ -360,14 +405,14 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
 <!-- ── Artefactos ── -->
 <section id="problema">
   <div style="max-width:1100px;margin:0 auto;">
-    <div class="section-label reveal">// artefactos de iluminación</div>
-    <h2 class="section-title reveal">Tres fenómenos que distorsionan la profundidad</h2>
-    <p class="section-body reveal" style="color:var(--m200);">Identificados y cuantificados sobre los cinco keyframes del dataset_1 en el EDA de iluminación.</p>
-    <div class="cards-grid">
+    <div class="section-label reveal">// el problema de iluminación</div>
+    <h2 class="section-title reveal">Tres artefactos que sesgan los modelos de profundidad</h2>
+    <p class="section-body reveal" style="color:var(--m200);">El endoscopio es a la vez cámara y fuente de luz. Esa geometría coaxial produce tres artefactos sistemáticos que los modelos de NeXF, EndoGaussian y EndoDepthAndMotion aprenden como si fueran estructura del tejido — introduciendo sesgo que la corrección de iluminación busca eliminar.</p>
+    <div class="cards-grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));">
       <div class="card reveal">
         <div class="card-icon">🔦</div>
         <h3>Gradiente radial de iluminación</h3>
-        <p>El endoscopio ilumina desde el centro. El ratio entre la luminancia del centro y la del borde varía entre 1.33× (leve) y 3.26× (severo) según el keyframe. El gradiente no es simétrico: el pico de luminancia se alinea con el centro óptico (cx=597, cy=520), no con el geométrico (640, 512).</p>
+        <p>La luz decae desde el centro hacia los bordes. El ratio centro/borde varía entre 1.33× y 3.26× según el keyframe. El artefacto es <strong>asimétrico</strong>: el pico de luminancia se alinea con el centro óptico (cx=597, cy=520), desplazado 43 px del centro geométrico (640, 512). Los modelos aprenden este gradiente como profundidad falsa.</p>
         <div class="stat-row">
           <span class="stat-pill">KF1: 1.33× <span class="tag-leve">leve</span></span>
           <span class="stat-pill">KF3: 3.26× <span class="tag-severo">severo</span></span>
@@ -377,50 +422,21 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
       <div class="card reveal">
         <div class="card-icon">✨</div>
         <h3>Reflejos especulares</h3>
-        <p>Los tejidos húmedos reflejan especularmente la luz. Se detectan como píxeles donde los tres canales RGB superan 240 simultáneamente (un solo canal alto es tejido vascular, no especular). La fracción de especulares es baja (0.4–1.6%), pero coinciden con zonas sin ground truth.</p>
+        <p>Los tejidos húmedos reflejan especularmente la luz del endoscopio. Los reflejos saturan el sensor de luz estructurada e impiden capturar el GT de profundidad en esas zonas — creando un vínculo directo entre iluminación y calidad de los datos de entrenamiento. La supresión de reflejos es la <strong>intervención central del proyecto</strong>.</p>
         <div class="stat-row">
-          <span class="stat-pill">KF1: 1.12%</span>
+          <span class="stat-pill">KF1: 1.12% de píxeles</span>
           <span class="stat-pill">KF3: 1.57%</span>
           <span class="stat-pill">KF5: 0.43%</span>
         </div>
       </div>
       <div class="card reveal">
         <div class="card-icon">🕳️</div>
-        <h3>Ground truth incompleto</h3>
-        <p>El sensor de luz estructurada no cubre el 100% de los píxeles. El GT faltante (13–28% según keyframe) se concentra en zonas de curvatura extrema del tejido donde el ángulo de incidencia es demasiado oblicuo. Los especulares explican solo parte de esta pérdida.</p>
+        <h3>GT incompleto en la periferia</h3>
+        <p>El sensor de luz estructurada no mide en zonas donde el ángulo de incidencia es oblicuo o la señal es demasiado débil por viñeteado. El GT faltante (13–28% según keyframe) se concentra exactamente en los bordes donde el gradiente radial también es más severo — el doble sesgo que este proyecto busca romper.</p>
         <div class="stat-row">
           <span class="stat-pill">KF1: 21.6% sin GT</span>
           <span class="stat-pill">KF4: 27.0% sin GT</span>
           <span class="stat-pill">KF5: 28.1% sin GT</span>
-        </div>
-      </div>
-      <div class="card reveal">
-        <div class="card-icon">📊</div>
-        <h3>CV de luminancia (heterogeneidad)</h3>
-        <p>El coeficiente de variación (CV = std/mean) resume en un solo número la heterogeneidad de la iluminación de cada keyframe. KF5 encabeza el ranking (CV=0.665) no por tener más especulares, sino porque sus bordes son muy oscuros y su centro relativamente brillante.</p>
-        <div class="stat-row">
-          <span class="stat-pill">KF5: CV=0.665</span>
-          <span class="stat-pill">KF3: CV=0.555</span>
-          <span class="stat-pill">KF1: CV=0.492</span>
-        </div>
-      </div>
-      <div class="card reveal">
-        <div class="card-icon">📐</div>
-        <h3>Asimetría del centro óptico</h3>
-        <p>El centro óptico real (cx=597, cy=520) está desplazado ~43 px respecto al centro geométrico del sensor (640, 512). Cualquier corrección radial que asuma simetría desde el centro geométrico sub-corregirá el lado izquierdo y sobre-corregirá el derecho.</p>
-        <div class="stat-row">
-          <span class="stat-pill">Δx = 43 px</span>
-          <span class="stat-pill">Δy = 8 px</span>
-          <span class="stat-pill">fx=1035.3 fy=1035.1</span>
-        </div>
-      </div>
-      <div class="card reveal">
-        <div class="card-icon">🔄</div>
-        <h3>Drift temporal de iluminación</h3>
-        <p>El video rgb.mp4 de cada keyframe contiene ~197 frames. La luminancia varía frame a frame a medida que el cirujano mueve el endoscopio (video_lum_std) y aparecen picos de especularidad (video_sat_max) que el keyframe estático no captura. Cada keyframe es una muestra de un proceso dinámico.</p>
-        <div class="stat-row">
-          <span class="stat-pill">~197 frames/keyframe</span>
-          <span class="stat-pill">33 MB por MP4</span>
         </div>
       </div>
     </div>
@@ -430,24 +446,19 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
 <!-- ── Hallazgos cuantitativos ── -->
 <section id="findings">
   <div style="max-width:1100px;margin:0 auto;">
-    <div class="section-label reveal">// hallazgos clave</div>
-    <h2 class="section-title reveal">Cinco resultados del EDA con implicaciones directas</h2>
-    <p class="section-body reveal" style="color:var(--m800);">Extraídos de los reportes de exploración e iluminación sobre el dataset_1 (5 keyframes, SCARED 2019).</p>
+    <div class="section-label reveal">// hallazgos EDA</div>
+    <h2 class="section-title reveal">Cinco hallazgos que justifican el experimento</h2>
+    <p class="section-body reveal" style="color:var(--m800);">Extraídos del análisis exploratorio sobre dataset_1 (5 keyframes, SCARED 2019). Cada hallazgo tiene una implicación directa sobre el diseño del experimento de modelado.</p>
     <div class="findings-grid">
       <div class="finding-card reveal">
-        <span class="num">1°</span>
-        <h3>El gradiente es sistemático y cuantificable</h3>
-        <p>Todos los keyframes muestran el mismo patrón descendente desde el centro hacia los bordes. El ratio centro/borde oscila entre 1.33× y 3.26×. Un gradiente de esa magnitud introduce un sesgo estructural en cualquier modelo que aprenda directamente de estas imágenes sin preprocesamiento.</p>
+        <span class="num">1</span>
+        <h3>El gradiente radial es sistemático y asimétrico</h3>
+        <p>Todos los keyframes muestran el mismo patrón descendente centro→bordes (ratio 1.33× a 3.26×). El pico de luminancia no está en el centro geométrico sino en el centro óptico (cx=597, cy=520), desplazado 43 px. <strong>Implicación:</strong> los métodos de corrección que asumen simetría radial subestimarán el sesgo en el lado izquierdo del frame.</p>
       </div>
       <div class="finding-card reveal">
-        <span class="num">2°</span>
-        <h3>El gradiente no es simétrico</h3>
-        <p>El manchón de máxima luminancia está desplazado hacia el centro óptico de la cámara (cx=597, cy=520), no hacia el centro geométrico (640, 512). Esto invalida los métodos de corrección que asumen simetría radial y exige estimación explícita de la envolvente de iluminación.</p>
-      </div>
-      <div class="finding-card reveal">
-        <span class="num">3°</span>
-        <h3>Correlación negativa fuerte: luz ↕ GT</h3>
-        <p>En 4 de 5 keyframes la correlación de Pearson entre luminancia y cobertura GT por distancia radial es negativa y significativa. Las zonas más brillantes son exactamente donde menos datos de profundidad hay. Este es el argumento cuantitativo central para incluir corrección de iluminación antes del entrenamiento.</p>
+        <span class="num">2</span>
+        <h3>Más luz = menos ground truth disponible</h3>
+        <p>En 4 de 5 keyframes, la correlación de Pearson entre luminancia y cobertura GT por zona radial es negativa y estadísticamente significativa. Las zonas más brillantes son exactamente donde el sensor de luz estructurada falla más. <strong>Implicación:</strong> corregir la iluminación no solo mejora la imagen — aumenta la cobertura del GT disponible para entrenamiento.</p>
         <table class="data-table" style="margin-top:.8rem;">
           <thead><tr><th>KF</th><th>r (Pearson)</th></tr></thead>
           <tbody>
@@ -460,20 +471,21 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
         </table>
       </div>
       <div class="finding-card reveal">
-        <span class="num">4°</span>
-        <h3>Los especulares no explican toda la pérdida de GT</h3>
-        <p>El solapamiento entre la máscara de especulares y la máscara de GT faltante varía de 8.7% (KF2) a 38.2% (KF5). La mayor parte del GT faltante corresponde a curvatura extrema del tejido, no a reflejos. La corrección de iluminación no recuperará ese GT, pero sí reducirá el sesgo del modelo en las zonas donde sí hay GT.</p>
+        <span class="num">3</span>
+        <h3>Los reflejos explican solo parte del GT faltante</h3>
+        <p>El solapamiento entre la máscara de especulares y la de GT faltante varía de 8.7% (KF2) a 38.2% (KF5). La mayor parte del GT faltante se debe a curvatura extrema del tejido, no a reflejos. <strong>Implicación:</strong> la corrección de iluminación mejorará el sesgo del modelo, pero no recuperará todo el GT perdido — el techo de mejora es parcial.</p>
       </div>
       <div class="finding-card reveal">
-        <span class="num">5°</span>
-        <h3>La corrección simple funciona, pero tiene efectos secundarios</h3>
-        <p>Una corrección por división de envolvente gaussiana (σ=60 px) sobre KF5 demuestra que el problema es tratable. El tejido oscuro del borde recupera textura visible. Sin embargo, introduce distorsión de color (la envolvente de luminancia no corrige igual los tres canales RGB) y amplifica ruido en los bordes. Esto motiva evaluar CLAHE, Retinex y MonoIIT.</p>
+        <span class="num">4</span>
+        <h3>La corrección simple funciona, pero distorsiona el color</h3>
+        <p>Una corrección por división de envolvente gaussiana (σ=60 px) sobre KF5 recupera textura visible en los bordes. Sin embargo, amplifica ruido y desequilibra los canales RGB porque la envolvente de luminancia no corrige igual R, G y B. <strong>Implicación:</strong> se necesitan métodos más sofisticados — CLAHE (por canal), Retinex (que preserva el color) o MonoIIT (red neuronal).</p>
       </div>
       <div class="finding-card reveal">
-        <span class="num">6°</span>
-        <h3>Tabla resumen de indicadores por keyframe</h3>
-        <table class="data-table">
-          <thead><tr><th>KF</th><th>CV</th><th>C/B</th><th>Especulares</th><th>GT válido</th></tr></thead>
+        <span class="num">5</span>
+        <h3>Indicadores por keyframe — resumen cuantitativo</h3>
+        <p>El coeficiente de variación (CV = std/mean) es el indicador más compacto de heterogeneidad. KF5 lidera con CV=0.665 pese a tener los <em>menos</em> reflejos — su problema es el gradiente radial, no la especularidad.</p>
+        <table class="data-table" style="margin-top:.8rem;">
+          <thead><tr><th>KF</th><th>CV</th><th>C/B</th><th>Espec.</th><th>GT válido</th></tr></thead>
           <tbody>
             <tr><td>KF5</td><td>0.665</td><td>2.72×</td><td>0.43%</td><td>71.9%</td></tr>
             <tr><td>KF3</td><td>0.555</td><td>3.26×</td><td>1.57%</td><td>86.8%</td></tr>
@@ -483,6 +495,69 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
           </tbody>
         </table>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Ground Truth ── -->
+<section id="gt">
+  <div class="gt-grid">
+    <div class="reveal">
+      <div class="section-label">// datos de referencia</div>
+      <h2 class="section-title" style="color:#fff;">¿Qué es el Ground Truth y por qué es incompleto?</h2>
+      <p class="section-body" style="color:var(--m200);">
+        El <strong style="color:var(--m300);">ground truth (GT) de profundidad</strong> es el mapa de distancias reales en milímetros capturado por el sensor de <strong style="color:var(--m300);">luz estructurada</strong> del robot da Vinci: proyecta un patrón infrarrojo sobre el tejido, observa cómo se deforma con la geometría de la superficie y triangula la distancia píxel a píxel. Es la "respuesta correcta" contra la cual se mide el error de cualquier modelo de estimación de profundidad.
+      </p>
+      <p class="section-body" style="color:var(--m200);margin-top:.9rem;">
+        El GT <strong style="color:#fca5a5;">no cubre el 100% de los píxeles</strong>. Las zonas sin GT quedan como <code>(0,0,0)</code> en el TIFF float32 y se excluyen del cálculo de pérdida durante el entrenamiento.
+      </p>
+      <div class="gt-why-list">
+        <div class="gt-why-item">
+          <div class="gt-why-num">1.</div>
+          <div class="gt-why-text"><strong>Reflejos especulares</strong> — los tejidos húmedos reflejan la luz infrarroja directamente hacia el sensor, saturándolo. Sin señal de retorno, la triangulación es imposible.</div>
+        </div>
+        <div class="gt-why-item">
+          <div class="gt-why-num">2.</div>
+          <div class="gt-why-text"><strong>Ángulo de incidencia oblicuo</strong> — en los bordes de la imagen y en zonas de curvatura extrema, el ángulo entre el rayo de luz y la normal del tejido es demasiado obtuso para una medición fiable.</div>
+        </div>
+        <div class="gt-why-item">
+          <div class="gt-why-num">3.</div>
+          <div class="gt-why-text"><strong>Viñeteado del endoscopio</strong> — la potencia luminosa disminuye radialmente desde el centro óptico. En los bordes, la señal infrarroja es demasiado débil para triangular.</div>
+        </div>
+      </div>
+      <div class="finding-box" style="margin-top:1.5rem;">
+        <p><strong>Implicación directa del proyecto:</strong> suprimir los reflejos especulares antes de la captura reduce la causa n.º 1 de GT faltante. Incluso una reducción del 50% en especulares aumentaría la cobertura del GT en las zonas más críticas — exactamente donde el modelo más necesita supervisión.</p>
+      </div>
+    </div>
+    <div class="reveal">
+      <img src="img/04_spatial_validity.png" alt="Validez espacial del GT por keyframe"
+           style="border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.4);margin-bottom:1.5rem;width:100%;">
+      <p style="font-family:var(--ff-mono);font-size:.75rem;color:var(--m500);margin-bottom:1.2rem;">
+        Fig. 04 — Validez espacial del GT (dataset_1, 5 keyframes). Amarillo = GT válido, violeta = sin GT. El perfil radial inferior confirma la caída desde el centro hacia los bordes.
+      </p>
+      <h3 style="font-family:var(--ff-serif);color:var(--m300);font-size:1.1rem;margin-bottom:.8rem;">¿Por qué keyframes y no el video completo?</h3>
+      <div class="kf-vs-video">
+        <div class="kv-card highlight">
+          <div class="kv-label">KEYFRAME</div>
+          <p>Captura estática diseñada para GT de alta calidad.</p>
+          <ul>
+            <li>Imagen RGB 1280×1024</li>
+            <li>Mapa de profundidad TIFF</li>
+            <li>Nube de puntos OBJ</li>
+            <li>Par supervisado completo</li>
+          </ul>
+        </div>
+        <div class="kv-card">
+          <div class="kv-label">VIDEO rgb.mp4</div>
+          <p>~197 frames del mismo escenario, <strong style="color:#fca5a5;">sin profundidad frame a frame</strong>.</p>
+          <ul>
+            <li>Solo flujo RGB</li>
+            <li>Útil para drift e iluminación</li>
+            <li>No apto para supervisión</li>
+          </ul>
+        </div>
+      </div>
+      <p style="font-size:.83rem;color:var(--m400);margin-top:1rem;line-height:1.6;">El sensor de luz estructurada requiere exposición estática para proyectar su patrón. En modo de video continuo esto no es posible. El protocolo SCARED maximiza la calidad del GT sacrificando cobertura temporal: 5 capturas estáticas por secuencia en lugar de 200 frames de video sin GT.</p>
     </div>
   </div>
 </section>
@@ -558,77 +633,51 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
 <section id="pipeline">
   <div style="max-width:1100px;margin:0 auto;text-align:center;">
     <div class="section-label reveal">// metodología</div>
-    <h2 class="section-title reveal">Pipeline de corrección</h2>
-    <p class="section-body reveal" style="color:var(--m200);margin:0 auto 3rem;text-align:center;">La corrección de iluminación se inserta como preprocesamiento antes del modelo. Todo lo demás permanece constante para aislar su efecto sobre AbsRel, RMSE y Chamfer Distance.</p>
-    <div class="pipeline-flow reveal">
+    <h2 class="section-title reveal">Cómo consumimos los datos y cómo elegimos al ganador</h2>
+    <p class="section-body reveal" style="color:var(--m200);margin:0 auto 2.5rem;text-align:center;max-width:740px;">El experimento es un diseño factorial: <strong>3 modelos × 3 métodos de corrección + 1 línea base sin corrección</strong>. Todo lo demás — datasets, GT, métricas — permanece constante para aislar el efecto de la iluminación.</p>
+
+    <div class="pipeline-flow reveal" style="margin-bottom:2.5rem;">
       <div class="pipe-step">
-        <div class="pipe-bubble">🎥</div>
-        <div class="pipe-label"><strong>Video RGB</strong>crudo del endoscopio</div>
+        <div class="pipe-bubble">🗄️</div>
+        <div class="pipe-label"><strong>SCARED</strong>keyframes RGB + GT TIFF</div>
       </div>
       <div class="pipe-arrow">→</div>
       <div class="pipe-step pipe-highlight">
         <div class="pipe-bubble">💡</div>
-        <div class="pipe-label"><strong>Corrección</strong>CLAHE / Retinex / MonoIIT</div>
+        <div class="pipe-label"><strong>Corrección</strong>Sin correc. / CLAHE / Retinex / MonoIIT</div>
       </div>
       <div class="pipe-arrow">→</div>
       <div class="pipe-step">
         <div class="pipe-bubble">🧠</div>
-        <div class="pipe-label"><strong>Modelo</strong>NeXF / EndoGaussian / EDM</div>
+        <div class="pipe-label"><strong>Modelo</strong>NeXF · EndoGaussian · EndoDepthAndMotion</div>
       </div>
       <div class="pipe-arrow">→</div>
       <div class="pipe-step">
         <div class="pipe-bubble">🗺️</div>
-        <div class="pipe-label"><strong>Depth map</strong>estimado</div>
+        <div class="pipe-label"><strong>Depth map</strong>estimado por el modelo</div>
       </div>
       <div class="pipe-arrow">→</div>
       <div class="pipe-step">
         <div class="pipe-bubble">📊</div>
-        <div class="pipe-label"><strong>Evaluación</strong>AbsRel · RMSE · Chamfer</div>
+        <div class="pipe-label"><strong>vs. GT</strong>AbsRel · RMSE · Chamfer</div>
       </div>
     </div>
-    <div class="cards-grid" style="margin-top:2rem;text-align:left;">
-      <div class="card reveal">
-        <div class="card-icon">📐</div>
-        <h3>Variable independiente</h3>
-        <p>Imagen RGB con o sin corrección de iluminación (X<sub>crudo</sub> → X<sub>corrected</sub>). Tres métodos a comparar: CLAHE, Retinex y MonoIIT.</p>
-      </div>
-      <div class="card reveal">
-        <div class="card-icon">📏</div>
-        <h3>Variable dependiente</h3>
-        <p>Error de estimación de profundidad: AbsRel, RMSE, SSIM, PSNR y Chamfer Distance contra el GT de luz estructurada del TIFF.</p>
-      </div>
-      <div class="card reveal">
-        <div class="card-icon">🔒</div>
-        <h3>Control experimental</h3>
-        <p>Modelo, hiperparámetros y ground truth constantes. Solo varía el preprocesamiento. Tres datasets para validar generalización: SCARED, Hamlyn y C3VD.</p>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- ── Datasets ── -->
-<section id="datasets" style="background:var(--m950);">
-  <div style="max-width:1100px;margin:0 auto;">
-    <div class="section-label reveal">// datos</div>
-    <h2 class="section-title reveal">Tres datasets clínicos</h2>
-    <div class="ds-grid">
-      <div class="ds-card reveal">
-        <h3>SCARED</h3>
-        <span class="ds-tag">dataset principal · MICCAI 2019</span>
-        <p>Stereo Correspondence and Reconstruction of Endoscopic Data. Mapas de profundidad reales por luz estructurada sobre tejido porcino ex-vivo. El único dataset con GT de profundidad pixel-perfecto para todas las métricas.</p>
-        <div class="ds-stat"><span>229 GB</span><span>45 keyframes</span><span>1280×1024 px</span><span>35–176 mm</span></div>
+    <div class="cards-grid" style="text-align:left;">
+      <div class="card reveal">
+        <div class="card-icon">🧠</div>
+        <h3>Tres modelos de profundidad</h3>
+        <p><strong>NeXF</strong> — modelo basado en Neural Radiance Fields optimizado para endoscopia. <strong>EndoGaussian</strong> — reconstrucción gaussiana 3D dinámica. <strong>EndoDepthAndMotion</strong> — estimación de profundidad y movimiento simultáneos. Se evalúan los tres para determinar cuál se beneficia más de la corrección.</p>
       </div>
-      <div class="ds-card reveal">
-        <h3>Hamlyn</h3>
-        <span class="ds-tag">validación in-vivo</span>
-        <p>Secuencias endoscópicas estéreo in-vivo (Recasens et al., 2021). Complementa SCARED con tejido real y condiciones clínicas más variadas, incluyendo movimiento del instrumento y cambios de iluminación.</p>
-        <div class="ds-stat"><span>Estéreo</span><span>In-vivo</span><span>Multi-secuencia</span></div>
+      <div class="card reveal">
+        <div class="card-icon">💡</div>
+        <h3>Tres métodos de corrección</h3>
+        <p><strong>CLAHE</strong> — ecualización adaptativa de histograma local. <strong>Retinex</strong> — separación de iluminación y reflectancia. <strong>MonoIIT</strong> — corrección basada en red neuronal. Más la condición sin corrección como línea base.</p>
       </div>
-      <div class="ds-card reveal">
-        <h3>C3VD</h3>
-        <span class="ds-tag">colonoscopia 3D</span>
-        <p>Colonoscopy 3D Video Dataset (Golhar et al., 2025). Maniquíes con mapas de referencia a nivel de píxel. Superficies de color variable que ponen a prueba la robustez de la corrección ante diferentes propiedades del tejido.</p>
-        <div class="ds-stat"><span>Maniquí</span><span>GT por píxel</span><span>3D video</span></div>
+      <div class="card reveal">
+        <div class="card-icon">🏆</div>
+        <h3>Criterio de ganador</h3>
+        <p>Menor <strong>AbsRel</strong> en el split de test de SCARED (datasets 8–9, cerdo_C). El modelo que, combinado con el mejor método de corrección, reduzca más el error absoluto relativo frente a la línea base sin corrección es la recomendación del proyecto.</p>
       </div>
     </div>
   </div>

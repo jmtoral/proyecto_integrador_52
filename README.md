@@ -10,10 +10,14 @@
 
 <center>
 
-[![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Jupyter](https://img.shields.io/badge/Jupyter-F37626?style=flat-square&logo=jupyter&logoColor=white)](https://jupyter.org/)
 [![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white)](https://numpy.org/)
+[![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white)](https://pandas.pydata.org/)
 [![OpenCV](https://img.shields.io/badge/OpenCV-5C3EE8?style=flat-square&logo=opencv&logoColor=white)](https://opencv.org/)
+[![scikit--learn](https://img.shields.io/badge/scikit--learn-F7931E?style=flat-square&logo=scikitlearn&logoColor=white)](https://scikit-learn.org/)
+[![Matplotlib](https://img.shields.io/badge/Matplotlib-11557c?style=flat-square&logo=python&logoColor=white)](https://matplotlib.org/)
+[![tifffile](https://img.shields.io/badge/tifffile-TIFF_float32-6a6a6a?style=flat-square)](https://github.com/cgohlke/tifffile)
 [![GitHub](https://img.shields.io/badge/Repo-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/jmtoral/proyecto_integrador_52)
 [![Sitio Web](https://img.shields.io/badge/Sitio_Web-GitHub_Pages-0036a3?style=flat-square&logo=github&logoColor=white)](https://jmtoral.github.io/proyecto_integrador_52/)
 
@@ -24,7 +28,8 @@
 # La luz que opaca
 ### Detección y supresión de reflejos especulares en imágenes endoscópicas
 
-**Materia:** Proyecto Integrador — TC5035.10
+**Materia:** Proyecto Integrador — TC5035.10  
+**Sitio web:** [https://jmtoral.github.io/proyecto_integrador_52/](https://jmtoral.github.io/proyecto_integrador_52/)
 
 ---
 
@@ -84,21 +89,24 @@ Este repositorio contiene el Proyecto Integrador para la Maestría de Inteligenc
 
 Los datos empleados en esta investigación responden a una naturaleza semiestructurada y no tabular. A diferencia de los datasets tabulares convencionales donde cada observación es una fila y cada variable una columna, los datos endoscópicos se organizan como secuencias de video estéreo, mapas de profundidad tridimensionales, nubes de puntos y archivos de calibración de cámara que deben interpretarse conjuntamente..
 
-El pipeline hasta el momento es el siguiente:
+El experimento es un diseño factorial: **3 modelos × 3 métodos de corrección + línea base sin corrección**, todo lo demás constante.
 
 ```
-video endoscópico (RGB crudo)
+SCARED (keyframes RGB + GT TIFF)
         ↓
-  corrección de iluminación   ← contribución del proyecto
+  corrección de iluminación   ← variable independiente
+  sin corrección / CLAHE / Retinex / MonoIIT
         ↓
-  modelo de profundidad monocular  (MonoIIT / NExF / EndoGaussian)
+  modelo de profundidad   ← tres candidatos en paralelo
+  NeXF · EndoGaussian · EndoDepthAndMotion
         ↓
   depth map estimado
         ↓
-  evaluación vs. GT de structured light  (AbsRel, RMSE, Chamfer Distance)
+  evaluación vs. GT de luz estructurada
+  AbsRel · RMSE · Chamfer Distance
 ```
 
-La hipótesis es que eliminar el gradiente radial de iluminación (más brillante en el centro, oscuro en los bordes) reduce el error de profundidad, especialmente en la periferia de la imageb.
+La hipótesis es que eliminar el gradiente radial de iluminación (más brillante en el centro, oscuro en los bordes) reduce el error de profundidad, especialmente en la periferia. El criterio de ganador es el menor AbsRel en el split de test (datasets 8–9).
 
 ## Datasets
 
