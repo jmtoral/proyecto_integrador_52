@@ -47,7 +47,7 @@
 <table style="width:100%; border:none; border-collapse:collapse;">
   <tr>
     <td align="center" style="border:none; width:33%; padding:10px;">
-      <img src="https://ui-avatars.com/api/?name=Elda+Morales&size=140&background=0036a3&color=fff&rounded=true" width="140px" style="border-radius:10px;">
+      <img src="https://raw.githubusercontent.com/jmtoral/proyecto_integrador_52/main/reports/elda.jpg" width="140px" height="140px" style="border-radius:50%; object-fit:cover;">
       <br>
       <h4>Elda Cristina Morales Sánchez de la Barquera</h4>
       <code>A00449074</code><br>
