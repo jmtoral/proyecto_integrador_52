@@ -359,7 +359,10 @@ h2::before{
 </tbody>
 </table>
 <p><strong>Implicación para el modelado:</strong> el AbsRel se calcula solo sobre píxeles con GT válido. Un modelo que falla más en zonas sin GT (bordes) penaliza menos en la métrica. La corrección de iluminación puede mejorar la validez del GT indirectamente al reducir los reflejos.</p>
-<h3 id="33-keyframes-vs-videos-completos">3.3 Keyframes vs. videos completos</h3>
+<figure class="report-fig">
+  <img src="../outcomes/04_spatial_validity.png" alt="Fig. 04 — Validez espacial del GT (dataset_1, 5 keyframes)" loading="lazy">
+  <figcaption><strong>Fig. 04 — Validez espacial del GT (dataset_1, 5 keyframes)</strong> — Amarillo = GT válido, violeta = sin GT. El perfil radial inferior confirma la caída desde el centro hacia los bordes.</figcaption>
+</figure><h3 id="33-keyframes-vs-videos-completos">3.3 Keyframes vs. videos completos</h3>
 <p>Los modelos de profundidad consumen <strong>keyframes</strong>, no videos completos. La razón técnica:</p>
 <ul>
 <li>El sensor de luz estructurada da Vinci requiere una <strong>exposición estática</strong> para capturar el mapa de profundidad con precisión. Durante el movimiento del endoscopio la señal es borrosa.</li>
@@ -502,7 +505,13 @@ h2::before{
 </tbody>
 </table>
 <p><strong>Metadatos (no features):</strong> <code>dataset_id</code>, <code>keyframe_id</code>, <code>split</code>, <code>cerdo_id</code></p>
-<h3 id="42-features-de-diagnostico-criticas">4.2 Features de diagnóstico críticas</h3>
+<figure class="report-fig">
+  <img src="../outcomes/01_rgb_keyframes.png" alt="Fig. 01 — Keyframes RGB del dataset_1 (5 keyframes)" loading="lazy">
+  <figcaption><strong>Fig. 01 — Keyframes RGB del dataset_1 (5 keyframes)</strong> — 1280×1024 px, uint8. Gradiente radial de iluminación visible a simple vista en todos los keyframes.</figcaption>
+</figure><figure class="report-fig">
+  <img src="../outcomes/02_depth_maps.png" alt="Fig. 02 — Mapas de profundidad GT (luz estructurada)" loading="lazy">
+  <figcaption><strong>Fig. 02 — Mapas de profundidad GT (luz estructurada)</strong> — Canal Z del TIFF float32. Rango 35–176 mm. Ceros = sin medición. Notar la cobertura incompleta en bordes.</figcaption>
+</figure><h3 id="42-features-de-diagnostico-criticas">4.2 Features de diagnóstico críticas</h3>
 <p>Tres features concentran la mayor información diagnóstica para el experimento:</p>
 <p><strong><code>sat_pct</code></strong> — Porcentaje de píxeles saturados. Mide directamente la severidad de los reflejos especulares. Si <code>sat_pct</code> es alto, la imagen tiene muchos píxeles donde los modelos no pueden inferir estructura de tejido. La hipótesis principal del proyecto predice que un modelo entrenado con imágenes de <code>sat_pct</code> bajo tendrá menor AbsRel.</p>
 <p><strong><code>depth_valid_pct</code></strong> — Porcentaje de GT válido. La correlación negativa observada con <code>sat_pct</code> (r ≈ −0.6) confirma que los reflejos especulares están causando directamente la invalidez del GT. Keyframes con <code>depth_valid_pct</code> &lt; 75% deben tratarse con cautela en la evaluación.</p>
@@ -521,7 +530,10 @@ h2::before{
 <pre><code class="language-python">Z_capped = np.where((Z &gt; 0) &amp; (Z &lt; 150), Z, np.nan)
 </code></pre>
 <p><strong>Impacto:</strong> reduce el rango efectivo de 0–∞ a 0–150 mm; elimina outliers que distorsionarían el log y la normalización.</p>
-<h3 id="52-transformacion-logaritmica-logz1">5.2 Transformación logarítmica log(Z+1)</h3>
+<figure class="report-fig">
+  <img src="../outcomes/03_depth_stats.png" alt="Fig. 03 — Distribución de profundidades por keyframe" loading="lazy">
+  <figcaption><strong>Fig. 03 — Distribución de profundidades por keyframe</strong> — Sesgo positivo confirmado: la mayoría de píxeles entre 20–80 mm con cola hasta 150 mm. Justifica la transformación log(Z+1).</figcaption>
+</figure><h3 id="52-transformacion-logaritmica-logz1">5.2 Transformación logarítmica log(Z+1)</h3>
 <p>La distribución de profundidades tiene sesgo positivo (la mayoría entre 20–80 mm, cola hasta 150 mm). La transformación log comprime la cola derecha y hace la distribución más simétrica, lo que beneficia los optimizadores de los modelos profundos.</p>
 <pre><code class="language-python">Z_log = np.log1p(Z_capped)   # log(Z + 1)
 </code></pre>
@@ -541,7 +553,10 @@ df_scaled = scaler.transform(df[NUMERIC_FEATS])
 <li><code>r_mean</code>, <code>g_mean</code>, <code>b_mean</code>: altamente intercorrelacionados (los canales RGB del tejido porcino varían juntos)</li>
 </ul>
 <p><strong>Decisión:</strong> eliminar <code>log_depth_median</code> y los canales RGB individuales en análisis de diagnóstico secundarios. Mantener <code>lum_mean</code> (derivado de los tres canales) y <code>rb_balance</code> (captura la variación de temperatura de color independientemente de la luminancia).</p>
-<h3 id="62-variancethreshold">6.2 VarianceThreshold</h3>
+<figure class="report-fig">
+  <img src="../outcomes/19_correlacion_lum_gt.png" alt="Fig. 19 — Correlación luminancia vs cobertura GT (Pearson r)" loading="lazy">
+  <figcaption><strong>Fig. 19 — Correlación luminancia vs cobertura GT (Pearson r)</strong> — r entre −0.66 y −0.86 en 4 de 5 keyframes. Las zonas más brillantes tienen menos GT disponible para entrenamiento.</figcaption>
+</figure><h3 id="62-variancethreshold">6.2 VarianceThreshold</h3>
 <p>Features con varianza &lt; 0.01 sobre los 20 keyframes son casi constantes y no aportan información discriminativa.</p>
 <p><strong>Eliminadas:</strong> <code>video_lum_std</code> y <code>video_sat_max</code> no pasan el umbral en 15/20 keyframes (5 keyframes no tienen video). Al incluir NaN imputados como 0, la varianza colapsa artificialmente. <strong>Estas features SÍ son útiles</strong> para los 15 keyframes que tienen video — la eliminación es un artefacto del tamaño muestral pequeño.</p>
 <p><strong>Decisión:</strong> mantener <code>video_lum_std</code> y <code>video_sat_max</code> en el dataframe completo, pero excluirlas de análisis que requieren completitud.</p>
@@ -576,7 +591,13 @@ df_scaled = scaler.transform(df[NUMERIC_FEATS])
 <p><strong>Centro de masa (dataset_1/keyframe_1):</strong> X=3.5 mm, Y=−1.8 mm, Z=60.6 mm — el tejido está a ~60 mm del endoscopio, ligeramente descentrado.</p>
 <p><strong>Para qué sirve:</strong> los vectores propios del PCA permiten transformar la nube de puntos al sistema de referencia del tejido, lo que puede mejorar la evaluación de Chamfer Distance al alinear ambas nubes (estimada vs. GT) antes de calcular la distancia.</p>
 <hr />
-<h2 id="7-features-de-video">7. Features de video</h2>
+<h2 id="7-features-de-video">7. Features de video</h2><figure class="report-fig">
+  <img src="../outcomes/16_perfil_radial.png" alt="Fig. 16 — Perfil radial de luminancia por keyframe" loading="lazy">
+  <figcaption><strong>Fig. 16 — Perfil radial de luminancia por keyframe</strong> — El centro es 1.33× a 3.26× más brillante que el borde. Patrón sistemático reproducible en todos los KF.</figcaption>
+</figure><figure class="report-fig">
+  <img src="../outcomes/17_mapa_gradiente.png" alt="Fig. 17 — Mapa 2D del gradiente de iluminación" loading="lazy">
+  <figcaption><strong>Fig. 17 — Mapa 2D del gradiente de iluminación</strong> — El pico de luminancia se alinea con el centro óptico (cx=597, cy=520), desplazado 43 px del centro geométrico (640, 512).</figcaption>
+</figure>
 <table>
 <thead>
 <tr>
@@ -601,7 +622,13 @@ df_scaled = scaler.transform(df[NUMERIC_FEATS])
 <p><strong>Keyframes sin video (5 de 20):</strong> los zips de dataset_1/kf4, dataset_1/kf5, dataset_2/kf5, dataset_8/kf4, dataset_9/kf4 no contienen <code>data/rgb.mp4</code>. No es un error de código — los archivos genuinamente no están en el zip (error de logging en la captura original de SCARED).</p>
 <p><strong>Hallazgo notable:</strong> dataset_2/keyframe_4 tiene <code>video_sat_max</code> = 40.6% — el frame más especular del conjunto de datos. Este keyframe es el candidato más difícil para el baseline sin corrección.</p>
 <hr />
-<h2 id="8-flujo-completo-de-datos-crudos-a-resultados">8. Flujo completo: de datos crudos a resultados</h2>
+<h2 id="8-flujo-completo-de-datos-crudos-a-resultados">8. Flujo completo: de datos crudos a resultados</h2><figure class="report-fig">
+  <img src="../outcomes/11_speculars.png" alt="Fig. 11 — Detección de reflejos especulares" loading="lazy">
+  <figcaption><strong>Fig. 11 — Detección de reflejos especulares</strong> — Detectados donde los 3 canales RGB > 240 simultáneamente. Solapamiento con GT faltante: 8.7% (KF2) a 38.2% (KF5).</figcaption>
+</figure><figure class="report-fig">
+  <img src="../outcomes/21_correccion_demo.png" alt="Fig. 21 — Demo de corrección por división de envolvente gaussiana (KF5)" loading="lazy">
+  <figcaption><strong>Fig. 21 — Demo de corrección por división de envolvente gaussiana (KF5)</strong> — Izquierda: original. Centro: corregido (σ=60 px). Derecha: diferencia ×3. La corrección recupera textura en bordes.</figcaption>
+</figure>
 <pre><code>DATOS CRUDOS (SCARED)
 Left_Image.png  +  left_depth_map.tiff (GT)
         |
