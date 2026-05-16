@@ -629,39 +629,46 @@ df_scaled = scaler.transform(df[NUMERIC_FEATS])
   <img src="../outcomes/21_correccion_demo.png" alt="Fig. 21 — Demo de corrección por división de envolvente gaussiana (KF5)" loading="lazy">
   <figcaption><strong>Fig. 21 — Demo de corrección por división de envolvente gaussiana (KF5)</strong> — Izquierda: original. Centro: corregido (σ=60 px). Derecha: diferencia ×3. La corrección recupera textura en bordes.</figcaption>
 </figure>
+<blockquote>
+<p><strong>Nota conceptual — MonoIIT:</strong> MonoIIT <strong>no</strong> es un método de corrección de imagen preprocesada como CLAHE o Retinex. Es el estimador de profundidad interno de EndoDepthAndMotion: reemplaza la DepthNet dentro de esa arquitectura. Las correcciones de iluminación (CLAHE, Retinex) se aplican como preprocesamiento a los tres modelos. MonoIIT vive dentro de uno de ellos.</p>
+</blockquote>
 <pre><code>DATOS CRUDOS (SCARED)
 Left_Image.png  +  left_depth_map.tiff (GT)
         |
-        |  [este notebook define qué hacer aquí:]
+        |  PREPROCESAMIENTO [definido en este notebook]
         |  • cap a 150 mm
         |  • log(Z+1)
-        |  • min-max (fit en train)
+        |  • min-max (fit exclusivo en train)
         v
-CORRECCIÓN DE IMAGEN           ← variable independiente del experimento
+CORRECCIÓN DE IMAGEN        ← variable independiente del experimento
         |
-        |-- [A] Sin corrección     baseline
-        |-- [B] CLAHE              ecualización adaptativa local
-        |-- [C] Retinex            separación iluminación/reflectancia
-        |-- [D] MonoIIT            red neuronal de corrección
+        |-- [A] Sin corrección    (baseline)
+        |-- [B] CLAHE             ecualización adaptativa local
+        |-- [C] Retinex           separación iluminación/reflectancia
         |
         v  X_corrected (misma resolución, distintos píxeles)
         |
-        +------------+------------+
-        |            |            |
-      NeXF    EndoGaussian    EndoDepthAndMotion
-        |            |            |
-        +------------+------------+
-        |
-        v  depth_map_estimado (float, mm)
-        |
-EVALUACIÓN vs. GT (datasets 8 y 9)
-        |-- AbsRel  ← métrica primaria para elegir ganador
-        |-- RMSE
-        |-- Chamfer Distance
-        |
-        v
-TABLA DE RESULTADOS (3 modelos × 4 métodos = 12 celdas)
-Ganador = celda con menor AbsRel en test
+        +------------------+------------------------+
+        |                  |                        |
+      NeXF          EndoGaussian        EndoDepthAndMotion
+  (NeRF+exposure)  (3DGS deformable)        |
+        |                  |             PoseNet + DepthNet
+        |                  |                    ↑
+        |                  |                 MonoIIT
+        |                  |          (estimador interno, no
+        |                  |           preprocesamiento externo)
+        +------------------+------------------------+
+                           |
+                           v  depth_map_estimado (mm)
+                           |
+              EVALUACIÓN vs. GT (datasets 8 y 9)
+                    AbsRel · RMSE · Chamfer Distance
+                           |
+                           v
+        TABLA DE RESULTADOS
+        3 modelos × 3 condiciones = 9 celdas principales
+        (+ MonoIIT como baseline adicional de arquitectura = hasta 12)
+        Ganador = celda con menor AbsRel en test
 </code></pre>
 <h3 id="que-aporta-este-notebook-a-ese-flujo">Qué aporta este notebook a ese flujo</h3>
 <table>
@@ -796,27 +803,33 @@ Ganador = celda con menor AbsRel en test
     SPLIT -->|"train\ndatasets 1–2"| CORR
     SPLIT -->|"test\ndatasets 8–9"| EVAL
 
-    subgraph CORR["Corrección de iluminación\nvariable independiente"]
+    subgraph CORR["Corrección de iluminación — variable independiente"]
         direction LR
         E1["Sin corrección\nbaseline"]
         E2["CLAHE\necual. adaptativa"]
         E3["Retinex\nilum/reflectancia"]
-        E4["MonoIIT\nred neuronal"]
     end
 
     CORR --> MOD
 
     subgraph MOD["Modelos de profundidad"]
         direction LR
-        M1["NeXF\nNeural Radiance Fields"]
-        M2["EndoGaussian\nGaussian Splatting"]
-        M3["EndoDepthAndMotion\nPose + depth"]
+        M1["NeXF\nNeRF + exposure"]
+        M2["EndoGaussian\n3DGS deformable"]
+        subgraph EDM["EndoDepthAndMotion"]
+            direction TB
+            P["PoseNet"]
+            DN["DepthNet"]
+            MI["MonoIIT\nestimador interno"]
+            P --> MI
+            DN --> MI
+        end
     end
 
     MOD --> G["depth_map_estimado\nfloat32 · mm"]
     G --> EVAL["Evaluación vs. GT\nAbsRel · RMSE · Chamfer Distance"]
 
-    EVAL --> H[("🏆 Tabla de resultados\n3 modelos × 4 métodos\n= 12 celdas de AbsRel\nGanador = min AbsRel en test")]
+    EVAL --> H[("🏆 Tabla de resultados\n3 modelos × 3 condiciones = 9 celdas\nGanador = min AbsRel en test")]
 
     style FE fill:#1e3a5f,stroke:#4599ec,color:#e8f4fd
     style CORR fill:#1a2e51,stroke:#4599ec,color:#e8f4fd

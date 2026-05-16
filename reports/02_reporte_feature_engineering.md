@@ -203,40 +203,46 @@ El PCA sobre los vértices XYZ del `point_cloud.obj` extrae la orientación y ex
 
 ## 8. Flujo completo: de datos crudos a resultados
 
+> **Nota conceptual — MonoIIT:** MonoIIT **no** es un método de corrección de imagen preprocesada como CLAHE o Retinex. Es el estimador de profundidad interno de EndoDepthAndMotion: reemplaza la DepthNet dentro de esa arquitectura. Las correcciones de iluminación (CLAHE, Retinex) se aplican como preprocesamiento a los tres modelos. MonoIIT vive dentro de uno de ellos.
+
 ```
 DATOS CRUDOS (SCARED)
 Left_Image.png  +  left_depth_map.tiff (GT)
         |
-        |  [este notebook define qué hacer aquí:]
+        |  PREPROCESAMIENTO [definido en este notebook]
         |  • cap a 150 mm
         |  • log(Z+1)
-        |  • min-max (fit en train)
+        |  • min-max (fit exclusivo en train)
         v
-CORRECCIÓN DE IMAGEN           ← variable independiente del experimento
+CORRECCIÓN DE IMAGEN        ← variable independiente del experimento
         |
-        |-- [A] Sin corrección     baseline
-        |-- [B] CLAHE              ecualización adaptativa local
-        |-- [C] Retinex            separación iluminación/reflectancia
-        |-- [D] MonoIIT            red neuronal de corrección
+        |-- [A] Sin corrección    (baseline)
+        |-- [B] CLAHE             ecualización adaptativa local
+        |-- [C] Retinex           separación iluminación/reflectancia
         |
         v  X_corrected (misma resolución, distintos píxeles)
         |
-        +------------+------------+
-        |            |            |
-      NeXF    EndoGaussian    EndoDepthAndMotion
-        |            |            |
-        +------------+------------+
-        |
-        v  depth_map_estimado (float, mm)
-        |
-EVALUACIÓN vs. GT (datasets 8 y 9)
-        |-- AbsRel  ← métrica primaria para elegir ganador
-        |-- RMSE
-        |-- Chamfer Distance
-        |
-        v
-TABLA DE RESULTADOS (3 modelos × 4 métodos = 12 celdas)
-Ganador = celda con menor AbsRel en test
+        +------------------+------------------------+
+        |                  |                        |
+      NeXF          EndoGaussian        EndoDepthAndMotion
+  (NeRF+exposure)  (3DGS deformable)        |
+        |                  |             PoseNet + DepthNet
+        |                  |                    ↑
+        |                  |                 MonoIIT
+        |                  |          (estimador interno, no
+        |                  |           preprocesamiento externo)
+        +------------------+------------------------+
+                           |
+                           v  depth_map_estimado (mm)
+                           |
+              EVALUACIÓN vs. GT (datasets 8 y 9)
+                    AbsRel · RMSE · Chamfer Distance
+                           |
+                           v
+        TABLA DE RESULTADOS
+        3 modelos × 3 condiciones = 9 celdas principales
+        (+ MonoIIT como baseline adicional de arquitectura = hasta 12)
+        Ganador = celda con menor AbsRel en test
 ```
 
 ### Qué aporta este notebook a ese flujo
@@ -296,27 +302,33 @@ flowchart TD
     SPLIT -->|"train\ndatasets 1–2"| CORR
     SPLIT -->|"test\ndatasets 8–9"| EVAL
 
-    subgraph CORR["Corrección de iluminación\nvariable independiente"]
+    subgraph CORR["Corrección de iluminación — variable independiente"]
         direction LR
         E1["Sin corrección\nbaseline"]
         E2["CLAHE\necual. adaptativa"]
         E3["Retinex\nilum/reflectancia"]
-        E4["MonoIIT\nred neuronal"]
     end
 
     CORR --> MOD
 
     subgraph MOD["Modelos de profundidad"]
         direction LR
-        M1["NeXF\nNeural Radiance Fields"]
-        M2["EndoGaussian\nGaussian Splatting"]
-        M3["EndoDepthAndMotion\nPose + depth"]
+        M1["NeXF\nNeRF + exposure"]
+        M2["EndoGaussian\n3DGS deformable"]
+        subgraph EDM["EndoDepthAndMotion"]
+            direction TB
+            P["PoseNet"]
+            DN["DepthNet"]
+            MI["MonoIIT\nestimador interno"]
+            P --> MI
+            DN --> MI
+        end
     end
 
     MOD --> G["depth_map_estimado\nfloat32 · mm"]
     G --> EVAL["Evaluación vs. GT\nAbsRel · RMSE · Chamfer Distance"]
 
-    EVAL --> H[("🏆 Tabla de resultados\n3 modelos × 4 métodos\n= 12 celdas de AbsRel\nGanador = min AbsRel en test")]
+    EVAL --> H[("🏆 Tabla de resultados\n3 modelos × 3 condiciones = 9 celdas\nGanador = min AbsRel en test")]
 
     style FE fill:#1e3a5f,stroke:#4599ec,color:#e8f4fd
     style CORR fill:#1a2e51,stroke:#4599ec,color:#e8f4fd
@@ -324,37 +336,7 @@ flowchart TD
     style H fill:#2766cb,stroke:#4599ec,color:#fff
 ```
 
----
 
-## 12. Prompt para IA de generación de imágenes
-
-Usa este prompt en Midjourney, DALL-E 3, Stable Diffusion o Adobe Firefly para generar una ilustración del pipeline del proyecto.
-
----
-
-**Prompt (inglés, para mejor calidad):**
-
-> Scientific diagram illustration, clean minimalist style with dark navy background. A multi-stage data pipeline for endoscopic depth estimation AI research. Left to right flow:
->
-> **Stage 1 — Data Source:** A glowing endoscope icon with circular light halo, labeled "SCARED dataset · RGB keyframes + depth TIFF". Anatomical tissue texture visible, with bright specular reflections shown as white hotspots.
->
-> **Stage 2 — Feature Engineering:** A table/spreadsheet icon with highlighted rows, labeled "20 keyframes × 20 features". Small icons for: bar chart (depth statistics), eye with glow (specular percentage sat_pct), target bullseye (vignette score), video film strip (video features). Color palette: deep blue (#2766CB) and gold accent (#E0A800).
->
-> **Stage 3 — Illumination Correction (branching):** Four parallel paths splitting from a single input image: one labeled "Baseline (no correction)", one "CLAHE" with histogram equalization visual, one "Retinex" with illumination/reflectance separation, one "MonoIIT" with small neural network icon. Each path shows the same endoscopic image becoming progressively more uniform.
->
-> **Stage 4 — Depth Models (three parallel boxes):** Three neural network blocks labeled "NeXF", "EndoGaussian", "EndoDepthAndMotion". Each shows a 3D Gaussian splat point cloud icon.
->
-> **Stage 5 — Evaluation:** A 3×4 comparison table glowing with heatmap colors (green=low error, red=high error), labeled "AbsRel · RMSE · Chamfer Distance". A trophy icon at the bottom labeled "Winner = min AbsRel on test split (datasets 8–9)".
->
-> Style: technical scientific illustration, flat design with subtle gradients, connecting arrows with flowing blue glow, white labels with monospace font, overall color scheme deep navy and electric blue with gold highlights. No photography, no photorealism. Resolution: 16:9 landscape.
-
----
-
-**Versión corta (para herramientas con límite de caracteres):**
-
-> Scientific data pipeline diagram, dark navy background, minimalist flat design. Left to right: endoscope with tissue and specular highlights → feature table (sat_pct, vignette_score, inpaint_ssim) → 4 illumination correction branches (baseline, CLAHE, Retinex, MonoIIT) → 3 depth model boxes (NeXF, EndoGaussian, EndoDepthAndMotion) → evaluation heatmap table 3×4 with trophy for winner. Blue and gold color palette, glowing arrows, monospace labels. Technical illustration, no photorealism.
-
----
 
 ## Referencias
 
