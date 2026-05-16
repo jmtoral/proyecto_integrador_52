@@ -224,7 +224,7 @@ La corrección de iluminación transforma `X_crudo → X_corrected` antes de pas
 
 ## Agradecimientos
 
-El Equipo 52 agradece la orientación y asesoría técnica del **Dr. Gilberto Ochoa Ruiz** y del **Dr. Ricardo Espinosa Loera** (Tecnológico de Monterrey), cuyas contribuciones al campo de la visión por computadora y el procesamiento de imágenes médicas enriquecieron el diseño metodológico de este proyecto.
+El Equipo 52 agradece la orientación y asesoría técnica del **Dr. Gilberto Ochoa Ruiz** (Tecnológico de Monterrey) y del **Dr. Ricardo Espinosa Loera** (Université de Lorraine), cuyas contribuciones al campo de la visión por computadora y el procesamiento de imágenes médicas enriquecieron el diseño metodológico de este proyecto.
 
 ## Nota sobre uso de inteligencia artificial
 
