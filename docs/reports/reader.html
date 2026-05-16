@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avances — La luz que opaca · Equipo 52</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --m50:#F0F8FE;--m100:#DDEEFC;--m200:#C3E2FA;--m300:#99D0F7;
+  --m400:#69B7F1;--m500:#4599EC;--m700:#2766CB;--m800:#2654A7;
+  --m900:#244984;--m950:#1A2E51;--gold:#E0A800;
+  --ff-serif:'Playfair Display',Georgia,serif;
+  --ff-sans:'Inter',system-ui,sans-serif;
+  --ff-mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:var(--ff-sans);background:var(--m950);color:#e8f4fd;}
+
+/* ── Top bar ── */
+.topbar{
+  height:56px;background:rgba(26,46,81,.95);
+  border-bottom:1px solid rgba(69,153,236,.2);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.5rem;position:fixed;top:0;left:0;right:0;z-index:100;
+  gap:1rem;
+}
+.topbar-brand{font-family:var(--ff-mono);font-size:.75rem;color:var(--m300);white-space:nowrap;}
+.topbar-title{font-family:var(--ff-serif);font-size:1rem;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:center;}
+.topbar-actions{display:flex;gap:.6rem;align-items:center;flex-shrink:0;}
+.btn-sm{
+  font-family:var(--ff-mono);font-size:.72rem;font-weight:600;
+  padding:.35rem .9rem;border-radius:6px;border:none;cursor:pointer;
+  text-decoration:none;white-space:nowrap;transition:background .2s,transform .15s;
+  display:inline-flex;align-items:center;gap:.4rem;
+}
+.btn-dl{background:var(--m500);color:#fff;}
+.btn-dl:hover{background:var(--m700);transform:translateY(-1px);}
+.btn-back{background:rgba(69,153,236,.15);border:1px solid rgba(69,153,236,.3);color:var(--m300);}
+.btn-back:hover{background:rgba(69,153,236,.25);color:#fff;}
+
+/* ── Tab bar ── */
+.tabbar{
+  position:fixed;top:56px;left:0;right:0;z-index:99;
+  background:rgba(26,46,81,.9);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(69,153,236,.15);
+  display:flex;gap:0;overflow-x:auto;
+}
+.tab{
+  padding:.65rem 1.4rem;font-family:var(--ff-mono);font-size:.78rem;
+  color:var(--m400);cursor:pointer;border:none;background:none;
+  border-bottom:2px solid transparent;white-space:nowrap;
+  transition:color .2s,border-color .2s;
+}
+.tab:hover{color:var(--m200);}
+.tab.active{color:#fff;border-bottom-color:var(--m500);}
+.tab .tab-badge{
+  display:inline-block;background:rgba(69,153,236,.2);
+  color:var(--m300);border-radius:4px;padding:.05rem .4rem;
+  font-size:.65rem;margin-left:.4rem;
+}
+.tab.active .tab-badge{background:var(--m700);color:#fff;}
+
+/* ── Viewer panels ── */
+.viewer-wrap{padding-top:calc(56px + 40px);height:100vh;display:flex;flex-direction:column;}
+.panel{display:none;flex:1;flex-direction:column;}
+.panel.active{display:flex;}
+
+/* PDF embed */
+.pdf-frame{flex:1;width:100%;border:none;background:#fff;}
+
+/* HTML report iframe */
+.html-frame{flex:1;width:100%;border:none;}
+
+/* No-PDF fallback */
+.pdf-fallback{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1.5rem;padding:3rem;text-align:center;
+}
+.pdf-fallback .icon{font-size:4rem;}
+.pdf-fallback h2{font-family:var(--ff-serif);font-size:1.6rem;color:#fff;}
+.pdf-fallback p{font-size:.9rem;color:var(--m300);max-width:420px;line-height:1.7;}
+
+/* ── Responsive ── */
+@media(max-width:600px){
+  .topbar-brand{display:none;}
+  .topbar-title{font-size:.85rem;}
+  .tab{padding:.55rem .9rem;font-size:.72rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-brand">Equipo 52 · MNA</span>
+  <span class="topbar-title" id="topTitle">Avances del Proyecto</span>
+  <div class="topbar-actions">
+    <a id="btnDownload" href="Avance1.52.pdf" download class="btn-sm btn-dl">⬇ Descargar</a>
+    <a href="../index.html#avances" class="btn-sm btn-back">← Sitio</a>
+  </div>
+</div>
+
+<div class="tabbar">
+  <button class="tab active" onclick="showPanel('a1pdf')" id="tab-a1pdf">
+    📄 Avance 1 <span class="tab-badge">PDF</span>
+  </button>
+  <button class="tab" onclick="showPanel('a2pdf')" id="tab-a2pdf">
+    📄 Avance 2 <span class="tab-badge">PDF</span>
+  </button>
+  <button class="tab" onclick="showPanel('a2html')" id="tab-a2html">
+    📊 Avance 2 <span class="tab-badge">Reporte técnico</span>
+  </button>
+</div>
+
+<div class="viewer-wrap">
+
+  <!-- Avance 1 PDF -->
+  <div class="panel active" id="panel-a1pdf">
+    <object class="pdf-frame" data="Avance1.52.pdf" type="application/pdf">
+      <div class="pdf-fallback">
+        <div class="icon">📄</div>
+        <h2>Avance 1 — EDA</h2>
+        <p>Tu navegador no puede mostrar el PDF embebido. Descárgalo para verlo.</p>
+        <a href="Avance1.52.pdf" download class="btn-sm btn-dl" style="font-size:.9rem;padding:.6rem 1.4rem;">⬇ Descargar PDF</a>
+      </div>
+    </object>
+  </div>
+
+  <!-- Avance 2 PDF -->
+  <div class="panel" id="panel-a2pdf">
+    <object class="pdf-frame" data="Avance2.52.pdf" type="application/pdf">
+      <div class="pdf-fallback">
+        <div class="icon">📄</div>
+        <h2>Avance 2 — Ingeniería de Características</h2>
+        <p>Tu navegador no puede mostrar el PDF embebido. Descárgalo para verlo.</p>
+        <a href="Avance2.52.pdf" download class="btn-sm btn-dl" style="font-size:.9rem;padding:.6rem 1.4rem;">⬇ Descargar PDF</a>
+      </div>
+    </object>
+  </div>
+
+  <!-- Avance 2 HTML técnico -->
+  <div class="panel" id="panel-a2html">
+    <iframe class="html-frame" src="02_reporte_feature_engineering.html" title="Reporte técnico Avance 2"></iframe>
+  </div>
+
+</div>
+
+<script>
+const panels = {
+  a1pdf:  { title: 'Avance 1 — Análisis Exploratorio de Datos', dl: 'Avance1.52.pdf' },
+  a2pdf:  { title: 'Avance 2 — Ingeniería de Características', dl: 'Avance2.52.pdf' },
+  a2html: { title: 'Avance 2 — Reporte Técnico Detallado', dl: null },
+};
+
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+
+  const info = panels[id];
+  document.getElementById('topTitle').textContent = info.title;
+  const btn = document.getElementById('btnDownload');
+  if (info.dl) {
+    btn.href = info.dl;
+    btn.download = info.dl;
+    btn.style.display = 'inline-flex';
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
+// Open specific tab from URL hash: reader.html#a2pdf
+const hash = location.hash.replace('#','');
+if (panels[hash]) showPanel(hash);
+</script>
+</body>
+</html>
