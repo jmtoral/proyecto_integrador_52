@@ -54,7 +54,7 @@
       <small>MNA Student</small>
     </td>
     <td align="center" style="border:none; width:33%; padding:10px;">
-      <img src="https://ui-avatars.com/api/?name=Maria+Gutierrez&size=140&background=0036a3&color=fff&rounded=true" width="140px" style="border-radius:10px;">
+      <img src="https://raw.githubusercontent.com/jmtoral/proyecto_integrador_52/main/reports/mpgc.jpg" width="140px" height="140px" style="border-radius:50%; object-fit:cover;">
       <br>
       <h4>María Paula Gutiérrez Cervantes</h4>
       <code>A01747706</code><br>
