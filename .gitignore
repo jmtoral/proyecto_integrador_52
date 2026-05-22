@@ -46,6 +46,9 @@ data/scared_raw/
 # Outputs pesados del EDA (HTMLs interactivos 3D)
 outcomes/eda_outputs/*.html
 
+# Claude Code local config
+.claude/
+
 # Keep folder structure
 !data/raw/.gitkeep
 !data/interim/.gitkeep
