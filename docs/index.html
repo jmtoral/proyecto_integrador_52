@@ -362,6 +362,10 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
         <span style="font-size:1.2rem;">📊</span>
         <span><strong>Avance 2</strong> — Ingeniería de Características<br><small style="font-weight:400;opacity:.85;">HTML · Reporte completo con figuras y Mermaid</small></span>
       </a>
+      <a href="https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks/Avance3_52_Pipeline_EndoDepth.ipynb" target="_blank" class="btn-outline" style="display:inline-flex;align-items:center;gap:.6rem;font-size:.95rem;padding:.85rem 1.8rem;border-color:var(--gold);color:var(--gold);">
+        <span style="font-size:1.2rem;">📊</span>
+        <span><strong>Avance 3</strong> — Baseline Endo-Depth<br><small style="font-weight:400;opacity:.85;">Notebook · Pipeline completo · Resultados AbsRel</small></span>
+      </a>
     </div>
 
     <p class="reveal" style="font-family:var(--ff-mono);font-size:.75rem;letter-spacing:.12em;color:var(--m500);text-transform:uppercase;margin:2.5rem 0 1rem;">Notebooks — GitHub</p>
@@ -749,24 +753,80 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
       </div>
     </div>
 
-    <!-- Hallazgos clave del avance -->
+    <!-- Hallazgos clave del avance — datos reales del experimento -->
     <div class="reveal">
       <p style="font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.1em;color:var(--m500);text-transform:uppercase;margin-bottom:1.2rem;">Hallazgos principales</p>
+
+      <!-- Tabla resumen de resultados -->
+      <div style="overflow-x:auto;margin-bottom:2rem;">
+        <table class="data-table" style="width:100%;font-size:.83rem;background:rgba(255,255,255,.04);border-radius:10px;overflow:hidden;">
+          <thead>
+            <tr style="background:rgba(39,102,203,.3);">
+              <th style="color:var(--m200);padding:.6rem 1rem;">Corrección</th>
+              <th style="color:var(--m200);padding:.6rem 1rem;">AbsRel ↓</th>
+              <th style="color:var(--m200);padding:.6rem 1rem;">RMSE mm ↓</th>
+              <th style="color:var(--m200);padding:.6rem 1rem;">Chamfer mm ↓</th>
+              <th style="color:var(--m200);padding:.6rem 1rem;">PSNR dB</th>
+              <th style="color:var(--m200);padding:.6rem 1rem;">SSIM</th>
+              <th style="color:var(--m200);padding:.6rem 1rem;">AbsRel especular ↓</th>
+              <th style="color:var(--m200);padding:.6rem 1rem;">AbsRel no-espec. ↓</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background:rgba(46,204,113,.07);border-left:3px solid #2ecc71;">
+              <td style="color:#2ecc71;font-family:var(--ff-mono);font-weight:700;padding:.6rem 1rem;">Retinex ★</td>
+              <td style="color:#2ecc71;font-family:var(--ff-mono);font-weight:700;padding:.6rem 1rem;">0.0843</td>
+              <td style="color:var(--m200);font-family:var(--ff-mono);padding:.6rem 1rem;">14.04</td>
+              <td style="color:var(--m200);font-family:var(--ff-mono);padding:.6rem 1rem;">5.635</td>
+              <td style="color:var(--m200);font-family:var(--ff-mono);padding:.6rem 1rem;">14.28</td>
+              <td style="color:var(--m200);font-family:var(--ff-mono);padding:.6rem 1rem;">0.7606</td>
+              <td style="color:#2ecc71;font-family:var(--ff-mono);font-weight:700;padding:.6rem 1rem;">0.0545</td>
+              <td style="color:var(--m200);font-family:var(--ff-mono);padding:.6rem 1rem;">0.0882</td>
+            </tr>
+            <tr>
+              <td style="color:var(--m300);font-family:var(--ff-mono);padding:.6rem 1rem;">Sin corrección</td>
+              <td style="color:var(--m300);font-family:var(--ff-mono);padding:.6rem 1rem;">0.1376</td>
+              <td style="color:var(--m200);font-family:var(--ff-mono);padding:.6rem 1rem;">18.59</td>
+              <td style="color:var(--m200);font-family:var(--ff-mono);padding:.6rem 1rem;">8.694</td>
+              <td style="color:var(--m400);font-family:var(--ff-mono);font-size:.75rem;padding:.6rem 1rem;">— (baseline)</td>
+              <td style="color:var(--m200);font-family:var(--ff-mono);padding:.6rem 1rem;">1.0000</td>
+              <td style="color:var(--m300);font-family:var(--ff-mono);padding:.6rem 1rem;">0.1215</td>
+              <td style="color:var(--m200);font-family:var(--ff-mono);padding:.6rem 1rem;">0.1397</td>
+            </tr>
+            <tr style="background:rgba(231,76,60,.05);">
+              <td style="color:var(--m300);font-family:var(--ff-mono);padding:.6rem 1rem;">CLAHE</td>
+              <td style="color:#e74c3c;font-family:var(--ff-mono);padding:.6rem 1rem;">0.1935</td>
+              <td style="color:var(--m200);font-family:var(--ff-mono);padding:.6rem 1rem;">27.46</td>
+              <td style="color:var(--m200);font-family:var(--ff-mono);padding:.6rem 1rem;">10.571</td>
+              <td style="color:var(--m200);font-family:var(--ff-mono);padding:.6rem 1rem;">20.39</td>
+              <td style="color:var(--m200);font-family:var(--ff-mono);padding:.6rem 1rem;">0.8409</td>
+              <td style="color:#e74c3c;font-family:var(--ff-mono);padding:.6rem 1rem;">0.1260</td>
+              <td style="color:var(--m200);font-family:var(--ff-mono);padding:.6rem 1rem;">0.2023</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-family:var(--ff-mono);font-size:.7rem;color:var(--m500);margin-top:.5rem;">★ Ganador. Dataset 8–9 SCARED. Median scaling por keyframe. AbsRel = error relativo medio; ↓ = menor es mejor.</p>
+      </div>
+
+      <!-- Cards con interpretación -->
       <div class="cards-grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));">
         <div class="card">
-          <div class="card-icon">📐</div>
-          <h3>Hipótesis bajo prueba</h3>
-          <p>Corregir la iluminación (CLAHE o Retinex SSR) antes de pasar la imagen a Endo-Depth reduce el AbsRel, con efecto concentrado en las zonas especulares donde el modelo estaba más confundido por sobreexposición.</p>
+          <div class="card-icon">🏆</div>
+          <h3>Retinex gana en AbsRel</h3>
+          <p>Retinex SSR (σ=30) obtiene <strong style="color:var(--m400);">AbsRel = 0.084</strong>, un <strong style="color:var(--m400);">38.7% menos</strong> que el baseline sin corrección (0.138). La separación iluminación/reflectancia del modelo de Retinex funciona mejor que la ecualización local de CLAHE en este dominio.</p>
+          <div class="stat-row"><span class="stat-pill">−38.7% vs baseline</span></div>
         </div>
         <div class="card">
-          <div class="card-icon">⚙️</div>
-          <h3>Protocolo: median scaling</h3>
-          <p>Endo-Depth fue entrenado en Hamlyn (rig distinto a SCARED). El factor de escala se calcula por keyframe alineando la mediana de la predicción con la del GT — protocolo estándar en la literatura para evaluación cross-domain.</p>
+          <div class="card-icon">✨</div>
+          <h3>Hipótesis confirmada en especulares</h3>
+          <p>Retinex reduce el AbsRel en zona especular de <strong style="color:var(--m400);">0.122 → 0.055</strong> (−55%), mucho más que fuera de ella (−37%). La corrección actúa donde el modelo más fallaba: zonas sobreexpuestas por el gradiente radial del endoscopio.</p>
+          <div class="stat-row"><span class="stat-pill">−55% en zona especular</span></div>
         </div>
         <div class="card">
-          <div class="card-icon">⏱️</div>
-          <h3>Viabilidad clínica</h3>
-          <p>El umbral clínico para retroalimentación fluida al cirujano es ≥ 25 FPS. Se mide el costo completo (corrección + inferencia) para determinar si alguna corrección supera ese límite en un entorno de producción.</p>
+          <div class="card-icon">⚠️</div>
+          <h3>CLAHE perjudica la profundidad</h3>
+          <p>CLAHE introduce más error (AbsRel = 0.194) que el baseline, aunque su SSIM (0.84) indica que preserva la estructura visual. La ecualización adaptativa amplifica artefactos de textura que Endo-Depth interpreta como variaciones de profundidad.</p>
+          <div class="stat-row"><span class="stat-pill">+40.6% vs baseline</span><span class="stat-pill">SSIM 0.84 — buena imagen</span></div>
         </div>
       </div>
     </div>
