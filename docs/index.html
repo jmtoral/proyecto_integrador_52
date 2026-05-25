@@ -702,11 +702,17 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
     <p class="section-body reveal" style="color:var(--m200);max-width:740px;">Pipeline completo de estimación de profundidad monocular sobre SCARED (datasets 8–9). Se comparan tres condiciones de preprocesamiento — sin corrección, CLAHE y Retinex SSR — usando Endo-Depth (ResNet18 + DepthDecoder) con pesos preentrenados. Todos los experimentos usan median scaling y se evalúan con el mismo protocolo.</p>
 
     <!-- Chips de contexto -->
-    <div style="display:flex;flex-wrap:wrap;gap:.8rem;margin:2rem 0 3rem;" class="reveal">
+    <div style="display:flex;flex-wrap:wrap;gap:.8rem;margin:2rem 0 2rem;" class="reveal">
       <div class="metric-chip"><div class="num" style="font-size:1.1rem;">A100</div><div class="lbl">GPU · 80 GB VRAM</div></div>
       <div class="metric-chip"><div class="num" style="font-size:1.1rem;">3</div><div class="lbl">Correcciones evaluadas</div></div>
       <div class="metric-chip"><div class="num" style="font-size:1.1rem;">AbsRel</div><div class="lbl">Métrica primaria</div></div>
       <div class="metric-chip"><div class="num" style="font-size:1.1rem;">25 FPS</div><div class="lbl">Umbral clínico</div></div>
+    </div>
+
+    <!-- Split del experimento -->
+    <div class="finding-box reveal" style="margin-bottom:2.5rem;border-left-color:var(--gold);">
+      <p><strong style="color:var(--m300);">¿Por qué solo datasets 8 y 9?</strong> El split de SCARED está diseñado por animal, no por keyframe. Los datasets 1–7 provienen de un cerdo distinto (cerdo A) al de los datasets 8–9 (cerdo C). Usar animales diferentes en train y test evita que el modelo aprenda características idiosincrásicas de un tejido concreto — textura, color, distribución de profundidad — y garantiza que los resultados miden <strong>generalización real</strong>, no memorización. Es el protocolo estándar del challenge SCARED (Allan et al., 2021).</p>
+      <p style="margin-top:.6rem;">Endo-Depth no se reentrena en este notebook; los pesos son los preentrenados en Hamlyn. Los datasets 8–9 son el <strong>split de test</strong> — el terreno neutral donde se comparan las tres correcciones.</p>
     </div>
 
     <!-- Figura 1: métricas comparativas -->
