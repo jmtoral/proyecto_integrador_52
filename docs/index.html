@@ -290,6 +290,7 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
     <li><a href="#context">El problema</a></li>
     <li><a href="#datasets">Datos</a></li>
     <li><a href="#findings">Hallazgos EDA</a></li>
+    <li><a href="#avance3">Baseline</a></li>
     <li><a href="#pipeline">Metodología</a></li>
     <li><a href="#equipo">Equipo</a></li>
   </ul>
@@ -301,6 +302,7 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
   <a href="#context"    onclick="closeMobile()">El problema</a>
   <a href="#datasets"   onclick="closeMobile()">Datos</a>
   <a href="#findings"   onclick="closeMobile()">Hallazgos EDA</a>
+  <a href="#avance3"    onclick="closeMobile()">Baseline</a>
   <a href="#pipeline"   onclick="closeMobile()">Metodología</a>
   <a href="#equipo"     onclick="closeMobile()">Equipo</a>
   <a href="https://github.com/jmtoral/proyecto_integrador_52" target="_blank">GitHub →</a>
@@ -388,9 +390,13 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
         <span style="font-size:1.3rem;flex-shrink:0;">📓</span>
         <span><span style="font-family:var(--ff-mono);font-size:.7rem;color:var(--gold);display:block;">A2 · FE</span><strong style="color:var(--m200);font-size:.85rem;">Feature Engineering</strong><span style="color:var(--m400);font-size:.75rem;display:block;">Pipeline completo: features, transformaciones, PCA</span></span>
       </a>
+      <a href="https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks/Avance3_52_Pipeline_EndoDepth.ipynb" target="_blank" style="display:flex;align-items:center;gap:.8rem;background:rgba(255,255,255,.04);border:1px solid rgba(224,168,0,.25);border-radius:10px;padding:.9rem 1.1rem;text-decoration:none;transition:border-color .2s,background .2s;" onmouseover="this.style.borderColor='rgba(224,168,0,.6)';this.style.background='rgba(224,168,0,.1)'" onmouseout="this.style.borderColor='rgba(224,168,0,.25)';this.style.background='rgba(255,255,255,.04)'">
+        <span style="font-size:1.3rem;flex-shrink:0;">📓</span>
+        <span><span style="font-family:var(--ff-mono);font-size:.7rem;color:var(--gold);display:block;">A3 · NUEVO</span><strong style="color:var(--m200);font-size:.85rem;">Pipeline Endo-Depth — Baseline</strong><span style="color:var(--m400);font-size:.75rem;display:block;">CLAHE vs. Retinex vs. sin corrección · AbsRel · RMSE · Chamfer</span></span>
+      </a>
     </div>
 
-    <p style="margin-top:2rem;font-size:.82rem;color:var(--m500);font-family:var(--ff-mono);">// Avance 3 y siguientes se publicarán conforme se completen las etapas del proyecto.</p>
+    <p style="margin-top:2rem;font-size:.82rem;color:var(--m500);font-family:var(--ff-mono);">// Avances siguientes se publicarán conforme se completen las etapas del proyecto.</p>
   </div>
 </section>
 
@@ -680,6 +686,95 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
         <img src="img/21_correccion_demo.png" alt="Demo de corrección de iluminación">
         <div class="gallery-caption">Fig. 21 — Corrección por división de envolvente gaussiana (KF5)<em>Izquierda: original. Centro: corregido (σ=60 px). Derecha: diferencia ×3.</em></div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Avance 3: Resultados Baseline ── -->
+<section id="avance3" style="background:var(--m950);padding-top:5rem;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label reveal">// avance 3 · baseline</div>
+    <h2 class="section-title reveal">Resultados del baseline con Endo-Depth</h2>
+    <p class="section-body reveal" style="color:var(--m200);max-width:740px;">Pipeline completo de estimación de profundidad monocular sobre SCARED (datasets 8–9). Se comparan tres condiciones de preprocesamiento — sin corrección, CLAHE y Retinex SSR — usando Endo-Depth (ResNet18 + DepthDecoder) con pesos preentrenados. Todos los experimentos usan median scaling y se evalúan con el mismo protocolo.</p>
+
+    <!-- Chips de contexto -->
+    <div style="display:flex;flex-wrap:wrap;gap:.8rem;margin:2rem 0 3rem;" class="reveal">
+      <div class="metric-chip"><div class="num" style="font-size:1.1rem;">A100</div><div class="lbl">GPU · 80 GB VRAM</div></div>
+      <div class="metric-chip"><div class="num" style="font-size:1.1rem;">3</div><div class="lbl">Correcciones evaluadas</div></div>
+      <div class="metric-chip"><div class="num" style="font-size:1.1rem;">AbsRel</div><div class="lbl">Métrica primaria</div></div>
+      <div class="metric-chip"><div class="num" style="font-size:1.1rem;">25 FPS</div><div class="lbl">Umbral clínico</div></div>
+    </div>
+
+    <!-- Figura 1: métricas comparativas -->
+    <div class="reveal" style="margin-bottom:3.5rem;">
+      <p style="font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.1em;color:var(--m500);text-transform:uppercase;margin-bottom:.8rem;">Fig. A3-1 — Métricas comparativas por corrección</p>
+      <div class="gallery-item" style="max-width:100%;cursor:pointer;" onclick="openLightbox('img/avance3_metricas_comparativa.png')">
+        <img src="img/avance3_metricas_comparativa.png" alt="Métricas comparativas Avance 3" style="height:auto;object-fit:contain;">
+        <div class="gallery-caption" style="background:rgba(255,255,255,.03);color:var(--m300);">AbsRel, RMSE, Chamfer Distance, PSNR, SSIM y AbsRel en zona especular para las tres condiciones. El método con menor AbsRel gana la comparación principal.
+          <em style="color:var(--m500);">Haz clic para ampliar.</em>
+        </div>
+      </div>
+    </div>
+
+    <!-- Figura 2: robustez especular -->
+    <div class="reveal" style="margin-bottom:3.5rem;">
+      <p style="font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.1em;color:var(--m500);text-transform:uppercase;margin-bottom:.8rem;">Fig. A3-2 — Robustez en zonas especulares vs. resto de la imagen</p>
+      <div class="gallery-item" style="max-width:100%;cursor:pointer;" onclick="openLightbox('img/avance3_robustez_especular.png')">
+        <img src="img/avance3_robustez_especular.png" alt="Robustez especular Avance 3" style="height:auto;object-fit:contain;">
+        <div class="gallery-caption" style="background:rgba(255,255,255,.03);color:var(--m300);">AbsRel separado en píxeles de zona especular (rojo) y fuera de ella (azul). Si la hipótesis del proyecto es correcta, CLAHE o Retinex deben mostrar mayor reducción en la barra roja.
+          <em style="color:var(--m500);">Haz clic para ampliar.</em>
+        </div>
+      </div>
+    </div>
+
+    <!-- Figuras 3 y 4 en grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:3.5rem;" class="reveal">
+      <div>
+        <p style="font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.1em;color:var(--m500);text-transform:uppercase;margin-bottom:.8rem;">Fig. A3-3 — Visualización cualitativa</p>
+        <div class="gallery-item" style="cursor:pointer;" onclick="openLightbox('img/avance3_viz_cualitativa.png')">
+          <img src="img/avance3_viz_cualitativa.png" alt="Visualización cualitativa depth maps" style="width:100%;height:220px;object-fit:cover;">
+          <div class="gallery-caption" style="background:rgba(255,255,255,.03);color:var(--m300);">Depth maps predichos vs. GT por cada corrección. Fila 1: imagen; Fila 2: profundidad estimada; Fila 3: error absoluto por píxel.
+            <em style="color:var(--m500);">Haz clic para ampliar.</em>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p style="font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.1em;color:var(--m500);text-transform:uppercase;margin-bottom:.8rem;">Fig. A3-4 — Performance: tiempo y FPS</p>
+        <div class="gallery-item" style="cursor:pointer;" onclick="openLightbox('img/avance3_performance.png')">
+          <img src="img/avance3_performance.png" alt="Performance tiempo FPS" style="width:100%;height:220px;object-fit:cover;">
+          <div class="gallery-caption" style="background:rgba(255,255,255,.03);color:var(--m300);">Tiempo total (corrección + inferencia) por método. La línea roja marca el umbral de 25 FPS para viabilidad en tiempo real.
+            <em style="color:var(--m500);">Haz clic para ampliar.</em>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hallazgos clave del avance -->
+    <div class="reveal">
+      <p style="font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.1em;color:var(--m500);text-transform:uppercase;margin-bottom:1.2rem;">Hallazgos principales</p>
+      <div class="cards-grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));">
+        <div class="card">
+          <div class="card-icon">📐</div>
+          <h3>Hipótesis bajo prueba</h3>
+          <p>Corregir la iluminación (CLAHE o Retinex SSR) antes de pasar la imagen a Endo-Depth reduce el AbsRel, con efecto concentrado en las zonas especulares donde el modelo estaba más confundido por sobreexposición.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">⚙️</div>
+          <h3>Protocolo: median scaling</h3>
+          <p>Endo-Depth fue entrenado en Hamlyn (rig distinto a SCARED). El factor de escala se calcula por keyframe alineando la mediana de la predicción con la del GT — protocolo estándar en la literatura para evaluación cross-domain.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">⏱️</div>
+          <h3>Viabilidad clínica</h3>
+          <p>El umbral clínico para retroalimentación fluida al cirujano es ≥ 25 FPS. Se mide el costo completo (corrección + inferencia) para determinar si alguna corrección supera ese límite en un entorno de producción.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:2.5rem;" class="reveal">
+      <a href="https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks/Avance3_52_Pipeline_EndoDepth.ipynb" target="_blank" class="btn-primary" style="display:inline-flex;align-items:center;gap:.6rem;">
+        <span>📓</span> Ver notebook completo en GitHub
+      </a>
     </div>
   </div>
 </section>
