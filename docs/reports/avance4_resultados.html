@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avance 4 — Image Enhancement · Equipo 52</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --m50:#F0F8FE;--m100:#DDEEFC;--m200:#C3E2FA;--m300:#99D0F7;
+  --m400:#69B7F1;--m500:#4599EC;--m700:#2766CB;--m800:#2654A7;
+  --m900:#244984;--m950:#1A2E51;--gold:#E0A800;
+  --ff-serif:'Playfair Display',Georgia,serif;
+  --ff-sans:'Inter',system-ui,sans-serif;
+  --ff-mono:'JetBrains Mono',monospace;
+  --green:#2ecc71;--red:#e74c3c;--orange:#E0A800;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{font-family:var(--ff-sans);background:var(--m950);color:#e8f4fd;line-height:1.7;}
+
+.topbar{height:56px;background:rgba(26,46,81,.95);border-bottom:1px solid rgba(69,153,236,.2);
+  display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;
+  position:sticky;top:0;z-index:100;}
+.topbar-brand{font-family:var(--ff-mono);font-size:.75rem;color:var(--m300);}
+.topbar-title{font-family:var(--ff-serif);font-size:1rem;color:#fff;flex:1;text-align:center;}
+.btn-sm{font-family:var(--ff-mono);font-size:.72rem;font-weight:600;padding:.35rem .9rem;
+  border-radius:6px;border:none;cursor:pointer;text-decoration:none;
+  display:inline-flex;align-items:center;gap:.4rem;transition:background .2s;}
+.btn-back{background:rgba(69,153,236,.15);border:1px solid rgba(69,153,236,.3);color:var(--m300);}
+.btn-back:hover{background:rgba(69,153,236,.25);color:#fff;}
+.btn-nb{background:var(--m700);color:#fff;}
+.btn-nb:hover{background:var(--m800);}
+
+.hero{padding:4rem 2rem 2rem;max-width:900px;margin:0 auto;text-align:center;}
+.hero h1{font-family:var(--ff-serif);font-size:2.2rem;color:#fff;margin-bottom:.8rem;}
+.hero p{color:var(--m300);font-size:1rem;max-width:680px;margin:0 auto 1.5rem;}
+.hero-badges{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem;}
+.badge{font-family:var(--ff-mono);font-size:.72rem;padding:.3rem .8rem;border-radius:20px;
+  background:rgba(69,153,236,.15);border:1px solid rgba(69,153,236,.3);color:var(--m300);}
+
+.container{max-width:900px;margin:0 auto;padding:0 2rem 4rem;}
+
+.section{margin-bottom:3rem;}
+.section-label{font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.12em;
+  color:var(--m500);text-transform:uppercase;margin-bottom:.6rem;}
+.section h2{font-family:var(--ff-serif);font-size:1.6rem;color:#fff;margin-bottom:1.2rem;}
+.section h3{font-size:1rem;font-weight:600;color:var(--m200);margin:1.5rem 0 .5rem;}
+.section p{color:var(--m300);margin-bottom:.8rem;}
+.section strong{color:#fff;}
+
+/* ── Result table ── */
+.result-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:1rem 0;}
+.result-table th{background:rgba(39,102,203,.3);color:var(--m200);
+  padding:.6rem .8rem;text-align:left;font-family:var(--ff-mono);font-size:.75rem;
+  border-bottom:1px solid rgba(69,153,236,.3);}
+.result-table td{padding:.55rem .8rem;border-bottom:1px solid rgba(69,153,236,.08);
+  font-family:var(--ff-mono);font-size:.8rem;color:var(--m300);}
+.result-table tr:hover td{background:rgba(69,153,236,.06);}
+.result-table .model-row td:first-child{color:#fff;font-weight:600;}
+.tag-best{background:rgba(46,204,113,.15);color:#2ecc71;border-radius:4px;
+  padding:.1rem .4rem;font-size:.7rem;}
+.tag-worst{background:rgba(231,76,60,.15);color:#e74c3c;border-radius:4px;
+  padding:.1rem .4rem;font-size:.7rem;}
+.delta-pos{color:#2ecc71;}
+.delta-neg{color:#e74c3c;}
+
+/* ── Finding cards ── */
+.findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin:1rem 0;}
+.card{background:rgba(39,102,203,.12);border:1px solid rgba(69,153,236,.2);
+  border-radius:10px;padding:1.2rem;}
+.card-icon{font-size:1.8rem;margin-bottom:.5rem;}
+.card h4{color:#fff;font-size:.95rem;margin-bottom:.4rem;}
+.card p{color:var(--m300);font-size:.83rem;line-height:1.6;}
+.card.highlight{border-color:var(--gold);background:rgba(224,168,0,.08);}
+.card.warning{border-color:#e74c3c;background:rgba(231,76,60,.08);}
+
+/* ── Model pills ── */
+.model-pill{display:inline-block;padding:.2rem .7rem;border-radius:20px;
+  font-family:var(--ff-mono);font-size:.72rem;margin:.15rem;}
+.pill-endo{background:rgba(69,153,236,.2);color:var(--m300);}
+.pill-sfm{background:rgba(46,204,113,.15);color:#2ecc71;}
+.pill-vit{background:rgba(224,168,0,.15);color:var(--gold);}
+
+.divider{border:none;border-top:1px solid rgba(69,153,236,.15);margin:2rem 0;}
+
+.note{background:rgba(39,102,203,.1);border-left:3px solid var(--m500);
+  border-radius:0 6px 6px 0;padding:.8rem 1rem;font-size:.83rem;color:var(--m300);margin:1rem 0;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-brand">Equipo 52 · MNA</span>
+  <span class="topbar-title">Avance 4 — Image Enhancement × Depth Models</span>
+  <div style="display:flex;gap:.6rem;">
+    <a href="Avance4_52_ImageEnhancement.html" target="_blank" class="btn-sm btn-nb">📓 Notebook</a>
+    <a href="../index.html#avances" class="btn-sm btn-back">← Sitio</a>
+  </div>
+</div>
+
+<div class="hero">
+  <h1>Image Enhancement sobre Estimación de Profundidad Endoscópica</h1>
+  <p>Evaluación factorial de 4 métodos de enhancement × 3 modelos de depth sobre SCARED datasets 8–9 (10 keyframes, 120 evaluaciones totales)</p>
+  <div class="hero-badges">
+    <span class="badge">SCARED · datasets 8–9</span>
+    <span class="badge">120 evaluaciones</span>
+    <span class="badge">4 enhancements</span>
+    <span class="badge">3 modelos de depth</span>
+    <span class="badge">Equipo 52 · 2026</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ── Diseño experimental ── -->
+  <div class="section">
+    <div class="section-label">// diseño</div>
+    <h2>Diseño del experimento</h2>
+    <p>El experimento evalúa si aplicar <strong>image enhancement</strong> antes de la inferencia de profundidad mejora las métricas en SCARED. La variable independiente es el método de enhancement; todo lo demás (modelo, dataset, GT) permanece constante.</p>
+
+    <h3>Modelos de depth evaluados</h3>
+    <table class="result-table">
+      <tr><th>Modelo</th><th>Backbone</th><th>Entrenamiento</th><th>Resolución</th><th>Brightness-aware</th></tr>
+      <tr><td><span class="model-pill pill-endo">Endo-Depth</span></td><td>ResNet-18</td><td>Hamlyn (laparoscopy)</td><td>640×192</td><td>No</td></tr>
+      <tr><td><span class="model-pill pill-sfm">EndoSfMLearner</span></td><td>DispResNet-18</td><td>EndoSLAM (capsule)</td><td>256×832</td><td><strong style="color:#2ecc71">Sí</strong></td></tr>
+      <tr><td><span class="model-pill pill-vit">MonoViT</span></td><td>MPViT-Small (ViT)</td><td>KITTI (outdoor)</td><td>640×192</td><td>No</td></tr>
+    </table>
+
+    <h3>Métodos de enhancement evaluados</h3>
+    <table class="result-table">
+      <tr><th>Método</th><th>Tipo</th><th>Entrenamiento</th><th>Parámetros</th></tr>
+      <tr><td>None (baseline)</td><td>—</td><td>—</td><td>0</td></tr>
+      <tr><td>Retinex SSR (σ=30)</td><td>Clásico</td><td>No requiere</td><td>0</td></tr>
+      <tr><td>EndoLMSPEC</td><td>U-Net + Laplaciana</td><td>Endo4IE</td><td>~2 M</td></tr>
+      <tr><td>IAT / EndoViT</td><td>Transformer local+global</td><td>Endo4IE (fine-tune)</td><td>~90 K</td></tr>
+    </table>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── Resultados ── -->
+  <div class="section">
+    <div class="section-label">// resultados</div>
+    <h2>Resultados por modelo</h2>
+
+    <h3><span class="model-pill pill-endo">Endo-Depth</span></h3>
+    <table class="result-table">
+      <tr><th>Enhancement</th><th>AbsRel</th><th>RMSE mm</th><th>AbsRel especular</th><th>Δ AbsRel</th><th>FPS</th></tr>
+      <tr><td>none</td><td>0.165</td><td>12.47</td><td>0.209</td><td>—</td><td>36.6</td></tr>
+      <tr><td>retinex</td><td>0.153</td><td>11.58</td><td>0.195</td><td class="delta-pos">−7.2%</td><td>2.8</td></tr>
+      <tr><td>endolmspec</td><td>0.164</td><td>12.95</td><td>0.203</td><td class="delta-pos">−1.0%</td><td>8.0</td></tr>
+      <tr class="model-row"><td>iat <span class="tag-best">mejor</span></td><td><strong>0.145</strong></td><td><strong>11.07</strong></td><td><strong>0.184</strong></td><td class="delta-pos"><strong>−12.0%</strong></td><td>4.4</td></tr>
+    </table>
+
+    <h3><span class="model-pill pill-sfm">EndoSfMLearner</span></h3>
+    <table class="result-table">
+      <tr><th>Enhancement</th><th>AbsRel</th><th>RMSE mm</th><th>AbsRel especular</th><th>Δ AbsRel</th><th>FPS</th></tr>
+      <tr><td>none</td><td>0.291</td><td>21.00</td><td>0.320</td><td>—</td><td>158.9</td></tr>
+      <tr><td>iat</td><td>0.290</td><td>20.97</td><td>0.320</td><td class="delta-pos">−0.1%</td><td>4.8</td></tr>
+      <tr><td>endolmspec</td><td>0.290</td><td>20.98</td><td>0.320</td><td class="delta-pos">−0.1%</td><td>9.6</td></tr>
+      <tr><td>retinex</td><td>0.291</td><td>21.00</td><td>0.321</td><td class="delta-neg">+0.1%</td><td>2.9</td></tr>
+    </table>
+
+    <h3><span class="model-pill pill-vit">MonoViT</span></h3>
+    <table class="result-table">
+      <tr><th>Enhancement</th><th>AbsRel</th><th>RMSE mm</th><th>AbsRel especular</th><th>Δ AbsRel</th><th>FPS</th></tr>
+      <tr><td>none</td><td>0.305</td><td>23.73</td><td>0.304</td><td>—</td><td>18.9</td></tr>
+      <tr class="model-row"><td>iat <span class="tag-best">mejor</span></td><td><strong>0.283</strong></td><td>21.34</td><td>0.288</td><td class="delta-pos"><strong>−7.3%</strong></td><td>4.0</td></tr>
+      <tr><td>retinex</td><td>0.314</td><td>26.57</td><td><strong>0.275</strong> <span class="tag-best">mejor spec.</span></td><td class="delta-neg">+3.1%</td><td>2.6</td></tr>
+      <tr><td>endolmspec <span class="tag-worst">peor</span></td><td>0.331</td><td>26.42</td><td>0.337</td><td class="delta-neg">+8.5%</td><td>6.7</td></tr>
+    </table>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── Hallazgos ── -->
+  <div class="section">
+    <div class="section-label">// hallazgos</div>
+    <h2>Hallazgos principales</h2>
+
+    <div class="findings">
+      <div class="card highlight">
+        <div class="card-icon">⚡</div>
+        <h4>IAT gana en 2 de 3 modelos</h4>
+        <p>IAT/EndoViT es el mejor enhancement para <strong>Endo-Depth</strong> (−12.0% AbsRel) y <strong>MonoViT</strong> (−7.3% AbsRel). Su corrección suave preserva la distribución de entrada de cada modelo mejor que Retinex o EndoLMSPEC.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🛡️</div>
+        <h4>EndoSfMLearner es inmune</h4>
+        <p>Todos los enhancements producen cambios &lt;0.1% en EndoSfMLearner. Su <strong>brightness-aware photometric loss</strong> durante el entrenamiento ya lo hace robusto a variaciones de iluminación por diseño.</p>
+      </div>
+      <div class="card warning">
+        <div class="card-icon">⚠️</div>
+        <h4>EndoLMSPEC perjudica MonoViT</h4>
+        <p>EndoLMSPEC <strong>empeora MonoViT en +8.5%</strong>. MonoViT fue entrenado en KITTI (outdoor); la corrección agresiva de EndoLMSPEC produce imágenes fuera de su distribución de entrenamiento.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔍</div>
+        <h4>Retinex → especulares de MonoViT</h4>
+        <p>Retinex empeora AbsRel global de MonoViT (+3.1%) pero <strong>mejora AbsRel especular −9.8%</strong>. Los especulares son el punto débil de MonoViT y Retinex los atenúa — a costa de ruido en el resto.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── Conclusión ── -->
+  <div class="section">
+    <div class="section-label">// conclusión</div>
+    <h2>Conclusión y viabilidad clínica</h2>
+    <p>La hipótesis del proyecto se <strong>confirma parcialmente</strong>: la corrección de iluminación reduce el error de profundidad, pero el efecto depende del modelo. IAT/EndoViT es consistentemente el mejor enhancement — su arquitectura de corrección local+global preserva mejor la distribución de imágenes que los modelos de depth esperan.</p>
+
+    <div class="note">
+      <strong>Viabilidad clínica:</strong> ninguna combinación enhancement + depth supera el umbral de 25 FPS en tiempo real. IAT + Endo-Depth logra 4.4 FPS. Para uso clínico se requiere optimización adicional: TensorRT, inferencia FP16, o reducción de resolución de entrada.
+    </div>
+
+    <table class="result-table" style="margin-top:1.5rem;">
+      <tr><th>Modelo</th><th>Mejor enhancement</th><th>Mejora AbsRel</th><th>FPS combinado</th><th>Veredicto</th></tr>
+      <tr><td><span class="model-pill pill-endo">Endo-Depth</span></td><td>IAT</td><td class="delta-pos">−12.0%</td><td>4.4</td><td>✓ Enhancement útil</td></tr>
+      <tr><td><span class="model-pill pill-sfm">EndoSfMLearner</span></td><td>Ninguno (&lt;0.1%)</td><td>~0%</td><td>≤9.6</td><td>Enhancement innecesario</td></tr>
+      <tr><td><span class="model-pill pill-vit">MonoViT</span></td><td>IAT</td><td class="delta-pos">−7.3%</td><td>4.0</td><td>✓ Solo IAT — evitar Retinex/EndoLMSPEC</td></tr>
+    </table>
+  </div>
+
+</div>
+
+<script>
+// Auto-scroll to top on load
+window.scrollTo(0,0);
+</script>
+</body>
+</html>
