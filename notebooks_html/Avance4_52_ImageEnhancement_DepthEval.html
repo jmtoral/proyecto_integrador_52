@@ -7326,45 +7326,138 @@ a.anchor-link {
     init_mathjax();
     </script>
 <!-- End of mathjax configuration --><script type="module">
-  // Cargador robusto de mermaid (reemplaza el de nbconvert).
-  async function renderMermaid() {
-    const blocks = [...document.querySelectorAll(".jp-Mermaid > pre.mermaid")];
-    if (!blocks.length) return;
-    let mermaid;
-    try {
-      mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs")).default;
-    } catch (e) {
-      blocks.forEach(p => { p.style.whiteSpace = "pre-wrap";
-                            p.parentNode.classList.add("jp-RenderedMermaid"); });
+  document.addEventListener("DOMContentLoaded", async () => {
+    const diagrams = document.querySelectorAll(".jp-Mermaid > pre.mermaid");
+    // do not load mermaidjs if not needed
+    if (!diagrams.length) {
       return;
     }
-    mermaid.initialize({ startOnLoad: false, securityLevel: "loose", theme: "dark",
-                         flowchart: { htmlLabels: true }, maxTextSize: 100000 });
-    for (const pre of blocks) {
-      const parent = pre.parentNode;
-      if (parent.classList.contains("jp-RenderedMermaid")) continue;
-      const code = pre.textContent.trim();
+    const mermaid = (await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.7.0/mermaid.esm.min.mjs")).default;
+    const parser = new DOMParser();
+
+    mermaid.initialize({
+      maxTextSize: 100000,
+      maxEdges: 100000,
+      startOnLoad: false,
+      fontFamily: window
+        .getComputedStyle(document.body)
+        .getPropertyValue("--jp-ui-font-family"),
+      theme: document.querySelector("body[data-jp-theme-light='true']")
+        ? "default"
+        : "dark",
+    });
+
+    let _nextMermaidId = 0;
+
+    function makeMermaidImage(svg) {
+      const img = document.createElement("img");
+      const doc = parser.parseFromString(svg, "image/svg+xml");
+      const svgEl = doc.querySelector("svg");
+      const { maxWidth } = svgEl?.style || {};
+      const firstTitle = doc.querySelector("title");
+      const firstDesc = doc.querySelector("desc");
+
+      img.setAttribute("src", `data:image/svg+xml,${encodeURIComponent(svg)}`);
+      if (maxWidth) {
+        img.width = parseInt(maxWidth);
+      }
+      if (firstTitle) {
+        img.setAttribute("alt", firstTitle.textContent);
+      }
+      if (firstDesc) {
+        const caption = document.createElement("figcaption");
+        caption.className = "sr-only";
+        caption.textContent = firstDesc.textContent;
+        return [img, caption];
+      }
+      return [img];
+    }
+
+    async function makeMermaidError(text) {
+      let errorMessage = "";
       try {
-        const id = "mmd-" + Math.random().toString(36).slice(2);
-        const { svg } = await mermaid.render(id, code);
-        const fig = document.createElement("figure");
-        fig.style.background = "#fff";
-        fig.style.borderRadius = "8px";
-        fig.style.padding = "1rem";
-        fig.style.overflow = "auto";
-        fig.innerHTML = svg;
-        parent.appendChild(fig);
-        pre.style.display = "none";
+        await mermaid.parse(text);
       } catch (err) {
-        pre.style.whiteSpace = "pre-wrap";  // si no parsea, deja el codigo visible
+        errorMessage = `${err}`;
+      }
+
+      const result = document.createElement("details");
+      result.className = 'jp-RenderedMermaid-Details';
+      const summary = document.createElement("summary");
+      summary.className = 'jp-RenderedMermaid-Summary';
+      const pre = document.createElement("pre");
+      const code = document.createElement("code");
+      code.innerText = text;
+      pre.appendChild(code);
+      summary.appendChild(pre);
+      result.appendChild(summary);
+
+      const warning = document.createElement("pre");
+      warning.innerText = errorMessage;
+      result.appendChild(warning);
+      return [result];
+    }
+
+    async function renderOneMarmaid(src) {
+      const id = `jp-mermaid-${_nextMermaidId++}`;
+      const parent = src.parentNode;
+      let raw = src.textContent.trim();
+      const el = document.createElement("div");
+      el.style.visibility = "hidden";
+      document.body.appendChild(el);
+      let results = null;
+      let output = null;
+      try {
+        let { svg } = await mermaid.render(id, raw, el);
+        svg = cleanMermaidSvg(svg);
+        results = makeMermaidImage(svg);
+        output = document.createElement("figure");
+        results.map(output.appendChild, output);
+      } catch (err) {
+        parent.classList.add("jp-mod-warning");
+        results = await makeMermaidError(raw);
+        output = results[0];
+      } finally {
+        el.remove();
       }
       parent.classList.add("jp-RenderedMermaid");
+      parent.appendChild(output);
     }
-  }
-  if (document.readyState === "loading")
-    document.addEventListener("DOMContentLoaded", renderMermaid);
-  else
-    renderMermaid();
+
+
+    /**
+     * Post-process to ensure mermaid diagrams contain only valid SVG and XHTML.
+     */
+    function cleanMermaidSvg(svg) {
+      return svg.replace(RE_VOID_ELEMENT, replaceVoidElement);
+    }
+
+
+    /**
+     * A regular expression for all void elements, which may include attributes and
+     * a slash.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Glossary/Void_element
+     *
+     * Of these, only `<br>` is generated by Mermaid in place of `\n`,
+     * but _any_ "malformed" tag will break the SVG rendering entirely.
+     */
+    const RE_VOID_ELEMENT =
+      /<\s*(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)\s*([^>]*?)\s*>/gi;
+
+    /**
+     * Ensure a void element is closed with a slash, preserving any attributes.
+     */
+    function replaceVoidElement(match, tag, rest) {
+      rest = rest.trim();
+      if (!rest.endsWith('/')) {
+        rest = `${rest} /`;
+      }
+      return `<${tag} ${rest}>`;
+    }
+
+    void Promise.all([...diagrams].map(renderOneMarmaid));
+  });
 </script>
 <style>
   .jp-Mermaid:not(.jp-RenderedMermaid) {
@@ -7690,6 +7783,61 @@ EndoSfMLearner cargado ✓
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=a9f58e58">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e85b0383">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<hr/>
+<h2 id="2c.-AF-SfMLearner-%E2%80%94-Appearance-Flow-para-Endoscop%C3%ADa-(Shao-et-al.,-2022)">2c. AF-SfMLearner — Appearance Flow para Endoscopía (Shao et al., 2022)<a class="anchor-link" href="#2c.-AF-SfMLearner-%E2%80%94-Appearance-Flow-para-Endoscop%C3%ADa-(Shao-et-al.,-2022)">¶</a></h2><p><strong>AF-SfMLearner</strong> (<em>Self-Supervised Monocular Depth and Ego-Motion Estimation in Endoscopy: Appearance Flow to the Rescue</em>, Medical Image Analysis 2022) introduce un módulo de <strong>appearance flow</strong> que compensa explícitamente los reflejos especulares y las variaciones de iluminación endoscópica durante el entrenamiento auto-supervisado.</p>
+<p>La contribución clave frente a EndoSfMLearner y Endo-Depth:</p>
+<ul>
+<li><strong>Appearance flow module</strong>: predice un campo de flujo denso que mapea píxeles especulares a regiones de tejido cercanas con iluminación similar, generando una imagen de referencia "limpia" para la pérdida fotométrica</li>
+<li><strong>Transformer de apariencia</strong>: deforma explícitamente la imagen fuente antes de comparar con el frame objetivo — hace el entrenamiento robusto a brillos sin depender de datos con anotación manual</li>
+</ul>
+<p>La arquitectura del encoder y decoder es la misma que Endo-Depth (ResNet-18 + DepthDecoder de Monodepth2), lo que permite comparación directa; la diferencia está en la <strong>función de pérdida y el módulo auxiliar de apariencia</strong> que solo actúa durante el entrenamiento.</p>
+<table>
+<thead>
+<tr>
+<th>Checkpoint</th>
+<th>AbsRel</th>
+<th>Sq Rel</th>
+<th>RMSE</th>
+<th>Dataset evaluación</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stage-wise (<strong>este experimento</strong>)</td>
+<td>0.059</td>
+<td>0.435</td>
+<td>4.925</td>
+<td>Endovis</td>
+</tr>
+<tr>
+<td>End-to-end</td>
+<td>0.059</td>
+<td>0.470</td>
+<td>5.062</td>
+<td>Endovis</td>
+</tr>
+<tr>
+<td>ICRA 2021</td>
+<td>0.063</td>
+<td>0.489</td>
+<td>5.185</td>
+<td>Endovis</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Shao, S., Pei, Z., Chen, W., Zhu, W., Wu, X., Sun, D., &amp; Zhang, B. (2022). Self-Supervised Monocular Depth and Ego-Motion Estimation in Endoscopy: Appearance Flow to the Rescue. <em>Medical Image Analysis</em>, 77, 102338.</p>
+</blockquote>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=ce6dadf6-bbc1-4639-84e3-22b4ffb5305d">
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
@@ -7903,7 +8051,7 @@ flowchart LR
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
-<h2 id="7.-Experimento-factorial:-4-enhancements-%C3%97-3-modelos-%C3%97-10-keyframes">7. Experimento factorial: 4 enhancements × 3 modelos × 10 keyframes<a class="anchor-link" href="#7.-Experimento-factorial:-4-enhancements-%C3%97-3-modelos-%C3%97-10-keyframes">¶</a></h2><p>Total: <strong>120 evaluaciones</strong>.</p>
+<h2 id="7.-Experimento-factorial:-4-enhancements-%C3%97-4-modelos-%C3%97-10-keyframes">7. Experimento factorial: 4 enhancements × 4 modelos × 10 keyframes<a class="anchor-link" href="#7.-Experimento-factorial:-4-enhancements-%C3%97-4-modelos-%C3%97-10-keyframes">¶</a></h2><p>Total: <strong>160 evaluaciones</strong>.</p>
 </div>
 </div>
 </div>
