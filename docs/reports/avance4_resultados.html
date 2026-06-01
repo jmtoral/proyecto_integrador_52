@@ -129,26 +129,26 @@ html,body{font-family:var(--ff-sans);background:var(--m950);color:#e8f4fd;line-h
 
     <div class="mermaid">
 flowchart TD
-    A["🗂️ SCARED\ndatasets 8–9, keyframes 0–4"] --> B
-    B["📷 Imagen RGB\n1280×1024 px"] --> C1 & C2 & C3 & C4
+    A["SCARED - datasets 8-9, keyframes 0-4"] --> B
+    B["Imagen RGB 1280x1024 px"] --> C1 & C2 & C3 & C4
 
-    subgraph ENHANCEMENT [" ⚙️ Image Enhancement "]
-        C1["❌ None\nbaseline"]
-        C2["🔆 Retinex SSR\nσ=30 · Rahman et al. 2004"]
-        C3["🧠 EndoLMSPEC\nU-Net + Laplaciana · Endo4IE"]
-        C4["⚡ IAT — EndoViT\nTransformer · Endo4IE"]
+    subgraph ENHANCEMENT ["Image Enhancement"]
+        C1["None - baseline"]
+        C2["Retinex SSR - Rahman 2004"]
+        C3["EndoLMSPEC - U-Net + Laplaciana - Endo4IE"]
+        C4["IAT EndoViT - Transformer - Endo4IE"]
     end
 
     C1 & C2 & C3 & C4 --> D1 & D2 & D3
 
-    subgraph DEPTH [" 🔍 Modelos de Depth "]
-        D1["Endo-Depth\nResNet18"]
-        D2["EndoSfMLearner\nDispResNet18"]
-        D3["MonoViT\nMPViT-Small"]
+    subgraph DEPTH ["Modelos de Depth"]
+        D1["Endo-Depth - ResNet18"]
+        D2["EndoSfMLearner - DispResNet18"]
+        D3["MonoViT - MPViT-Small"]
     end
 
-    D1 & D2 & D3 --> E["📐 Median Scaling → mm"]
-    E --> F["📊 AbsRel · RMSE · Chamfer · FPS"]
+    D1 & D2 & D3 --> E["Median Scaling a mm"]
+    E --> F["AbsRel - RMSE - Chamfer - FPS"]
 
     style ENHANCEMENT fill:#1a2e51,stroke:#E0A800,stroke-width:2px,color:#e8f4fd
     style DEPTH fill:#1a2e51,stroke:#2766CB,stroke-width:2px,color:#e8f4fd
