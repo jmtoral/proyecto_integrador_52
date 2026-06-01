@@ -155,32 +155,32 @@ Los datos crudos no están en el repositorio por su tamaño.
 
 ### Avance 1 — Análisis Exploratorio de Datos
 
-| Notebook | Dataset | Contenido | Vista HTML |
-|---|---|---|---|
-| [`Avance1_Equipo52_00_exploracion_scared.ipynb`](notebooks/Avance1_Equipo52_00_exploracion_scared.ipynb) | SCARED | Estructura, formatos, dimensiones, rangos de profundidad | [🌐 HTML](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance1_Equipo52_00_exploracion_scared.html) |
-| [`Avance1_Equipo52_01_eda_iluminacion.ipynb`](notebooks/Avance1_Equipo52_01_eda_iluminacion.ipynb) | SCARED | Gradiente radial, CV de luminancia, especulares, correlación luminancia-GT | [🌐 HTML](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance1_Equipo52_01_eda_iluminacion.html) |
-| [`Avance1_Equipo52_02_hamlyn_eda.ipynb`](notebooks/Avance1_Equipo52_02_hamlyn_eda.ipynb) | Hamlyn | Exploración de secuencias estéreo in-vivo | [🌐 HTML](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance1_Equipo52_02_hamlyn_eda.html) |
-| [`Avance2_Equipo_52_03_eda_calidad_input.ipynb`](notebooks/Avance2_Equipo_52_03_eda_calidad_input.ipynb) | SCARED | Calidad de video, flujo óptico, poses, cobertura GT en frames | [🌐 HTML](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance2_Equipo_52_03_eda_calidad_input.html) |
-| [`Avance1_Equipo52_04_exploracion_C3VDv2.ipynb`](notebooks/Avance1_Equipo52_04_exploracion_C3VDv2.ipynb) | C3VD | Exploración del dataset de colonoscopía 3D | [🌐 HTML](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance1_Equipo52_04_exploracion_C3VDv2.html) |
+| Notebook | Dataset | Contenido |
+|---|---|---|
+| [Avance1 — Exploración SCARED](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance1_Equipo52_00_exploracion_scared.html) | SCARED | Estructura, formatos, dimensiones, rangos de profundidad |
+| [Avance1 — EDA Iluminación](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance1_Equipo52_01_eda_iluminacion.html) | SCARED | Gradiente radial, CV de luminancia, especulares, correlación luminancia-GT |
+| [Avance1 — Hamlyn EDA](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance1_Equipo52_02_hamlyn_eda.html) | Hamlyn | Exploración de secuencias estéreo in-vivo |
+| [Avance2 — Calidad Input](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance2_Equipo_52_03_eda_calidad_input.html) | SCARED | Calidad de video, flujo óptico, poses, cobertura GT en frames |
+| [Avance1 — C3VD](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance1_Equipo52_04_exploracion_C3VDv2.html) | C3VD | Exploración del dataset de colonoscopía 3D |
 
 ### Avance 2 — Ingeniería de Características
 
-| Notebook | Dataset | Contenido | Vista HTML |
-|---|---|---|---|
-| [`Avance2_52_Feature_Engineering.ipynb`](notebooks/Avance2_52_Feature_Engineering.ipynb) | SCARED | Construcción de dataframe por keyframe, transformaciones (cap, log, min-max), selección y PCA geométrico | [🌐 HTML](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance2_52_Feature_Engineering.html) |
+| Notebook | Dataset | Contenido |
+|---|---|---|
+| [Avance2 — Feature Engineering](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance2_52_Feature_Engineering.html) | SCARED | Construcción de dataframe por keyframe, transformaciones (cap, log, min-max), selección y PCA geométrico |
 
 ### Avance 3 — Baseline de Estimación de Profundidad
 
-| Notebook | Dataset | Contenido | Vista HTML |
-|---|---|---|---|
-| [`Avance3_52_Pipeline_EndoDepth.ipynb`](notebooks/Avance3_52_Pipeline_EndoDepth.ipynb) | SCARED | Endo-Depth sobre datasets 8–9, comparativa CLAHE vs. Retinex, AbsRel/RMSE/Chamfer | [🌐 HTML](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance3_52_Pipeline_EndoDepth.html) |
+| Notebook | Dataset | Contenido |
+|---|---|---|
+| [Avance3 — Pipeline EndoDepth](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance3_52_Pipeline_EndoDepth.html) | SCARED | Endo-Depth sobre datasets 8–9, comparativa CLAHE vs. Retinex, AbsRel/RMSE/Chamfer |
 
 ### Avance 4 — Image Enhancement y Photometric Tracking
 
-| Notebook | Contenido | Vista HTML |
-|---|---|---|
-| [`Avance4_52_Photometric_Tracking_Viz.ipynb`](notebooks/Avance4_52_Photometric_Tracking_Viz.ipynb) | Reproyección fotométrica con homografía ORB, animación 5 columnas, impacto de Retinex en error fotométrico (−29.8%) | [🌐 HTML](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance4_52_Photometric_Tracking_Viz.html) |
-| [`Avance4_52_ImageEnhancement_DepthEval.ipynb`](notebooks/Avance4_52_ImageEnhancement_DepthEval.ipynb) | Evaluación de Retinex, EndoLMSPEC e IAT sobre Endo-Depth en SCARED | [🌐 HTML](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance4_52_ImageEnhancement_DepthEval.html) |
+| Notebook | Contenido |
+|---|---|
+| [Avance4 — Photometric Tracking](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance4_52_Photometric_Tracking_Viz.html) | Reproyección fotométrica con homografía ORB, animación 5 columnas, impacto de Retinex en error fotométrico (−29.8%) |
+| [Avance4 — Image Enhancement](https://htmlpreview.github.io/?https://github.com/jmtoral/proyecto_integrador_52/blob/main/notebooks_html/Avance4_52_ImageEnhancement_DepthEval.html) | Evaluación de Retinex, EndoLMSPEC e IAT/EndoViT sobre 3 modelos de depth en SCARED |
 
 
 ## Variables del experimento
