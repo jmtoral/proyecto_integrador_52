@@ -236,31 +236,85 @@ flowchart TD
 
   <hr class="divider">
 
+  <!-- ── Glosario de métricas ── -->
+  <div class="section">
+    <div class="section-label">// cómo se mide</div>
+    <h2>Métricas de evaluación</h2>
+    <p>Cada combinación <em>enhancement × modelo × keyframe</em> se evalúa contra el mapa de
+    profundidad ground-truth de SCARED (canal Z en mm). La predicción relativa de cada modelo se
+    escala al rango métrico con <strong>median scaling</strong> antes de comparar.</p>
+    <div class="findings">
+      <div class="card">
+        <div class="card-icon">📐</div>
+        <h4>AbsRel <span class="tag-best">primaria</span></h4>
+        <p>Error relativo absoluto medio: <code>mean(|d − gt| / gt)</code>. Métrica estándar de
+        depth estimation; penaliza el error en proporción a la distancia real. <strong>Menor es mejor.</strong></p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📏</div>
+        <h4>RMSE (mm)</h4>
+        <p>Raíz del error cuadrático medio en milímetros. Sensible a errores grandes (outliers
+        geométricos). Da una idea del error absoluto en la escala física del tejido.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">✨</div>
+        <h4>AbsRel especular <span class="tag-best">hipótesis</span></h4>
+        <p>AbsRel calculado solo sobre píxeles de <strong>reflejos especulares</strong> (percentil 97
+        de luminancia L*, dilatado). Es la métrica clave para validar si la corrección de luz ayuda
+        donde más falla la profundidad.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧩</div>
+        <h4>Chamfer Distance</h4>
+        <p>Distancia bidireccional entre la nube de puntos 3D predicha y la real (KD-Tree, hasta 50k
+        puntos). Mide fidelidad de la <strong>geometría reconstruida</strong>, no solo del mapa 2D.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⏱️</div>
+        <h4>FPS total</h4>
+        <p>Cuadros por segundo de la cadena completa <em>enhancement + inferencia de profundidad</em>
+        en GPU L4. Determina la <strong>viabilidad clínica</strong> en tiempo real (umbral ≈ 25 FPS).</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <h4>Δ AbsRel</h4>
+        <p>Cambio porcentual de AbsRel respecto al baseline <code>none</code> del mismo modelo.
+        <strong>Negativo = el enhancement mejora</strong>; positivo = lo empeora.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
   <!-- ── Imágenes ── -->
   <div class="section">
     <div class="section-label">// visualizaciones</div>
     <h2>Gráficas del experimento</h2>
+    <p>Figuras derivadas del experimento factorial completo (120 evaluaciones, promedio de 10
+    keyframes en datasets 8–9 de SCARED).</p>
 
     <div class="img-row">
-      <div>
+      <div class="img-full">
         <img src="https://raw.githubusercontent.com/jmtoral/proyecto_integrador_52/main/outcomes/avance4/avance4_metricas_comparativa.png"
-             alt="Métricas comparativa"
+             alt="Métricas comparativas por modelo y enhancement"
              onerror="this.parentElement.innerHTML='<div style=\'background:rgba(39,102,203,.1);border:1px dashed rgba(69,153,236,.3);border-radius:8px;padding:2rem;text-align:center;color:var(--m400);font-family:var(--ff-mono);font-size:.8rem;\'>📊 Imagen disponible tras correr el notebook en Colab</div>'">
-        <p class="img-caption">AbsRel, RMSE, AbsRel especular y FPS por modelo × enhancement</p>
-      </div>
-      <div>
-        <img src="https://raw.githubusercontent.com/jmtoral/proyecto_integrador_52/main/outcomes/avance4/avance4_robustez_especular.png"
-             alt="Robustez especular"
-             onerror="this.parentElement.innerHTML='<div style=\'background:rgba(39,102,203,.1);border:1px dashed rgba(69,153,236,.3);border-radius:8px;padding:2rem;text-align:center;color:var(--m400);font-family:var(--ff-mono);font-size:.8rem;\'>📊 Imagen disponible tras correr el notebook en Colab</div>'">
-        <p class="img-caption">AbsRel en zona especular vs. tejido normal por modelo</p>
+        <p class="img-caption">Matriz 3 modelos × 4 métricas. En verde, el mejor método por celda. IAT (verde) domina AbsRel y RMSE en Endo-Depth y MonoViT.</p>
       </div>
     </div>
     <div class="img-row">
       <div class="img-full">
-        <img src="https://raw.githubusercontent.com/jmtoral/proyecto_integrador_52/main/outcomes/avance4/avance4_enhancement_comparativa.png"
-             alt="Enhancement comparativa"
+        <img src="https://raw.githubusercontent.com/jmtoral/proyecto_integrador_52/main/outcomes/avance4/avance4_robustez_especular.png"
+             alt="AbsRel global vs zona especular por modelo"
              onerror="this.parentElement.innerHTML='<div style=\'background:rgba(39,102,203,.1);border:1px dashed rgba(69,153,236,.3);border-radius:8px;padding:2rem;text-align:center;color:var(--m400);font-family:var(--ff-mono);font-size:.8rem;\'>📊 Imagen disponible tras correr el notebook en Colab</div>'">
-        <p class="img-caption">Comparativa visual de los métodos de enhancement sobre keyframe de prueba</p>
+        <p class="img-caption">AbsRel global (azul) vs. zona especular (rojo). El error siempre es mayor en especulares — confirma que los reflejos son el punto débil de la profundidad. En MonoViT, Retinex es el único que baja el especular (0.275) por debajo del global.</p>
+      </div>
+    </div>
+    <div class="img-row">
+      <div class="img-full">
+        <img src="https://raw.githubusercontent.com/jmtoral/proyecto_integrador_52/main/outcomes/avance4/avance4_mejora_tradeoff.png"
+             alt="Mejora relativa y trade-off precisión vs velocidad"
+             onerror="this.parentElement.innerHTML='<div style=\'background:rgba(39,102,203,.1);border:1px dashed rgba(69,153,236,.3);border-radius:8px;padding:2rem;text-align:center;color:var(--m400);font-family:var(--ff-mono);font-size:.8rem;\'>📊 Imagen disponible tras correr el notebook en Colab</div>'">
+        <p class="img-caption">Izq.: Δ AbsRel vs. baseline (barras hacia abajo = mejora). Der.: trade-off precisión–velocidad en escala log; la línea verde marca los 25 FPS de tiempo real. Ninguna combinación con enhancement la cruza.</p>
       </div>
     </div>
   </div>
@@ -297,6 +351,43 @@ flowchart TD
 
   <hr class="divider">
 
+  <!-- ── Interpretación detallada ── -->
+  <div class="section">
+    <div class="section-label">// lectura por modelo</div>
+    <h2>Interpretación detallada</h2>
+
+    <h3><span class="model-pill pill-endo">Endo-Depth</span> — IAT mejora de forma consistente</h3>
+    <p>IAT es el mejor enhancement en <strong>todas</strong> las métricas: −12.0% AbsRel, −12.1%
+    AbsRel especular y −11.2% RMSE. Que la mejora global (−12.0%) y la especular (−12.1%) sean casi
+    idénticas indica que IAT <strong>no</strong> actúa selectivamente sobre los reflejos, sino que
+    mejora la imagen de forma homogénea. Retinex también ayuda (−7.2%) con un perfil más selectivo.
+    EndoLMSPEC apenas mueve la aguja (−1.0%): probable <em>domain gap</em> entre Endo4IE y SCARED.</p>
+
+    <h3><span class="model-pill pill-sfm">EndoSfMLearner</span> — insensible al enhancement</h3>
+    <p>Todos los métodos producen cambios &lt;0.1%. EndoSfMLearner se entrenó con una
+    <strong>brightness-aware photometric loss</strong> que ya lo hace robusto a variaciones de
+    iluminación por diseño: el enhancement no aporta información que el modelo no haya aprendido a
+    ignorar. Es el modelo más rápido en baseline (158.9 FPS), pero cualquier enhancement lo frena a
+    la velocidad del corrector (≤9.6 FPS), sin ganancia de precisión que lo justifique.</p>
+
+    <h3><span class="model-pill pill-vit">MonoViT</span> — IAT ayuda, Retinex y EndoLMSPEC perjudican</h3>
+    <p>IAT mejora AbsRel −7.3%, pero Retinex (+3.1%) y EndoLMSPEC (+8.5%) lo <strong>empeoran</strong>.
+    Es esperable: MonoViT se entrenó en KITTI (outdoor) y las correcciones agresivas de color/iluminación
+    producen imágenes fuera de su distribución. IAT, con su corrección suave (local mul/add + gamma),
+    preserva mejor lo que el modelo espera. El matiz interesante: Retinex <strong>sí</strong> mejora el
+    AbsRel especular (0.275, −9.8%) aunque empeore el global — atenúa los brillos puntuales, que son
+    el punto débil de MonoViT, pero introduce ruido en el resto de la escena.</p>
+
+    <div class="note">
+      <strong>Lectura transversal:</strong> el beneficio del enhancement no es universal —
+      depende de <em>cómo fue entrenado</em> cada modelo de profundidad. Modelos con pérdidas
+      robustas a iluminación (EndoSfMLearner) son inmunes; modelos sin ellas (Endo-Depth) se
+      benefician; modelos fuera de dominio (MonoViT) son frágiles a correcciones agresivas.
+    </div>
+  </div>
+
+  <hr class="divider">
+
   <!-- ── Conclusión ── -->
   <div class="section">
     <div class="section-label">// conclusión</div>
@@ -309,6 +400,50 @@ flowchart TD
     </table>
     <div class="note" style="margin-top:1.2rem;">
       <strong>Viabilidad clínica:</strong> ninguna combinación supera 25 FPS. IAT + Endo-Depth logra 4.4 FPS. Para uso clínico se requiere optimización: TensorRT, inferencia FP16 o reducción de resolución.
+    </div>
+
+    <h3 style="margin-top:1.8rem;">Estado de la hipótesis</h3>
+    <p>La hipótesis del proyecto —<em>la corrección de iluminación reduce el error de profundidad,
+    con mayor efecto en zonas especulares</em>— se <strong>confirma parcialmente</strong>:</p>
+    <table class="result-table">
+      <tr><th>Afirmación</th><th>Evidencia</th><th>Veredicto</th></tr>
+      <tr><td>El enhancement reduce AbsRel</td><td>IAT: −12.0% (Endo-Depth), −7.3% (MonoViT)</td><td style="color:#2ecc71;">✓ Sí, en 2/3 modelos</td></tr>
+      <tr><td>El efecto se concentra en especulares</td><td>En Endo-Depth la mejora global ≈ especular; solo Retinex/MonoViT es selectivo</td><td style="color:var(--gold);">≈ Parcial</td></tr>
+      <tr><td>Aplica a todos los modelos</td><td>EndoSfMLearner inmune; EndoLMSPEC daña MonoViT</td><td style="color:#e74c3c;">✗ Depende del modelo</td></tr>
+    </table>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── Limitaciones ── -->
+  <div class="section">
+    <div class="section-label">// limitaciones y trabajo futuro</div>
+    <h2>Limitaciones y próximos pasos</h2>
+    <div class="findings">
+      <div class="card warning">
+        <div class="card-icon">🐢</div>
+        <h4>Cuello de botella de velocidad</h4>
+        <p>IAT añade ~230 ms/imagen, hundiendo el FPS combinado muy por debajo de tiempo real.
+        Falta evaluar TensorRT / FP16 / resolución reducida para cuantificar la penalización real.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌍</div>
+        <h4>Dominio limitado</h4>
+        <p>Solo SCARED (cerdo, laparoscopía). Falta validar en C3VD, Hamlyn o EndoSLAM para confirmar
+        que las conclusiones generalizan a otros tejidos y ópticas.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧪</div>
+        <h4>Modelos pendientes</h4>
+        <p>HADepth y AF-SfMLearner quedan por integrar. AF-SfMLearner es especialmente relevante: usa
+        un módulo de <em>appearance flow</em> diseñado contra reflejos.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h4>Significancia estadística</h4>
+        <p>Resultados sobre 10 keyframes. Convendría reportar desviación estándar e intervalos de
+        confianza para distinguir mejoras reales del ruido de medición.</p>
+      </div>
     </div>
   </div>
 
