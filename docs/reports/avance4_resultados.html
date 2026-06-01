@@ -174,6 +174,20 @@ flowchart TD
       </table>
     </div>
 
+    <h3>Dataset de entrenamiento por modelo</h3>
+    <table class="result-table">
+      <tr><th>Modelo / Método</th><th>Dataset</th><th>Tipo de tejido</th><th>Supervisión</th><th>Dominio</th><th>Imágenes</th></tr>
+      <tr><td><span class="model-pill pill-endo">Endo-Depth</span></td><td>Hamlyn Centre</td><td>Laparoscopia in-vivo</td><td>Auto-supervisado</td><td>Endoscópico</td><td>~135K frames</td></tr>
+      <tr><td><span class="model-pill pill-sfm">EndoSfMLearner</span></td><td>EndoSLAM</td><td>Cápsula endoscópica (colon, estómago)</td><td>Auto-supervisado</td><td>Endoscópico</td><td>~64K frames</td></tr>
+      <tr><td><span class="model-pill pill-vit">MonoViT</span></td><td>KITTI</td><td>Escenas outdoor (carretera)</td><td>Auto-supervisado</td><td>Outdoor ⚠️</td><td>~44K frames</td></tr>
+      <tr><td>EndoLMSPEC</td><td>Endo4IE</td><td>Colonoscopía + laparoscopia real/sintética</td><td>Supervisado (pares exp/GT)</td><td>Endoscópico</td><td>~3K pares</td></tr>
+      <tr><td>IAT / EndoViT</td><td>Endo4IE (fine-tune)</td><td>Colonoscopía + laparoscopia real/sintética</td><td>Supervisado (fine-tune)</td><td>Endoscópico</td><td>~3K pares</td></tr>
+      <tr style="opacity:.5;"><td>HADepth</td><td>—</td><td>—</td><td>—</td><td>— (pendiente)</td><td>—</td></tr>
+      <tr style="opacity:.5;"><td>AF-SfMLearner</td><td>—</td><td>—</td><td>—</td><td>— (pendiente)</td><td>—</td></tr>
+    </table>
+
+    <div class="note">⚠️ <strong>MonoViT</strong> fue entrenado en KITTI (outdoor), no en datos endoscópicos. Esto explica por qué EndoLMSPEC lo perjudica: la corrección de imagen produce distribuciones fuera de su dominio de entrenamiento. <strong>HADepth</strong> y <strong>AF-SfMLearner</strong> están pendientes de implementación.</div>
+
     <h3>Pesos utilizados</h3>
     <table class="result-table">
       <tr><th>Modelo / Método</th><th>Archivo de pesos</th><th>Entrenamiento</th><th>Epoch / Notas</th></tr>
