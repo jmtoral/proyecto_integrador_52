@@ -192,7 +192,11 @@ function showPanel(id) {
 
 // Open specific tab from URL hash: reader.html#a2pdf
 const hash = location.hash.replace('#','');
-if (panels[hash]) showPanel(hash);
+if (hash && panels[hash]) {
+  showPanel(hash);
+} else {
+  showPanel('a1pdf');
+}
 </script>
 </body>
 </html>
