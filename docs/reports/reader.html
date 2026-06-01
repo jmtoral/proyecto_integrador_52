@@ -113,10 +113,7 @@ html,body{height:100%;font-family:var(--ff-sans);background:var(--m950);color:#e
     📊 Avance 2 <span class="tab-badge">Reporte técnico</span>
   </button>
   <button class="tab" onclick="showPanel('a4res')" id="tab-a4res">
-    📋 Avance 4 <span class="tab-badge">Resultados</span>
-  </button>
-  <button class="tab" onclick="showPanel('a4html')" id="tab-a4html">
-    🧠 Avance 4 <span class="tab-badge">Notebook</span>
+    🧠 Avance 4 <span class="tab-badge">Image Enhancement</span>
   </button>
 </div>
 
@@ -156,10 +153,6 @@ html,body{height:100%;font-family:var(--ff-sans);background:var(--m950);color:#e
     <iframe class="html-frame" src="avance4_resultados.html" title="Avance 4 — Resultados"></iframe>
   </div>
 
-  <!-- Avance 4 HTML notebook -->
-  <div class="panel" id="panel-a4html">
-    <iframe class="html-frame" src="Avance4_52_ImageEnhancement.html" title="Avance 4 — Notebook"></iframe>
-  </div>
 
 </div>
 
@@ -168,8 +161,7 @@ const panels = {
   a1pdf:  { title: 'Avance 1 — Análisis Exploratorio de Datos', dl: 'Avance1.52.pdf' },
   a2pdf:  { title: 'Avance 2 — Ingeniería de Características', dl: 'Avance2.52.pdf' },
   a2html: { title: 'Avance 2 — Reporte Técnico Detallado', dl: null },
-  a4res:  { title: 'Avance 4 — Resultados: Image Enhancement × Depth Models', dl: null },
-  a4html: { title: 'Avance 4 — Notebook: Image Enhancement sobre Depth Estimation en SCARED', dl: null },
+  a4res:  { title: 'Avance 4 — Image Enhancement × Depth Models en SCARED', dl: null },
 };
 
 function showPanel(id) {
