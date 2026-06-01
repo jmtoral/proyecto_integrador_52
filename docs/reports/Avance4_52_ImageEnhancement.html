@@ -7580,21 +7580,22 @@ flowchart TD
         C4["IAT EndoViT - Endo4IE - Wang 2022"]
     end
 
-    C1 &amp; C2 &amp; C3 &amp; C4 --&gt; D1 &amp; D2 &amp; D3
+    C1 &amp; C2 &amp; C3 &amp; C4 --&gt; D1 &amp; D2 &amp; D3 &amp; D4
 
     subgraph DEPTH ["Modelos de Depth"]
         D1["Endo-Depth - ResNet18 - Recasens 2021"]
         D2["EndoSfMLearner - DispResNet18 - Ozyoruk 2020"]
         D3["MonoViT - MPViT-Small - Zhao 2022"]
+        D4["AF-SfMLearner - ResNet18 + AppFlow - Shao 2022"]
     end
 
-    D1 &amp; D2 &amp; D3 --&gt; E["Median Scaling a mm"]
+    D1 &amp; D2 &amp; D3 &amp; D4 --&gt; E["Median Scaling a mm"]
     E --&gt; F["AbsRel - RMSE - Chamfer - FPS"]
 
     style ENHANCEMENT fill:#fff8e1,stroke:#E0A800,stroke-width:2px
     style DEPTH fill:#e8f4fd,stroke:#2766CB,stroke-width:2px
-</pre></div><p><strong>Diseño factorial</strong>: 4 enhancements x 3 modelos de depth x 10 keyframes = <strong>120 evaluaciones</strong></p>
-<h3 id="Hip%C3%B3tesis">Hipótesis<a class="anchor-link" href="#Hip%C3%B3tesis">¶</a></h3><p>Los métodos de enhancement entrenados en datos endoscópicos (EndoLMSPEC, IAT/EndoViT) reducen el error de profundidad en los tres modelos, con mayor efecto en zonas especulares.</p>
+</pre></div><p><strong>Diseño factorial</strong>: 4 enhancements × 4 modelos de depth × 10 keyframes = <strong>160 evaluaciones</strong></p>
+<h3 id="Hip%C3%B3tesis">Hipótesis<a class="anchor-link" href="#Hip%C3%B3tesis">¶</a></h3><p>Los métodos de enhancement entrenados en datos endoscópicos (EndoLMSPEC, IAT/EndoViT) reducen el error de profundidad en los cuatro modelos, con mayor efecto en zonas especulares. AF-SfMLearner, entrenado con appearance flow loss, debería ser el más robusto al enhancement por diseño.</p>
 </div>
 </div>
 </div>
@@ -7625,6 +7626,7 @@ CUDA OK  : True
 ├── scared_raw/
 ├── endo_depth_weights/            ← encoder.pth + depth.pth  (Endo-Depth)
 ├── Endo-Depth-and-Motion/
+├── Model_MIA/                     ← encoder.pth + depth.pth  (AF-SfMLearner Stage-wise)
 ├── EndoLMSPEC/
 │   └── checkpoint/main_net/model_256_combined_SSIM5_1.pth
 ├── EndoViT/
@@ -7668,6 +7670,13 @@ CUDA OK  : True
 <td>MPViT-Small (ViT)</td>
 <td>KITTI (outdoor)</td>
 <td>640×192</td>
+</tr>
+<tr>
+<td><strong>AF-SfMLearner</strong></td>
+<td><code>Model_MIA/encoder.pth</code> + <code>depth.pth</code></td>
+<td>ResNet-18 + Appearance Flow</td>
+<td>Endovis (endoscopy)</td>
+<td>256×320</td>
 </tr>
 </tbody>
 </table>
