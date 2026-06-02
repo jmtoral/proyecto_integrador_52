@@ -118,6 +118,9 @@ html,body{height:100%;font-family:var(--ff-sans);background:var(--m950);color:#e
   <button class="tab" onclick="showPanel('a4html')" id="tab-a4html">
     🧠 Avance 4 <span class="tab-badge">Notebook</span>
   </button>
+  <button class="tab" onclick="showPanel('a5nb')" id="tab-a5nb">
+    🔬 Avance 5 <span class="tab-badge">Notebook SCARED</span>
+  </button>
 </div>
 
 <div class="viewer-wrap">
@@ -161,6 +164,11 @@ html,body{height:100%;font-family:var(--ff-sans);background:var(--m950);color:#e
     <iframe class="html-frame" src="Avance4_52_ImageEnhancement.html" title="Avance 4 — Notebook"></iframe>
   </div>
 
+  <!-- Avance 5 Notebook -->
+  <div class="panel" id="panel-a5nb">
+    <iframe class="html-frame" src="Avance5_52_SCARED_Weights.html" title="Avance 5 — Pesos SCARED"></iframe>
+  </div>
+
 </div>
 
 <script>
@@ -170,6 +178,7 @@ const panels = {
   a2html: { title: 'Avance 2 — Reporte Técnico Detallado', dl: null },
   a4res:  { title: 'Avance 4 — Resultados: Image Enhancement × Depth Models', dl: null },
   a4html: { title: 'Avance 4 — Notebook: Image Enhancement sobre Depth Estimation en SCARED', dl: null },
+  a5nb:   { title: 'Avance 5 — Notebook: Modelos entrenados en SCARED (Dr. Ricardo Espinosa Loera)', dl: null },
 };
 
 function showPanel(id) {

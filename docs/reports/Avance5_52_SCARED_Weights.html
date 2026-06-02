@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Avance4_52_ImageEnhancement_DepthEval</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>Avance5_52_SCARED_Weights_DepthEval</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -7418,7 +7418,7 @@ a.anchor-link {
 <!-- End of mermaid configuration --></head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 <main>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ced66a68-89f5-4f30-bb93-be56dfbaf52d">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4f7f19dd-7846-4c59-93d2-f8abccfd5378">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7428,12 +7428,10 @@ a.anchor-link {
 </center>
 <center>
 <p><a href="https://www.python.org/"><img alt="Python" src="https://img.shields.io/badge/Python-3776AB?style=flat-square&amp;logo=python&amp;logoColor=white"/></a>
-<a href="https://jupyter.org/"><img alt="Jupyter" src="https://img.shields.io/badge/Jupyter-F37626?style=flat-square&amp;logo=jupyter&amp;logoColor=white"/></a>
 <a href="https://pytorch.org/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&amp;logo=pytorch&amp;logoColor=white"/></a>
-<a href="https://opencv.org/"><img alt="OpenCV" src="https://img.shields.io/badge/OpenCV-5C3EE8?style=flat-square&amp;logo=opencv&amp;logoColor=white"/></a>
 <a href="https://github.com/jmtoral/proyecto_integrador_52"><img alt="GitHub" src="https://img.shields.io/badge/Repo-GitHub-181717?style=flat-square&amp;logo=github&amp;logoColor=white"/></a></p>
 </center>
-<h2 id="Avance-4-%E2%80%94-Evaluaci%C3%B3n-de-Image-Enhancement-(Retinex,-EndoLMSPEC-e-IAT/EndoViT)-sobre-M%C3%BAltiples-Modelos-de-Profundidad-Endosc%C3%B3pica-en-SCARED"><strong><font color="#0036a3">Avance 4 — Evaluación de Image Enhancement (Retinex, EndoLMSPEC e IAT/EndoViT) sobre Múltiples Modelos de Profundidad Endoscópica en SCARED</font></strong><a class="anchor-link" href="#Avance-4-%E2%80%94-Evaluaci%C3%B3n-de-Image-Enhancement-(Retinex,-EndoLMSPEC-e-IAT/EndoViT)-sobre-M%C3%BAltiples-Modelos-de-Profundidad-Endosc%C3%B3pica-en-SCARED">¶</a></h2><h3 id="Proyecto-Integrador-%E2%80%94-TC5035.10"><strong><font color="#E0A800">Proyecto Integrador — TC5035.10</font></strong><a class="anchor-link" href="#Proyecto-Integrador-%E2%80%94-TC5035.10">¶</a></h3><hr/>
+<h2 id="Avance-5-%E2%80%94-Evaluaci%C3%B3n-de-Image-Enhancement-sobre-Modelos-de-Profundidad-Endosc%C3%B3pica-Entrenados-en-SCARED"><strong><font color="#0036a3">Avance 5 — Evaluación de Image Enhancement sobre Modelos de Profundidad Endoscópica Entrenados en SCARED</font></strong><a class="anchor-link" href="#Avance-5-%E2%80%94-Evaluaci%C3%B3n-de-Image-Enhancement-sobre-Modelos-de-Profundidad-Endosc%C3%B3pica-Entrenados-en-SCARED">¶</a></h2><h3 id="Proyecto-Integrador-%E2%80%94-TC5035.10"><strong><font color="#E0A800">Proyecto Integrador — TC5035.10</font></strong><a class="anchor-link" href="#Proyecto-Integrador-%E2%80%94-TC5035.10">¶</a></h3><hr/>
 <h2 id="-Equipo-52-"><strong><center> <font color="#0036a3">Equipo 52</font> </center></strong><a class="anchor-link" href="#-Equipo-52-">¶</a></h2><table style="border-collapse:collapse; width:60%; margin:auto;">
 <tr>
 <td align="center" style="border:none; width:33%; padding:10px;">
@@ -7451,31 +7449,20 @@ a.anchor-link {
 </tr>
 </table>
 <hr/>
-<h3 id="Objetivos-de-este-notebook">Objetivos de este notebook<a class="anchor-link" href="#Objetivos-de-este-notebook">¶</a></h3><p>Evaluar si los modelos de <strong>Image Enhancement</strong> mejoran el desempeño de <strong>múltiples modelos de depth estimation</strong> sobre SCARED:</p>
-<ol>
-<li>Comparar <strong>4 métodos de enhancement</strong>: None (baseline), Retinex SSR, EndoLMSPEC e IAT/EndoViT</li>
-<li>Evaluar sobre <strong>2 modelos de depth</strong>: Endo-Depth (Recasens et al., 2021) y EndoSfMLearner (Ozyoruk et al., 2020)</li>
-<li>Cuantificar el impacto en: <strong>AbsRel, RMSE, Chamfer Distance</strong></li>
-<li>Analizar si la mejora se concentra en <strong>zonas especulares</strong> (hipótesis central)</li>
-<li>Evaluar <strong>viabilidad clínica</strong> (FPS)</li>
-</ol>
-<blockquote>
-<p>García-Vega, A., et al. (2022). Multi-Scale Structural-aware Exposure Correction for Endoscopic Imaging. <em>arXiv:2210.15033</em>.
-Rahman, Z., et al. (2004). Retinex processing for automatic image enhancement. <em>Journal of Electronic Imaging</em>, 13(1). <a href="https://doi.org/10.1117/1.1636183">https://doi.org/10.1117/1.1636183</a>
-Wang, T., et al. (2022). Ultra-High-Definition Low-Light Image Enhancement. <em>AAAI 2022</em>.
-Ozyoruk, K.B., et al. (2020). EndoSLAM Dataset and Endo-SfMLearner. <em>arXiv:2006.16670</em>.</p>
-</blockquote>
+<h3 id="Diferencia-respecto-a-Avance-4">Diferencia respecto a Avance 4<a class="anchor-link" href="#Diferencia-respecto-a-Avance-4">¶</a></h3><p>En el <strong>Avance 4</strong> se evaluaron modelos con sus pesos <strong>originales del paper</strong> (entrenados en Hamlyn, KITTI o Endovis).</p>
+<p>En este <strong>Avance 5</strong> se usan pesos <strong>re-entrenados en SCARED</strong> (proporcionados por el Dr. Ricardo Espinosa Loera), evaluados en los mismos datasets 8–9. Esto responde la pregunta: <strong>¿cambia el impacto del enhancement cuando el modelo conoce el dominio de evaluación?</strong></p>
+<h3 id="Hip%C3%B3tesis">Hipótesis<a class="anchor-link" href="#Hip%C3%B3tesis">¶</a></h3><p>El fine-tuning en SCARED mejora el baseline (none) de todos los modelos. El efecto del enhancement se reduce para los modelos que ya manejan bien las especularidades del dominio.</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=70e4c4ff-0381-4854-9597-9bce78791402">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f3583eb1-5c7b-48f6-97f2-3552687deee2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
-<h2 id="0.-Pipeline-general-del-experimento">0. Pipeline general del experimento<a class="anchor-link" href="#0.-Pipeline-general-del-experimento">¶</a></h2><div class="jp-Mermaid"><pre class="mermaid">
+<h2 id="0.-Pipeline-general">0. Pipeline general<a class="anchor-link" href="#0.-Pipeline-general">¶</a></h2><div class="jp-Mermaid"><pre class="mermaid">
 flowchart TD
     A["SCARED - datasets 8-9, keyframes 0-4"] --&gt; B
     B["Imagen RGB 1280x1024 px"] --&gt; C1 &amp; C2 &amp; C3 &amp; C4
@@ -7487,44 +7474,29 @@ flowchart TD
         C4["IAT EndoViT - Endo4IE - Wang 2022"]
     end
 
-    C1 &amp; C2 &amp; C3 &amp; C4 --&gt; D1 &amp; D2 &amp; D3 &amp; D4 &amp; D5
+    C1 &amp; C2 &amp; C3 &amp; C4 --&gt; D1 &amp; D2 &amp; D3 &amp; D4 &amp; D5 &amp; D6
 
-    subgraph DEPTH ["Modelos de Depth"]
-        D1["Endo-Depth - ResNet18 - Recasens 2021"]
-        D2["EndoSfMLearner - DispResNet18 - Ozyoruk 2020"]
-        D3["AF-SfMLearner - ResNet18 + AppFlow - Shao 2022"]
-        D4["HADepth - DINOv2 ViT-Base + DoRA - Shao en revision"]
-        D5["MonoViT - MPViT-Small - Zhao 2022"]
+    subgraph DEPTH ["Modelos — pesos SCARED (Dr. Espinosa Loera)"]
+        D1["Monodepth2 - ResNet18 - epoch 19"]
+        D2["MonoViT - MPViT-Small - epoch 19"]
+        D3["EndoSfMLearner - DispResNet18"]
+        D4["AF-SfMLearner - ResNet18 + AppFlow"]
+        D5["MonoIIT - MPViT + Lighting - winner"]
+        D6["weights19-MonoViT - MPViT + Lighting"]
     end
 
-    D1 &amp; D2 &amp; D3 &amp; D4 &amp; D5 --&gt; E["Median Scaling a mm"]
-    E --&gt; F["AbsRel - RMSE - Chamfer - FPS"]
+    D1 &amp; D2 &amp; D3 &amp; D4 &amp; D5 &amp; D6 --&gt; E["Median Scaling a mm"]
+    E --&gt; F["AbsRel - SqRel - RMSE - RMSELog - delta - FPS"]
 
     style ENHANCEMENT fill:#fff8e1,stroke:#E0A800,stroke-width:2px
     style DEPTH fill:#e8f4fd,stroke:#2766CB,stroke-width:2px
-</pre></div><p><strong>Diseño factorial</strong>: 4 enhancements × 5 modelos de depth × 10 keyframes = <strong>200 evaluaciones</strong></p>
-<h3 id="Hip%C3%B3tesis">Hipótesis<a class="anchor-link" href="#Hip%C3%B3tesis">¶</a></h3><p>Los métodos de enhancement reducen el error de profundidad con mayor efecto en zonas especulares. HADepth y AF-SfMLearner, diseñados explícitamente para endoscopía con highlight-awareness y appearance flow, deberían ser los más robustos al enhancement por diseño.</p>
+</pre></div><p><strong>Diseño factorial</strong>: 4 enhancements × 6 modelos × 10 keyframes = <strong>240 evaluaciones</strong></p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=fd931847-5055-4a74-a2a9-656f1db9001b">
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=e1c96dc1-b1b9-4668-8388-5d20e6995f20">
 </div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>torch    : 2.11.0+cu128
-tifffile : 2026.4.11
-opencv   : 4.13.0
-CUDA OK  : True
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ec00d322-6889-4e47-87b0-e8facda21d46">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2ec6e749-0107-47c2-b1d1-f4caeb0d5405">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7532,936 +7504,238 @@ CUDA OK  : True
 <hr/>
 <h2 id="1.-Configuraci%C3%B3n-de-rutas">1. Configuración de rutas<a class="anchor-link" href="#1.-Configuraci%C3%B3n-de-rutas">¶</a></h2><h3 id="Estructura-esperada-en-Google-Drive">Estructura esperada en Google Drive<a class="anchor-link" href="#Estructura-esperada-en-Google-Drive">¶</a></h3><pre><code>MyDrive/proyecto_integrador/
 ├── scared_raw/
-├── endo_depth_weights/            ← encoder.pth + depth.pth  (Endo-Depth)
-├── Endo-Depth-and-Motion/
-├── Model_MIA/                     ← encoder.pth + depth.pth  (AF-SfMLearner Stage-wise)
-├── HADepth/                       ← repo completo (código: models/, utils/, ...)
-├── HADepth_fullmodel/             ← depth_model.pth
+├── Endo-Depth-and-Motion/        ← código Monodepth2 / Endo-Depth
 ├── EndoLMSPEC/
-│   └── checkpoint/main_net/model_256_combined_SSIM5_1.pth
 ├── EndoViT/
-│   └── Endo4IE/best_Epoch50_laplacian_histogan_loss.pth
 ├── EndoSLAM/
-│   ├── EndoSfMLearner/
-│   └── pretrained/08-13-00_00/dispnet_model_best.pth.tar
-├── MonoViT/
-│   ├── networks/                  ← mpvit.py (parcheado), hr_decoder.py
-│   └── mono_640x192/encoder.pth + depth.pth
-└── avance4_outputs/
+├── MonoViT/                      ← código MonoViT (también para MonoIIT)
+├── AF-SfMLearner/                ← código AF-SfMLearner
+└── scared_weights/               ← pesos SCARED (Dr. Espinosa Loera)
+    ├── monodepth2/               ← encoder.pth + depth.pth
+    ├── monovit/                  ← encoder.pth + depth.pth
+    ├── endosfmlearner/           ← dispnet_model_best.pth.tar
+    ├── afsfmlearner/             ← encoder.pth + depth.pth
+    ├── monoIIT/                  ← encoder.pth + depth.pth (+ lighting.pth)
+    └── weights19_monovit/        ← encoder.pth + depth.pth (+ lighting.pth)
 </code></pre>
-<h3 id="Modelos-de-depth-%E2%80%94-resumen-de-pesos">Modelos de depth — resumen de pesos<a class="anchor-link" href="#Modelos-de-depth-%E2%80%94-resumen-de-pesos">¶</a></h3><table>
+<blockquote>
+<p><strong>Nota sobre MonoIIT</strong>: el Dr. Espinosa indicó que los pesos de MonoIIT
+se ejecutan con el código de testing de MonoViT (misma arquitectura MPViT,
+con un módulo de iluminación adicional que no se usa en inferencia de profundidad).</p>
+</blockquote>
+<h3 id="Tabla-de-pesos-%E2%80%94-Avance-5-vs-Avance-4">Tabla de pesos — Avance 5 vs Avance 4<a class="anchor-link" href="#Tabla-de-pesos-%E2%80%94-Avance-5-vs-Avance-4">¶</a></h3><table>
 <thead>
 <tr>
 <th>Modelo</th>
-<th>Archivo(s) de pesos</th>
-<th>Backbone</th>
-<th>Dataset entrenamiento</th>
-<th>AbsRel paper†</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Endo-Depth</strong></td>
-<td><code>endo_depth_weights/encoder.pth</code> + <code>depth.pth</code></td>
-<td>ResNet-18</td>
-<td>Hamlyn (laparoscopy)</td>
-<td>0.094*</td>
-</tr>
-<tr>
-<td><strong>EndoSfMLearner</strong></td>
-<td><code>EndoSLAM/pretrained/.../dispnet_model_best.pth.tar</code></td>
-<td>ResNet-18 (DispResNet)</td>
-<td>EndoSLAM (capsule)</td>
-<td>0.062</td>
-</tr>
-<tr>
-<td><strong>AF-SfMLearner</strong></td>
-<td><code>Model_MIA/encoder.pth</code> + <code>depth.pth</code></td>
-<td>ResNet-18 + Appearance Flow</td>
-<td>Endovis</td>
-<td>0.059</td>
-</tr>
-<tr>
-<td><strong>HADepth</strong></td>
-<td><code>HADepth_fullmodel/depth_model.pth</code></td>
-<td>DINOv2 ViT-Base + DoRA</td>
-<td>Endovis</td>
-<td>0.049</td>
-</tr>
-<tr>
-<td><strong>MonoViT</strong></td>
-<td><code>MonoViT/mono_640x192/encoder.pth</code> + <code>depth.pth</code></td>
-<td>MPViT-Small (ViT)</td>
-<td>KITTI (outdoor)</td>
-<td>—</td>
-</tr>
-</tbody>
-</table>
-<p>† Números <strong>reportados en los papers originales</strong> en sus propios splits de evaluación, sin enhancement. No son resultados de este experimento. Nuestros resultados se miden sobre datasets 8–9 de SCARED con protocolo unificado.<br>
-* EndoDepth-Perf según tabla de HADepth; Endo-Depth original evaluado en Hamlyn.</br></p>
-<h3 id="M%C3%A9todos-de-enhancement-%E2%80%94-resumen-de-pesos">Métodos de enhancement — resumen de pesos<a class="anchor-link" href="#M%C3%A9todos-de-enhancement-%E2%80%94-resumen-de-pesos">¶</a></h3><table>
-<thead>
-<tr>
-<th>Método</th>
-<th>Archivo de pesos</th>
-<th>Arquitectura</th>
-<th>Dataset entrenamiento</th>
-<th>Parámetros</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Retinex SSR</strong></td>
-<td>— (sin pesos)</td>
-<td>Filtro gaussiano logarítmico</td>
-<td>—</td>
-<td>0</td>
-</tr>
-<tr>
-<td><strong>EndoLMSPEC</strong></td>
-<td><code>EndoLMSPEC/checkpoint/main_net/model_256_combined_SSIM5_1.pth</code></td>
-<td>U-Net multi-escala + pirámide Laplaciana</td>
-<td>Endo4IE (over+under)</td>
-<td>~2 M</td>
-</tr>
-<tr>
-<td><strong>IAT / EndoViT</strong></td>
-<td><code>EndoViT/Endo4IE/best_Epoch50_laplacian_histogan_loss.pth</code></td>
-<td>Transformer local+global (IAT)</td>
-<td>Endo4IE fine-tune, época 50</td>
-<td>~90 K</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=92f5e8c8-cfa5-4e2c-be34-f80e6a8717de">
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=48be8d88-4efe-4a51-831d-4663c3277248">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<hr/>
-<h2 id="2.-Cargar-Endo-Depth">2. Cargar Endo-Depth<a class="anchor-link" href="#2.-Cargar-Endo-Depth">¶</a></h2><p>Mismo modelo que en Avances 3 y 4: ResNet18 encoder + DepthDecoder, pesos Hamlyn. No se modifica el modelo — es la variable dependiente fija del experimento.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=d95f0f37-9a6f-455c-a7cc-974c018a7d8a">
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Dispositivo: cuda
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>/usr/local/lib/python3.12/dist-packages/torchvision/models/_utils.py:135: UserWarning: Using 'weights' as positional parameter(s) is deprecated since 0.13 and may be removed in the future. Please use keyword parameter(s) instead.
-  warnings.warn(
-/usr/local/lib/python3.12/dist-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=None`.
-  warnings.warn(msg)
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Resolución del modelo: 256×320
-Endo-Depth cargado ✓
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=50d50d16-749f-4af2-b4b3-f85c2bc07945">
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>EndoSfMLearner parámetros: 14.84 M
-Pesos: dispnet_model_best.pth.tar
-EndoSfMLearner cargado ✓
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=13a2abfb-b770-49a0-a0da-c243c40c95a9">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<hr/>
-<h2 id="2b.-EndoSfMLearner-%E2%80%94-Endo-SfMLearner-(Ozyoruk-et-al.,-2020)">2b. EndoSfMLearner — Endo-SfMLearner (Ozyoruk et al., 2020)<a class="anchor-link" href="#2b.-EndoSfMLearner-%E2%80%94-Endo-SfMLearner-(Ozyoruk-et-al.,-2020)">¶</a></h2><p><strong>EndoSfMLearner</strong> es un método de estimación de profundidad monocular auto-supervisado específicamente diseñado para endoscopía, publicado como parte del dataset EndoSLAM. Sus contribuciones principales son:</p>
-<ul>
-<li><strong>Brightness-aware photometric loss</strong>: hace la predicción de profundidad robusta a variaciones de iluminación — relevante directamente para nuestra hipótesis de corrección de iluminación</li>
-<li><strong>Spatial attention-based pose network</strong>: optimizado para las características geométricas de imágenes endoscópicas</li>
-</ul>
-<p>La arquitectura usa <strong>DispResNet</strong> (ResNet-18 como backbone), misma familia que Endo-Depth, pero con una cabeza de disparidad diferente y entrenado en datos de endoscopía de cápsula (EndoSLAM dataset).</p>
-<blockquote>
-<p>Ozyoruk, K. B., et al. (2020). EndoSLAM Dataset and An Unsupervised Monocular Visual Odometry and Depth Estimation Approach for Endoscopic Videos: Endo-SfMLearner. <em>arXiv:2006.16670</em>.</p>
-</blockquote>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=a9f58e58">
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e85b0383">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<hr/>
-<h2 id="2c.-AF-SfMLearner-%E2%80%94-Appearance-Flow-para-Endoscop%C3%ADa-(Shao-et-al.,-2022)">2c. AF-SfMLearner — Appearance Flow para Endoscopía (Shao et al., 2022)<a class="anchor-link" href="#2c.-AF-SfMLearner-%E2%80%94-Appearance-Flow-para-Endoscop%C3%ADa-(Shao-et-al.,-2022)">¶</a></h2><p><strong>AF-SfMLearner</strong> (<em>Self-Supervised Monocular Depth and Ego-Motion Estimation in Endoscopy: Appearance Flow to the Rescue</em>, Medical Image Analysis 2022) introduce un módulo de <strong>appearance flow</strong> que compensa explícitamente los reflejos especulares y las variaciones de iluminación endoscópica durante el entrenamiento auto-supervisado.</p>
-<p>La contribución clave frente a EndoSfMLearner y Endo-Depth:</p>
-<ul>
-<li><strong>Appearance flow module</strong>: predice un campo de flujo denso que mapea píxeles especulares a regiones de tejido cercanas con iluminación similar, generando una imagen de referencia "limpia" para la pérdida fotométrica</li>
-<li><strong>Transformer de apariencia</strong>: deforma explícitamente la imagen fuente antes de comparar con el frame objetivo — hace el entrenamiento robusto a brillos sin depender de datos con anotación manual</li>
-</ul>
-<p>La arquitectura del encoder y decoder es la misma que Endo-Depth (ResNet-18 + DepthDecoder de Monodepth2), lo que permite comparación directa; la diferencia está en la <strong>función de pérdida y el módulo auxiliar de apariencia</strong> que solo actúa durante el entrenamiento.</p>
-<table>
-<thead>
-<tr>
-<th>Checkpoint</th>
-<th>AbsRel</th>
-<th>Sq Rel</th>
-<th>RMSE</th>
-<th>Dataset evaluación</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Stage-wise (<strong>este experimento</strong>)</td>
-<td>0.059</td>
-<td>0.435</td>
-<td>4.925</td>
-<td>Endovis</td>
-</tr>
-<tr>
-<td>End-to-end</td>
-<td>0.059</td>
-<td>0.470</td>
-<td>5.062</td>
-<td>Endovis</td>
-</tr>
-<tr>
-<td>ICRA 2021</td>
-<td>0.063</td>
-<td>0.489</td>
-<td>5.185</td>
-<td>Endovis</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>Shao, S., Pei, Z., Chen, W., Zhu, W., Wu, X., Sun, D., &amp; Zhang, B. (2022). Self-Supervised Monocular Depth and Ego-Motion Estimation in Endoscopy: Appearance Flow to the Rescue. <em>Medical Image Analysis</em>, 77, 102338.</p>
-</blockquote>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=1e4ae594">
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a9d34bea">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<hr/>
-<h2 id="2d.-HADepth-%E2%80%94-Highlight-Aware-Monocular-Depth-para-Endoscop%C3%ADa-(Shao-et-al.,-en-revisi%C3%B3n)">2d. HADepth — Highlight-Aware Monocular Depth para Endoscopía (Shao et al., en revisión)<a class="anchor-link" href="#2d.-HADepth-%E2%80%94-Highlight-Aware-Monocular-Depth-para-Endoscop%C3%ADa-(Shao-et-al.,-en-revisi%C3%B3n)">¶</a></h2><p><strong>HADepth</strong> (<em>Highlight-aware monocular depth estimation for endoscopy</em>, Signal, Image and Video Processing) diseña un pipeline explícitamente consciente de los <strong>reflejos especulares</strong> (highlights), el principal factor de degradación en imágenes endoscópicas.</p>
-<h3 id="Arquitectura">Arquitectura<a class="anchor-link" href="#Arquitectura">¶</a></h3><div class="jp-Mermaid"><pre class="mermaid">
-flowchart LR
-    IN["Imagen RGB\n224×280 px\n(resize interno)"] --&gt; VIT
-
-    subgraph ENCODER ["Encoder: DINOv2 ViT-Base + DoRA"]
-        VIT["ViT-Base/14\n12 bloques Transformer\npatch 14×14"]
-        DORA["DoRA rank=4\nen MLP de cada bloque\n(fine-tune eficiente)"]
-        VIT --- DORA
-    end
-
-    VIT --&gt;|"features de capas 2,5,8,11"| DPT
-
-    subgraph DECODER ["Decoder: DPTHead"]
-        DPT["4 proyecciones\n+ resize/deconv"]
-        RF["4 RefineNet\nFusion Blocks"]
-        DPT --&gt; RF
-    end
-
-    RF --&gt; OUT["outputs disp 0..3\nSigmoid"]
-
-    style ENCODER fill:#e8f4fd,stroke:#2766CB
-    style DECODER fill:#fff8e1,stroke:#E0A800
-</pre></div><p><strong>Contribuciones clave:</strong></p>
-<ul>
-<li><strong>DINOv2</strong> como backbone: representaciones de largo rango más robustas a discontinuidades de iluminación que ResNet</li>
-<li><strong>DoRA</strong> (<em>Weight-Decomposed Low-Rank Adaptation</em>): fine-tune eficiente del ViT en datos endoscópicos</li>
-<li><strong>DPTHead</strong> multi-escala: fusión de features de 4 capas del transformer</li>
-</ul>
-<h3 id="Referencia-de-resultados-(paper,-sin-enhancement)">Referencia de resultados (paper, sin enhancement)<a class="anchor-link" href="#Referencia-de-resultados-(paper,-sin-enhancement)">¶</a></h3><blockquote>
-<p>Los números siguientes son <strong>reportados por los autores</strong> en su split de Endovis — <strong>no son resultados de nuestro experimento</strong>. Los usamos solo como referencia de contexto para calibrar expectativas.</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>Método</th>
-<th>AbsRel</th>
-<th>Sq Rel</th>
-<th>RMSE</th>
-<th>RMSE log</th>
+<th>Avance 4 (pesos originales)</th>
+<th>Avance 5 (pesos SCARED)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Monodepth2</td>
-<td>0.071</td>
-<td>0.590</td>
-<td>5.606</td>
-<td>0.094</td>
-</tr>
-<tr>
-<td>EndoSfMLearner</td>
-<td>0.062</td>
-<td>0.606</td>
-<td>5.726</td>
-<td>0.093</td>
-</tr>
-<tr>
-<td>AF-SfMLearner</td>
-<td>0.059</td>
-<td>0.435</td>
-<td>4.925</td>
-<td>0.082</td>
-</tr>
-<tr>
-<td>HADepth (paper)</td>
-<td><strong>0.049</strong></td>
-<td><strong>0.326</strong></td>
-<td><strong>4.286</strong></td>
-<td><strong>0.069</strong></td>
-</tr>
-</tbody>
-</table>
-<p>Nuestros resultados se medirán sobre <strong>datasets 8–9 de SCARED con y sin enhancement</strong> usando <code>compute_metrics</code> con median scaling, protocolo idéntico para todos los modelos del experimento.</p>
-<blockquote>
-<p>Shao, S., et al. HADepth: Highlight-aware monocular depth estimation for endoscopy. <em>Signal, Image and Video Processing</em> (en revisión).</p>
-</blockquote>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=ce6dadf6-bbc1-4639-84e3-22b4ffb5305d">
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>/usr/local/lib/python3.12/dist-packages/timm/models/layers/__init__.py:49: FutureWarning: Importing from timm.models.layers is deprecated, please import via timm.layers
-  warnings.warn(f"Importing from {__name__} is deprecated, please import via timm.layers", FutureWarning)
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>MonoViT parámetros: 27.9 M
-Resolución        : 192×640
-MonoViT cargado ✓
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=476d73f2-b66c-4141-8d5a-43a03cabb1c1">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<hr/>
-<h2 id="2e.-MonoViT-%E2%80%94-Self-Supervised-Monocular-Depth-with-Vision-Transformer-(Zhao-et-al.,-2022)">2e. MonoViT — Self-Supervised Monocular Depth with Vision Transformer (Zhao et al., 2022)<a class="anchor-link" href="#2e.-MonoViT-%E2%80%94-Self-Supervised-Monocular-Depth-with-Vision-Transformer-(Zhao-et-al.,-2022)">¶</a></h2><p><strong>MonoViT</strong> reemplaza el encoder ResNet de Monodepth2 con <strong>MPViT-Small</strong> (<em>Multi-Path Vision Transformer</em>), un transformer que procesa parches de imagen en múltiples escalas simultáneamente. El decoder es <code>HR-Depth</code> (high-resolution decoder con attention modules).</p>
-<p>Sus ventajas clave para este experimento:</p>
-<ul>
-<li><strong>Transformer encoder</strong>: captura dependencias de largo rango en la imagen — potencialmente más robusto a variaciones de iluminación localizada (especulares) que los encoders convolucionales</li>
-<li><strong>Multi-path</strong>: procesa la imagen a 4 escalas en paralelo, combinando contexto global y detalle local</li>
-<li><strong>Estado del arte</strong> en KITTI (AbsRel=0.099 @ 640×192)</li>
-</ul>
-<blockquote>
-<p>Zhao, C., Zhang, Y., Poggi, M., Tosi, F., Guo, X., Zhu, Z., Huang, G., Tang, Y., &amp; Mattoccia, S. (2022). MonoViT: Self-Supervised Monocular Depth Estimation with a Vision Transformer. <em>3DV 2022</em>. arXiv:2208.03543.</p>
-</blockquote>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=922e6220-312f-41b7-83a3-f2dff589fac2">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<hr/>
-<h2 id="3.-EndoLMSPEC-%E2%80%94-Arquitectura-y-carga-del-modelo">3. EndoLMSPEC — Arquitectura y carga del modelo<a class="anchor-link" href="#3.-EndoLMSPEC-%E2%80%94-Arquitectura-y-carga-del-modelo">¶</a></h2><h3 id="3.1-%C2%BFQu%C3%A9-es-EndoLMSPEC?">3.1 ¿Qué es EndoLMSPEC?<a class="anchor-link" href="#3.1-%C2%BFQu%C3%A9-es-EndoLMSPEC?">¶</a></h3><p>EndoLMSPEC (<em>Multi-Scale Structural-aware Exposure Correction for Endoscopic Imaging</em>, García-Vega et al., 2022) es una extensión del método LMSPEC de Afifi et al. (2021) adaptada específicamente para imágenes endoscópicas. Resuelve el problema de <strong>corrección de exposición</strong> (tanto sobreexposición por reflejos especulares como subexposición en zonas periféricas) sin datos pareados anotados manualmente — aprende a corregir usando la distribución estadística de imágenes endoscópicas normales.</p>
-<p>Fue entrenado en <strong>Endo4IE</strong>, el primer dataset endoscópico diseñado específicamente para evaluación de métodos de image enhancement, que contiene frames reales y sintéticos con exposición incorrecta y sus correspondientes imágenes de referencia.</p>
-<h3 id="3.2-Arquitectura-detallada">3.2 Arquitectura detallada<a class="anchor-link" href="#3.2-Arquitectura-detallada">¶</a></h3><div class="jp-Mermaid"><pre class="mermaid">
-flowchart LR
-    IN["Imagen de entrada\nHxWx3 float32"] --&gt; LP
-
-    subgraph LP [" 🔺 Pirámide Laplaciana (4 niveles) "]
-        direction TB
-        L4["Level 4\nH/8 × W/8\n(low-freq)"]
-        L3["Level 3\nH/4 × W/4"]
-        L2["Level 2\nH/2 × W/2"]
-        L1["Level 1\nH × W\n(high-freq)"]
-    end
-
-    L4 --&gt; U1
-
-    subgraph UNETS [" 🧱 Cascada de U-Nets "]
-        direction TB
-        U1["UNet24\n(sin residual)\nCorrige low-freq"]
-        U2["UNet24-res\n(+ residual)\nRefina freq. medias"]
-        U3["UNet24-res\n(+ residual)\nRefina más detalle"]
-        U4["UNet16-res\n(+ residual)\nReconstrucción final"]
-    end
-
-    U1 --&gt;|"y_hat0 + L3"| U2
-    U2 --&gt;|"y_hat1 + L2"| U3
-    U3 --&gt;|"y_hat2 + L1"| U4
-
-    U4 --&gt; OUT["subnet_16\nImagen corregida\nHxWx3"]
-
-    style LP fill:#fff8e1,stroke:#E0A800
-    style UNETS fill:#e8f4fd,stroke:#2766CB
-</pre></div><p><strong>Clave de la arquitectura</strong>: la imagen de entrada se descompone en una <strong>pirámide Laplaciana</strong> de 4 niveles. El nivel 4 (más pequeño, baja frecuencia) captura la iluminación global; los niveles superiores capturan detalles de alta frecuencia (texturas, bordes, venas). Cada U-Net procesa un nivel de la pirámide y pasa su resultado al siguiente nivel sumando con los detalles de alta frecuencia. Esto permite corregir la iluminación global sin destruir la textura del tejido.</p>
-<h3 id="3.3-Pir%C3%A1mide-Laplaciana">3.3 Pirámide Laplaciana<a class="anchor-link" href="#3.3-Pir%C3%A1mide-Laplaciana">¶</a></h3><p>La pirámide Laplaciana descompone la imagen como:</p>
-<p>$$L_k = G_k - \text{pyrUp}(G_{k+1})$$</p>
-<p>donde $G_k$ es el nivel $k$ de la pirámide Gaussiana. Cada $L_k$ contiene las <strong>diferencias</strong> entre escalas consecutivas — esencialmente el contenido de alta frecuencia a esa escala. La imagen original se puede reconstruir exactamente sumando todos los niveles de la pirámide Laplaciana.</p>
-<p><strong>¿Por qué es ideal para endoscopía?</strong> Los reflejos especulares son eventos de alta frecuencia localizada (brillos puntuales), mientras que el gradiente radial de iluminación del endoscopio es de baja frecuencia. La pirámide Laplaciana los separa naturalmente, permitiendo que la red corrija la iluminación global (niveles bajos) sin alterar los detalles del tejido (niveles altos).</p>
-<h3 id="3.4-Funci%C3%B3n-de-p%C3%A9rdida">3.4 Función de pérdida<a class="anchor-link" href="#3.4-Funci%C3%B3n-de-p%C3%A9rdida">¶</a></h3><p>EndoLMSPEC usa una pérdida compuesta de 4 términos:</p>
-<p>$$\mathcal{L} = \alpha \mathcal{L}_{rec} + \beta \mathcal{L}_{pyr} + \gamma \mathcal{L}_{SSIM} + \delta \mathcal{L}_{adv}$$</p>
-<p>donde:</p>
-<ul>
-<li>$\mathcal{L}_{rec}$: reconstrucción pixel-wise (L1)</li>
-<li>$\mathcal{L}_{pyr}$: consistencia de pirámide Laplaciana</li>
-<li>$\mathcal{L}_{SSIM}$: similitud estructural (aportación principal vs. LMSPEC original)</li>
-<li>$\mathcal{L}_{adv}$: pérdida adversarial (discriminador)</li>
-</ul>
-<p>La inclusión de $\mathcal{L}_{SSIM}$ es la innovación principal respecto al LMSPEC original: fuerza a la red a preservar la <strong>estructura del tejido</strong> (bordes, venas, pliegues) incluso al corregir la exposición — esencial para que la imagen corregida sea útil para estimación de profundidad.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=3bf882ba-9bee-4ebc-9a77-92beb09875c7">
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cf52749d-933b-4537-b6b7-5ecc2c749ea1">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<hr/>
-<h2 id="3b.-IAT-/-EndoViT-%E2%80%94-Illumination-Adaptive-Transformer-fine-tuneado-en-Endo4IE">3b. IAT / EndoViT — Illumination-Adaptive Transformer fine-tuneado en Endo4IE<a class="anchor-link" href="#3b.-IAT-/-EndoViT-%E2%80%94-Illumination-Adaptive-Transformer-fine-tuneado-en-Endo4IE">¶</a></h2><h3 id="%C2%BFQu%C3%A9-es-IAT-y-c%C3%B3mo-se-relaciona-con-EndoViT?">¿Qué es IAT y cómo se relaciona con EndoViT?<a class="anchor-link" href="#%C2%BFQu%C3%A9-es-IAT-y-c%C3%B3mo-se-relaciona-con-EndoViT?">¶</a></h3><p>El repositorio <strong>EndoViT</strong> (proporcionado por el Dr. Gilberto Ochoa Ruiz) contiene una implementación del <strong>IAT</strong> (<em>Illumination-Adaptive Transformer</em>, Wang et al., 2022) con pesos fine-tuneados en el dataset <strong>Endo4IE</strong> — específicamente con una función de pérdida que combina pirámide Laplaciana e histograma GAN (<code>best_Epoch50_laplacian_histogan_loss.pth</code>). Esto lo distingue del IAT original entrenado en imágenes naturales (MIT-FiveK) y lo hace directamente comparable con EndoLMSPEC, que también fue entrenado en Endo4IE.</p>
-<p>IAT opera en dos ramas paralelas:</p>
-<ul>
-<li><strong>Rama local</strong> (<code>Local_pred_S</code>): predice dos mapas por píxel — un factor multiplicativo <code>mul</code> y un desplazamiento aditivo <code>add</code>: $\hat{I}_{local} = I \odot mul + add$</li>
-<li><strong>Rama global</strong> (<code>Global_pred</code>): un Swin Transformer que predice gamma $\gamma$ y una matriz de corrección de color CCM 3×3</li>
-</ul>
-<div class="jp-Mermaid"><pre class="mermaid">
-flowchart LR
-    IN["Imagen\n[0,1] float\n(Endo4IE fine-tune)"] --&gt; LP &amp; GP
-
-    subgraph LP [" 🔲 Rama Local "]
-        LC["Conv + 3×CBlock_ln"] --&gt; MUL["mul map\n(ReLU)"]
-        LC --&gt; ADD["add map\n(Tanh)"]
-    end
-
-    subgraph GP [" 🌐 Rama Global "]
-        ST["Swin Transformer\n(Global_pred)"] --&gt; GAMMA["γ (gamma)"]
-        ST --&gt; CCM["CCM 3×3\n(color matrix)"]
-    end
-
-    IN --&gt; MULT["I × mul + add\n= I_local"]
-    MUL &amp; ADD --&gt; MULT
-    MULT --&gt; APPLY["apply_color(I_local, CCM)^γ"]
-    GAMMA &amp; CCM --&gt; APPLY
-    APPLY --&gt; OUT["Imagen corregida\n[0,1] float"]
-
-    style LP fill:#e8f4fd,stroke:#2766CB
-    style GP fill:#fff8e1,stroke:#E0A800
-</pre></div><h3 id="Pesos-utilizados">Pesos utilizados<a class="anchor-link" href="#Pesos-utilizados">¶</a></h3><table>
-<thead>
-<tr>
-<th>Archivo</th>
-<th>Descripción</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>best_Epoch50_laplacian_histogan_loss.pth</code></td>
-<td>Fine-tune en Endo4IE (over+underexp), pérdida Laplaciana + HistoGAN, epoch 50</td>
-</tr>
-</tbody>
-</table>
-<p>Otros checkpoints disponibles en <code>EndoVit/Endo4IE/</code>: epoch 10, 20 con variantes de normalización.</p>
-<blockquote>
-<p>Wang, T., Zhang, K., Shen, T., Luo, W., Stenger, B., &amp; Lu, T. (2022). Ultra-High-Definition Low-Light Image Enhancement: A Benchmark and Transformer-Based Method. <em>AAAI 2022</em>.</p>
-</blockquote>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=6aa05cb6-5cfe-471b-8595-2631ff91ced9">
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=739856d0-837b-410f-8dcc-64cd92a49caf">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<hr/>
-<h2 id="4.-M%C3%A9todos-de-Image-Enhancement">4. Métodos de Image Enhancement<a class="anchor-link" href="#4.-M%C3%A9todos-de-Image-Enhancement">¶</a></h2><h3 id="4.1-Baseline:-sin-correcci%C3%B3n">4.1 Baseline: sin corrección<a class="anchor-link" href="#4.1-Baseline:-sin-correcci%C3%B3n">¶</a></h3><p>La imagen original sin ningún preprocesamiento. Referencia para cuantificar el impacto de los métodos.</p>
-<h3 id="4.2-Retinex-SSR">4.2 Retinex SSR<a class="anchor-link" href="#4.2-Retinex-SSR">¶</a></h3><p>$$R_{SSR}(x,y) = \log I(x,y) - \log\left[G_\sigma * I(x,y)\right], \quad \sigma=30$$</p>
-<blockquote>
-<p>Rahman, Z., Jobson, D. J., &amp; Woodell, G. A. (2004). <em>Journal of Electronic Imaging</em>, 13(1), 100–110. <a href="https://doi.org/10.1117/1.1636183">https://doi.org/10.1117/1.1636183</a></p>
-</blockquote>
-<h3 id="4.3-EndoLMSPEC">4.3 EndoLMSPEC<a class="anchor-link" href="#4.3-EndoLMSPEC">¶</a></h3><p>Pirámide Laplaciana de 4 niveles → cascada de 4 U-Nets con pérdida SSIM. Salida: <code>subnet_16</code> a resolución completa. Ver sección 3 para detalles.</p>
-<h3 id="4.4-IAT-(Illumination-Adaptive-Transformer)">4.4 IAT (Illumination-Adaptive Transformer)<a class="anchor-link" href="#4.4-IAT-(Illumination-Adaptive-Transformer)">¶</a></h3><p>Corrección local (mul/add por píxel vía conv) + corrección global (gamma + CCM vía Swin Transformer). ~90K parámetros, muy rápido. Ver sección 3b para detalles.</p>
-<blockquote>
-<p>Wang, T., et al. (2022). Ultra-High-Definition Low-Light Image Enhancement. <em>AAAI 2022</em>.</p>
-</blockquote>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=1cfe2356-b78f-47bb-b044-d170a09f7516">
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=973c3ed5-9590-4e91-bcc2-b5457941e0f8">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<hr/>
-<h2 id="5.-Carga-de-datos-SCARED">5. Carga de datos SCARED<a class="anchor-link" href="#5.-Carga-de-datos-SCARED">¶</a></h2><p>Mismo protocolo que Avance 3: datasets 8–9 (split de test, animal distinto al de train). Cada keyframe contiene <code>Left_Image.png</code> y <code>left_depth_map.tiff</code> (canal Z en mm).</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=02f114fb-455b-4d0a-8b47-430d381bff80">
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ca812fd7-d06c-430b-93d8-a5484e1a270f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<hr/>
-<h2 id="6.-Visualizaci%C3%B3n-comparativa-de-los-m%C3%A9todos-de-enhancement">6. Visualización comparativa de los métodos de enhancement<a class="anchor-link" href="#6.-Visualizaci%C3%B3n-comparativa-de-los-m%C3%A9todos-de-enhancement">¶</a></h2><p>Antes de correr el experimento completo, comparamos visualmente los tres métodos sobre el keyframe de prueba. Esto permite verificar que:</p>
-<ol>
-<li>EndoLMSPEC corrige correctamente la exposición</li>
-<li>Retinex elimina el gradiente de iluminación</li>
-<li>Ambos preservan la textura del tejido</li>
-</ol>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=428787b1-280a-49a8-8a20-d07d12b4e3f8">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<hr/>
-<h2 id="7.-Experimento-factorial:-4-enhancements-%C3%97-5-modelos-%C3%97-10-keyframes">7. Experimento factorial: 4 enhancements × 5 modelos × 10 keyframes<a class="anchor-link" href="#7.-Experimento-factorial:-4-enhancements-%C3%97-5-modelos-%C3%97-10-keyframes">¶</a></h2><p>Total: <strong>200 evaluaciones</strong>.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=989afed6-9f21-4d96-b653-e62197883f4f">
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=ecd53e75-2268-4b6d-9f98-cf6f8fdd29b6">
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=8ffaf04a-d722-46cc-ae00-c3f4821e850e">
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=edefd082-c168-40d4-b938-b988c26c050b">
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=8a7ca590-0f96-4494-b0a0-63578c7f07cf">
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=764ec00a-ed0b-434d-875d-9f57864ec4ee">
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=6768c49b-6ffc-4fad-b550-54498242d21e">
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1789459e-c867-4318-95cd-c8184923a1ae">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<hr/>
-<h2 id="11.-Conclusiones">11. Conclusiones<a class="anchor-link" href="#11.-Conclusiones">¶</a></h2><h3 id="Tabla-completa-de-resultados-(promedio-10-keyframes,-datasets-8%E2%80%939-SCARED)">Tabla completa de resultados (promedio 10 keyframes, datasets 8–9 SCARED)<a class="anchor-link" href="#Tabla-completa-de-resultados-(promedio-10-keyframes,-datasets-8%E2%80%939-SCARED)">¶</a></h3><table>
-<thead>
-<tr>
-<th>Modelo</th>
-<th>Enhancement</th>
-<th>AbsRel↓</th>
-<th>SqRel↓</th>
-<th>RMSE↓</th>
-<th>RMSELog↓</th>
-<th>δ&lt;1.25↑</th>
-<th>δ&lt;1.25²↑</th>
-<th>δ&lt;1.25³↑</th>
-<th>IT (ms)</th>
-<th>ΔAR%</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Endo-Depth</strong></td>
-<td>none</td>
-<td>0.1652</td>
-<td>2.6842</td>
-<td>12.468</td>
-<td>0.2119</td>
-<td>0.7764</td>
-<td>0.9420</td>
-<td>0.9900</td>
-<td>27.4</td>
-<td>baseline</td>
-</tr>
-<tr>
-<td></td>
-<td>retinex</td>
-<td>0.1533</td>
-<td>2.3998</td>
-<td>11.578</td>
-<td>0.2137</td>
-<td>0.8015</td>
-<td>0.9394</td>
-<td>0.9823</td>
-<td>372.2</td>
-<td><strong>−7.2%</strong> ←</td>
-</tr>
-<tr>
-<td></td>
-<td>endolmspec</td>
-<td>0.1635</td>
-<td>2.8055</td>
-<td>12.949</td>
-<td>0.2259</td>
-<td>0.7660</td>
-<td>0.9299</td>
-<td>0.9848</td>
-<td>143.6</td>
-<td>−1.0% ←</td>
-</tr>
-<tr>
-<td></td>
-<td><strong>iat</strong></td>
-<td><strong>0.1454</strong></td>
-<td><strong>2.1133</strong></td>
-<td><strong>11.074</strong></td>
-<td>0.1899</td>
-<td><strong>0.8223</strong></td>
-<td><strong>0.9581</strong></td>
-<td>0.9910</td>
-<td>271.4</td>
-<td><strong>−12.0%</strong> ←</td>
-</tr>
-<tr>
-<td><strong>EndoSfMLearner</strong></td>
-<td>none</td>
-<td>0.2906</td>
-<td>7.6026</td>
-<td>21.002</td>
-<td>0.3802</td>
-<td>0.4706</td>
-<td>0.7550</td>
-<td>0.9148</td>
-<td>6.2</td>
-<td>baseline</td>
-</tr>
-<tr>
-<td></td>
-<td>retinex</td>
-<td>0.2908</td>
-<td>7.6062</td>
-<td>21.000</td>
-<td>0.3804</td>
-<td>0.4706</td>
-<td>0.7548</td>
-<td>0.9142</td>
-<td>351.1</td>
-<td>+0.1%</td>
-</tr>
-<tr>
-<td></td>
-<td>endolmspec</td>
-<td>0.2904</td>
-<td>7.5904</td>
-<td>20.981</td>
-<td>0.3797</td>
-<td>0.4709</td>
-<td>0.7558</td>
-<td>0.9154</td>
-<td>122.4</td>
-<td>−0.1% ←</td>
-</tr>
-<tr>
-<td></td>
-<td>iat</td>
-<td>0.2902</td>
-<td>7.5804</td>
-<td>20.969</td>
-<td>0.3795</td>
-<td>0.4712</td>
-<td>0.7560</td>
-<td>0.9157</td>
-<td>250.4</td>
-<td>−0.1% ←</td>
-</tr>
-<tr>
-<td><strong>MonoViT</strong></td>
-<td>none</td>
-<td>0.3046</td>
-<td>10.2427</td>
-<td>23.729</td>
-<td>0.3532</td>
-<td>0.4838</td>
-<td>0.7896</td>
-<td>0.9348</td>
-<td>53.3</td>
-<td>baseline</td>
-</tr>
-<tr>
-<td></td>
-<td>retinex</td>
-<td>0.3139</td>
-<td>11.5943</td>
-<td>26.566</td>
-<td>0.3438</td>
-<td>0.4574</td>
-<td>0.8143</td>
-<td>0.9510</td>
-<td>397.7</td>
-<td>+3.1%</td>
-</tr>
-<tr>
-<td></td>
-<td>endolmspec</td>
-<td>0.3305</td>
-<td>12.3400</td>
-<td>26.422</td>
-<td>0.3712</td>
-<td>0.4422</td>
-<td>0.7657</td>
-<td>0.9273</td>
-<td>169.2</td>
-<td>+8.5%</td>
-</tr>
-<tr>
-<td></td>
-<td><strong>iat</strong></td>
-<td><strong>0.2825</strong></td>
-<td><strong>8.1560</strong></td>
-<td><strong>21.340</strong></td>
-<td>0.3280</td>
-<td><strong>0.4917</strong></td>
-<td><strong>0.8321</strong></td>
-<td>0.9485</td>
-<td>297.0</td>
-<td><strong>−7.3%</strong> ←</td>
-</tr>
-<tr>
-<td><strong>AF-SfMLearner</strong></td>
-<td><strong>none</strong></td>
-<td><strong>0.1060</strong></td>
-<td><strong>1.3628</strong></td>
-<td><strong>8.815</strong></td>
-<td><strong>0.1461</strong></td>
-<td><strong>0.9025</strong></td>
-<td>0.9829</td>
-<td>0.9912</td>
-<td>27.4</td>
-<td>baseline</td>
-</tr>
-<tr>
-<td></td>
-<td>retinex</td>
-<td>0.1271</td>
-<td>1.6887</td>
-<td>9.915</td>
-<td>0.1709</td>
-<td>0.8464</td>
-<td>0.9798</td>
-<td>0.9913</td>
-<td>372.2</td>
-<td>+19.9%</td>
-</tr>
-<tr>
-<td></td>
-<td>endolmspec</td>
-<td>0.1074</td>
-<td>1.3426</td>
-<td>8.586</td>
-<td>0.1436</td>
-<td>0.9104</td>
-<td>0.9832</td>
-<td>0.9916</td>
-<td>143.4</td>
-<td>+1.3%</td>
-</tr>
-<tr>
-<td></td>
-<td>iat</td>
-<td>0.1120</td>
-<td>1.4800</td>
-<td>9.078</td>
-<td>0.1511</td>
-<td>0.8923</td>
-<td>0.9825</td>
-<td>0.9912</td>
-<td>271.6</td>
-<td>+5.7%</td>
-</tr>
-<tr>
-<td><strong>HADepth</strong></td>
-<td><strong>none</strong></td>
-<td><strong>0.0444</strong></td>
-<td><strong>0.2534</strong></td>
-<td><strong>3.683</strong></td>
-<td><strong>0.0592</strong></td>
-<td><strong>0.9945</strong></td>
-<td><strong>0.9990</strong></td>
-<td><strong>0.9996</strong></td>
-<td>32.1</td>
-<td>baseline</td>
-</tr>
-<tr>
-<td></td>
-<td>retinex</td>
-<td>0.0849</td>
-<td>0.7427</td>
-<td>6.333</td>
-<td>0.1098</td>
-<td>0.9195</td>
-<td>0.9951</td>
-<td>0.9992</td>
-<td>376.9</td>
-<td>+91.2%</td>
-</tr>
-<tr>
-<td></td>
-<td>endolmspec</td>
-<td>0.0512</td>
-<td>0.3459</td>
-<td>4.399</td>
-<td>0.0713</td>
-<td>0.9827</td>
-<td>0.9982</td>
-<td>0.9995</td>
-<td>148.2</td>
-<td>+15.3%</td>
-</tr>
-<tr>
-<td></td>
-<td>iat</td>
-<td>0.0470</td>
-<td>0.2780</td>
-<td>3.919</td>
-<td>0.0645</td>
-<td>0.8995</td>
-<td>0.9985</td>
-<td>0.9997</td>
-<td>276.1</td>
-<td>+5.9%</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>δ &lt; 1.25ᵏ = fracción de píxeles con max(pred/gt, gt/pred) &lt; 1.25ᵏ (mayor = mejor). ΔAR% negativo = mejora vs. baseline. ← indica mejora.</p>
-</blockquote>
-<hr/>
-<h3 id="Hallazgos-principales">Hallazgos principales<a class="anchor-link" href="#Hallazgos-principales">¶</a></h3><h4 id="1.-HADepth-es-el-mejor-modelo-con-diferencia">1. HADepth es el mejor modelo con diferencia<a class="anchor-link" href="#1.-HADepth-es-el-mejor-modelo-con-diferencia">¶</a></h4><p>HADepth (DINOv2 + DoRA) alcanza AbsRel=<strong>0.044</strong>, δ&lt;1.25=<strong>0.9945</strong> sin enhancement — mejor que cualquier combinación modelo+enhancement. La segunda mejor opción (AF-SfMLearner+none, 0.106) tiene más del doble de error.</p>
-<h4 id="2.-Los-mejores-modelos-son-perjudicados-por-el-enhancement">2. Los mejores modelos son perjudicados por el enhancement<a class="anchor-link" href="#2.-Los-mejores-modelos-son-perjudicados-por-el-enhancement">¶</a></h4><p>AF-SfMLearner y HADepth son los únicos donde el baseline es óptimo. Fueron entrenados con loss functions robustas a especulares: el enhancement modifica la distribución de entrada alejándola del entrenamiento. Retinex es especialmente destructivo (HADepth +91.2%, AF-SfMLearner +19.9%).</p>
-<h4 id="3.-Los-modelos-ResNet/gen%C3%A9ricos-se-benefician-de-IAT">3. Los modelos ResNet/genéricos se benefician de IAT<a class="anchor-link" href="#3.-Los-modelos-ResNet/gen%C3%A9ricos-se-benefician-de-IAT">¶</a></h4><p>EndoDepth + IAT: <strong>−12.0% AbsRel</strong> (δ&lt;1.25 sube 0.776→0.822). MonoViT + IAT: <strong>−7.3%</strong>. IAT, por su corrección suave (local mul/add + gamma), preserva mejor la distribución de entrada.</p>
-<h4 id="4.-EndoSfMLearner-es-completamente-inmune">4. EndoSfMLearner es completamente inmune<a class="anchor-link" href="#4.-EndoSfMLearner-es-completamente-inmune">¶</a></h4><p>Cambios &lt; 0.1% con cualquier enhancement — su brightness-aware photometric loss lo hace insensible por diseño.</p>
-<h4 id="5.-EndoLMSPEC-nunca-es-la-mejor-opci%C3%B3n">5. EndoLMSPEC nunca es la mejor opción<a class="anchor-link" href="#5.-EndoLMSPEC-nunca-es-la-mejor-opci%C3%B3n">¶</a></h4><p>En todos los modelos es peor que IAT o que no hacer nada (domain gap Endo4IE→SCARED).</p>
-<hr/>
-<h3 id="Veredicto-final">Veredicto final<a class="anchor-link" href="#Veredicto-final">¶</a></h3><table>
-<thead>
-<tr>
-<th>Modelo</th>
-<th>Mejor config.</th>
-<th>AbsRel</th>
-<th>δ&lt;1.25</th>
-<th>IT (ms)</th>
-<th>Conclusión</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>HADepth</strong></td>
-<td><strong>none</strong></td>
-<td><strong>0.044</strong></td>
-<td><strong>0.995</strong></td>
-<td>32.1</td>
-<td>★ Mejor absoluto; enhancement perjudica</td>
-</tr>
-<tr>
-<td>AF-SfMLearner</td>
-<td>none</td>
-<td>0.106</td>
-<td>0.903</td>
-<td>27.4</td>
-<td>2º mejor; enhancement perjudica</td>
-</tr>
-<tr>
-<td>EndoDepth</td>
-<td>IAT</td>
-<td>0.145</td>
-<td>0.822</td>
-<td>271.4</td>
-<td>Enhancement útil (+IAT)</td>
+<td>Hamlyn</td>
+<td>SCARED</td>
 </tr>
 <tr>
 <td>MonoViT</td>
-<td>IAT</td>
-<td>0.283</td>
-<td>0.492</td>
-<td>297.0</td>
-<td>Solo IAT; otros perjudican</td>
+<td>KITTI</td>
+<td>SCARED</td>
 </tr>
 <tr>
 <td>EndoSfMLearner</td>
-<td>—</td>
-<td>0.291</td>
-<td>0.471</td>
-<td>6.2</td>
-<td>Enhancement innecesario</td>
+<td>EndoSLAM</td>
+<td>SCARED</td>
+</tr>
+<tr>
+<td>AF-SfMLearner</td>
+<td>Endovis (paper)</td>
+<td>SCARED</td>
+</tr>
+<tr>
+<td>MonoIIT</td>
+<td>— (no en A4)</td>
+<td>SCARED</td>
+</tr>
+<tr>
+<td>weights19-MonoViT</td>
+<td>— (no en A4)</td>
+<td>SCARED</td>
 </tr>
 </tbody>
 </table>
-<p><strong>La hipótesis se confirma parcialmente con un hallazgo inesperado:</strong> el enhancement mejora modelos genéricos (EndoDepth, MonoViT con IAT), pero los modelos <strong>específicamente diseñados para endoscopía</strong> (HADepth, AF-SfMLearner) no lo necesitan y son perjudicados. La mejor configuración global es HADepth sin ningún enhancement.</p>
-<blockquote>
-<p><strong>Avance 5:</strong> este experimento usa los pesos <strong>originales</strong> de cada paper. En el Avance 5 se repite con pesos <strong>re-entrenados en SCARED</strong> (Dr. Espinosa Loera) para medir si el fine-tuning en el dominio de evaluación cambia el comportamiento del enhancement.</p>
-</blockquote>
-<h2 id="Referencias">Referencias<a class="anchor-link" href="#Referencias">¶</a></h2><ul>
-<li>Shao, S., et al. (en revisión). HADepth: Highlight-aware monocular depth estimation for endoscopy. <em>Signal, Image and Video Processing</em>.</li>
-<li>Shao, S., et al. (2022). AF-SfMLearner. <em>Medical Image Analysis</em>, 77, 102338.</li>
-<li>Zhao, C., et al. (2022). MonoViT. <em>3DV 2022</em>. arXiv:2208.03543.</li>
-<li>Ozyoruk, K. B., et al. (2020). EndoSLAM Dataset and Endo-SfMLearner. <em>arXiv:2006.16670</em>.</li>
-<li>García-Vega, A., et al. (2022). Multi-Scale Structural-aware Exposure Correction. <em>arXiv:2210.15033</em>.</li>
-<li>Wang, T., et al. (2022). Ultra-High-Definition Low-Light Image Enhancement. <em>AAAI 2022</em>.</li>
-<li>Recasens, D., et al. (2021). Endo-Depth-and-Motion. <em>arXiv:2103.16525</em>.</li>
-<li>Rahman, Z., et al. (2004). Retinex processing. <em>Journal of Electronic Imaging</em>, 13(1).</li>
-<li>Allan, M., et al. (2021). SCARED Challenge. <em>arXiv:2101.01133</em>.</li>
-</ul>
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=9d7dde49-d8f3-41c8-9491-a9025203b593">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=07d184a5-09f4-4ba2-9888-28fbc28e71aa">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=668244e8-3f56-423e-a7d4-30a802a7d7ac">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
-<h2 id="12.-Exportar-resultados-al-repositorio">12. Exportar resultados al repositorio<a class="anchor-link" href="#12.-Exportar-resultados-al-repositorio">¶</a></h2><p>Las imágenes ya se guardaron directamente en <code>outcomes/avance4/</code> del repo clonado.
-Esta celda hace <code>git add / commit / push</code>.</p>
-<p><strong>En Colab</strong>: necesita un GitHub token con scope <code>repo</code>.
-Créalo en <a href="https://github.com/settings/tokens">https://github.com/settings/tokens</a> y pégalo cuando se pida.</p>
-<p><strong>En local (VS Code)</strong>: el push usa las credenciales de git configuradas, no pide token.</p>
+<h2 id="2.-Cargar-Modelos-%E2%80%94-Pesos-SCARED">2. Cargar Modelos — Pesos SCARED<a class="anchor-link" href="#2.-Cargar-Modelos-%E2%80%94-Pesos-SCARED">¶</a></h2><h3 id="2a.-Monodepth2-(ResNet-18,-entrenado-en-SCARED)">2a. Monodepth2 (ResNet-18, entrenado en SCARED)<a class="anchor-link" href="#2a.-Monodepth2-(ResNet-18,-entrenado-en-SCARED)">¶</a></h3>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=a9710339-23a3-42ea-b125-684602a3eeee">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=b3a8d5cd-ea84-4fdc-9a56-d7bc1b02e99f">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8d173985-a97c-4d8b-b3ec-08e4143578a8">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="2b.-MonoViT-(MPViT-Small,-entrenado-en-SCARED)">2b. MonoViT (MPViT-Small, entrenado en SCARED)<a class="anchor-link" href="#2b.-MonoViT-(MPViT-Small,-entrenado-en-SCARED)">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=1bf5f941-4603-4fc3-9537-75b6564bfe89">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f1681602-57f7-4f39-8abc-096819badb71">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="2c.-EndoSfMLearner-(DispResNet-18,-entrenado-en-SCARED)">2c. EndoSfMLearner (DispResNet-18, entrenado en SCARED)<a class="anchor-link" href="#2c.-EndoSfMLearner-(DispResNet-18,-entrenado-en-SCARED)">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=4476fd54-dedf-4b50-a5d8-865f1b321a5d">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5bca02f4-de86-4d07-9b14-296158150325">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="2d.-AF-SfMLearner-(ResNet-18-+-Appearance-Flow,-entrenado-en-SCARED)">2d. AF-SfMLearner (ResNet-18 + Appearance Flow, entrenado en SCARED)<a class="anchor-link" href="#2d.-AF-SfMLearner-(ResNet-18-+-Appearance-Flow,-entrenado-en-SCARED)">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=3ba6156d-fa33-401b-9c88-336d1aa3d123">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=59633e10-4245-4d57-9ea3-e37704f4f149">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="2e.-MonoIIT-(MPViT-+-Lighting,-entrenado-en-SCARED)">2e. MonoIIT (MPViT + Lighting, entrenado en SCARED)<a class="anchor-link" href="#2e.-MonoIIT-(MPViT-+-Lighting,-entrenado-en-SCARED)">¶</a></h3><p><strong>Nota del Dr. Espinosa Loera</strong>: los pesos de MonoIIT se ejecutan con el código de MonoViT.
+La arquitectura base es MPViT-Small (igual que MonoViT). El módulo de iluminación (<code>lighting.pth</code>)
+se usa durante el entrenamiento; para inferencia de profundidad se usan solo <code>encoder.pth</code> + <code>depth.pth</code>.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=cce1bca3-0bd9-4a22-b741-8955d85d50d9">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=96a1d796-d400-4920-a2fc-58da41c600c3">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="2f.-weights19-MonoViT-(%C2%BFMonoIIF?-%E2%80%94-confirmar-con-Dr.-Espinosa-Loera)">2f. weights19-MonoViT (¿MonoIIF? — confirmar con Dr. Espinosa Loera)<a class="anchor-link" href="#2f.-weights19-MonoViT-(%C2%BFMonoIIF?-%E2%80%94-confirmar-con-Dr.-Espinosa-Loera)">¶</a></h3><p>Esta carpeta tiene la misma estructura que MonoIIT (con <code>lighting.pth</code>).
+Podría ser MonoIIF, el tercer modelo propuesto. <strong>Pendiente de confirmación.</strong></p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=d4e2f68c-35e0-49c9-a28f-4423d607cf95">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8bbce430-ca53-4302-bea1-a5e4ebc659c7">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<hr/>
+<h2 id="3.-M%C3%A9todos-de-Image-Enhancement">3. Métodos de Image Enhancement<a class="anchor-link" href="#3.-M%C3%A9todos-de-Image-Enhancement">¶</a></h2><p>Idénticos al Avance 4 — mismas funciones de corrección.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=2a46e60d-c10a-4807-bda5-88fcdef6cc21">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=185f4c2a-4a11-40c9-bd3e-243b6c5a97b2">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<hr/>
+<h2 id="4.-Funciones-de-inferencia-y-m%C3%A9tricas">4. Funciones de inferencia y métricas<a class="anchor-link" href="#4.-Funciones-de-inferencia-y-m%C3%A9tricas">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=9cc8b3f3-77d6-41fc-82fa-0c0dcf7d4b44">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e1d81d23-27d0-4194-835e-e9c53c6b9651">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<hr/>
+<h2 id="5.-Carga-de-datos-SCARED">5. Carga de datos SCARED<a class="anchor-link" href="#5.-Carga-de-datos-SCARED">¶</a></h2><p>Mismo protocolo que Avances 3–4: datasets 8–9, keyframes 0–4.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=791bf2e2-7b6e-4c9c-87c4-4663b2bed5ba">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7f83382c-1288-491c-a868-8529ffed6d1c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<hr/>
+<h2 id="6.-Experimento-factorial:-4-enhancements-%C3%97-6-modelos-%C3%97-10-keyframes">6. Experimento factorial: 4 enhancements × 6 modelos × 10 keyframes<a class="anchor-link" href="#6.-Experimento-factorial:-4-enhancements-%C3%97-6-modelos-%C3%97-10-keyframes">¶</a></h2><p>Total: <strong>240 evaluaciones</strong></p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=36b044a7-d19a-42ca-9ce9-da242dba36d5">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2e9cbe41-aae0-4c3d-8daa-3ac048cffd8f">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<hr/>
+<h2 id="7.-Resumen-de-resultados">7. Resumen de resultados<a class="anchor-link" href="#7.-Resumen-de-resultados">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=c88d7586-39f5-40b7-bd6b-ac111cc84c96">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5c4f771f-fff7-43c0-b8be-1a824633ead6">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<hr/>
+<h2 id="8.-Visualizaciones">8. Visualizaciones<a class="anchor-link" href="#8.-Visualizaciones">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=f630958c-d6d0-4390-8196-2b0998f0da84">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=e68d137e-8abf-4161-b077-6c878d8b8a03">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8f91a164-8e45-438a-8ece-33d7f40e7b10">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<hr/>
+<h2 id="9.-Comparativa-Avance-4-vs.-Avance-5-(baseline-none)">9. Comparativa Avance 4 vs. Avance 5 (baseline none)<a class="anchor-link" href="#9.-Comparativa-Avance-4-vs.-Avance-5-(baseline-none)">¶</a></h2><p>La siguiente celda carga los resultados del Avance 4 (si están en Drive/repo)
+y compara el baseline <code>none</code> de cada modelo entre pesos originales y pesos SCARED.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=ec438d80-ebe6-4d71-bfa7-034303d4c2e8">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8e010867-f869-426c-9578-727a79a05407">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<hr/>
+<h2 id="10.-Exportar-resultados-al-repositorio">10. Exportar resultados al repositorio<a class="anchor-link" href="#10.-Exportar-resultados-al-repositorio">¶</a></h2><p>Las imágenes se guardan en <code>outcomes/avance5/</code>.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=2433b867-cfb9-4d3b-bf34-d6e07d2522cb">
 </div>
 </main>
 </body>

@@ -7326,138 +7326,45 @@ a.anchor-link {
     init_mathjax();
     </script>
 <!-- End of mathjax configuration --><script type="module">
-  document.addEventListener("DOMContentLoaded", async () => {
-    const diagrams = document.querySelectorAll(".jp-Mermaid > pre.mermaid");
-    // do not load mermaidjs if not needed
-    if (!diagrams.length) {
+  // Cargador robusto de mermaid (reemplaza el de nbconvert).
+  async function renderMermaid() {
+    const blocks = [...document.querySelectorAll(".jp-Mermaid > pre.mermaid")];
+    if (!blocks.length) return;
+    let mermaid;
+    try {
+      mermaid = (await import("https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs")).default;
+    } catch (e) {
+      blocks.forEach(p => { p.style.whiteSpace = "pre-wrap";
+                            p.parentNode.classList.add("jp-RenderedMermaid"); });
       return;
     }
-    const mermaid = (await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.7.0/mermaid.esm.min.mjs")).default;
-    const parser = new DOMParser();
-
-    mermaid.initialize({
-      maxTextSize: 100000,
-      maxEdges: 100000,
-      startOnLoad: false,
-      fontFamily: window
-        .getComputedStyle(document.body)
-        .getPropertyValue("--jp-ui-font-family"),
-      theme: document.querySelector("body[data-jp-theme-light='true']")
-        ? "default"
-        : "dark",
-    });
-
-    let _nextMermaidId = 0;
-
-    function makeMermaidImage(svg) {
-      const img = document.createElement("img");
-      const doc = parser.parseFromString(svg, "image/svg+xml");
-      const svgEl = doc.querySelector("svg");
-      const { maxWidth } = svgEl?.style || {};
-      const firstTitle = doc.querySelector("title");
-      const firstDesc = doc.querySelector("desc");
-
-      img.setAttribute("src", `data:image/svg+xml,${encodeURIComponent(svg)}`);
-      if (maxWidth) {
-        img.width = parseInt(maxWidth);
-      }
-      if (firstTitle) {
-        img.setAttribute("alt", firstTitle.textContent);
-      }
-      if (firstDesc) {
-        const caption = document.createElement("figcaption");
-        caption.className = "sr-only";
-        caption.textContent = firstDesc.textContent;
-        return [img, caption];
-      }
-      return [img];
-    }
-
-    async function makeMermaidError(text) {
-      let errorMessage = "";
+    mermaid.initialize({ startOnLoad: false, securityLevel: "loose", theme: "dark",
+                         flowchart: { htmlLabels: true }, maxTextSize: 100000 });
+    for (const pre of blocks) {
+      const parent = pre.parentNode;
+      if (parent.classList.contains("jp-RenderedMermaid")) continue;
+      const code = pre.textContent.trim();
       try {
-        await mermaid.parse(text);
+        const id = "mmd-" + Math.random().toString(36).slice(2);
+        const { svg } = await mermaid.render(id, code);
+        const fig = document.createElement("figure");
+        fig.style.background = "#fff";
+        fig.style.borderRadius = "8px";
+        fig.style.padding = "1rem";
+        fig.style.overflow = "auto";
+        fig.innerHTML = svg;
+        parent.appendChild(fig);
+        pre.style.display = "none";
       } catch (err) {
-        errorMessage = `${err}`;
-      }
-
-      const result = document.createElement("details");
-      result.className = 'jp-RenderedMermaid-Details';
-      const summary = document.createElement("summary");
-      summary.className = 'jp-RenderedMermaid-Summary';
-      const pre = document.createElement("pre");
-      const code = document.createElement("code");
-      code.innerText = text;
-      pre.appendChild(code);
-      summary.appendChild(pre);
-      result.appendChild(summary);
-
-      const warning = document.createElement("pre");
-      warning.innerText = errorMessage;
-      result.appendChild(warning);
-      return [result];
-    }
-
-    async function renderOneMarmaid(src) {
-      const id = `jp-mermaid-${_nextMermaidId++}`;
-      const parent = src.parentNode;
-      let raw = src.textContent.trim();
-      const el = document.createElement("div");
-      el.style.visibility = "hidden";
-      document.body.appendChild(el);
-      let results = null;
-      let output = null;
-      try {
-        let { svg } = await mermaid.render(id, raw, el);
-        svg = cleanMermaidSvg(svg);
-        results = makeMermaidImage(svg);
-        output = document.createElement("figure");
-        results.map(output.appendChild, output);
-      } catch (err) {
-        parent.classList.add("jp-mod-warning");
-        results = await makeMermaidError(raw);
-        output = results[0];
-      } finally {
-        el.remove();
+        pre.style.whiteSpace = "pre-wrap";  // si no parsea, deja el codigo visible
       }
       parent.classList.add("jp-RenderedMermaid");
-      parent.appendChild(output);
     }
-
-
-    /**
-     * Post-process to ensure mermaid diagrams contain only valid SVG and XHTML.
-     */
-    function cleanMermaidSvg(svg) {
-      return svg.replace(RE_VOID_ELEMENT, replaceVoidElement);
-    }
-
-
-    /**
-     * A regular expression for all void elements, which may include attributes and
-     * a slash.
-     *
-     * @see https://developer.mozilla.org/en-US/docs/Glossary/Void_element
-     *
-     * Of these, only `<br>` is generated by Mermaid in place of `\n`,
-     * but _any_ "malformed" tag will break the SVG rendering entirely.
-     */
-    const RE_VOID_ELEMENT =
-      /<\s*(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)\s*([^>]*?)\s*>/gi;
-
-    /**
-     * Ensure a void element is closed with a slash, preserving any attributes.
-     */
-    function replaceVoidElement(match, tag, rest) {
-      rest = rest.trim();
-      if (!rest.endsWith('/')) {
-        rest = `${rest} /`;
-      }
-      return `<${tag} ${rest}>`;
-    }
-
-    void Promise.all([...diagrams].map(renderOneMarmaid));
-  });
+  }
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", renderMermaid);
+  else
+    renderMermaid();
 </script>
 <style>
   .jp-Mermaid:not(.jp-RenderedMermaid) {
@@ -8178,260 +8085,303 @@ flowchart LR
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
-<h2 id="11.-Conclusiones">11. Conclusiones<a class="anchor-link" href="#11.-Conclusiones">¶</a></h2><h3 id="Resultados-por-modelo-(promedio-10-keyframes,-datasets-8%E2%80%939-SCARED)">Resultados por modelo (promedio 10 keyframes, datasets 8–9 SCARED)<a class="anchor-link" href="#Resultados-por-modelo-(promedio-10-keyframes,-datasets-8%E2%80%939-SCARED)">¶</a></h3><h4 id="Endo-Depth">Endo-Depth<a class="anchor-link" href="#Endo-Depth">¶</a></h4><table>
+<h2 id="11.-Conclusiones">11. Conclusiones<a class="anchor-link" href="#11.-Conclusiones">¶</a></h2><h3 id="Tabla-completa-de-resultados-(promedio-10-keyframes,-datasets-8%E2%80%939-SCARED)">Tabla completa de resultados (promedio 10 keyframes, datasets 8–9 SCARED)<a class="anchor-link" href="#Tabla-completa-de-resultados-(promedio-10-keyframes,-datasets-8%E2%80%939-SCARED)">¶</a></h3><table>
 <thead>
 <tr>
+<th>Modelo</th>
 <th>Enhancement</th>
-<th>AbsRel</th>
-<th>RMSE mm</th>
-<th>AbsRel_spec</th>
-<th>Δ AbsRel</th>
-<th>FPS</th>
+<th>AbsRel↓</th>
+<th>SqRel↓</th>
+<th>RMSE↓</th>
+<th>RMSELog↓</th>
+<th>δ&lt;1.25↑</th>
+<th>δ&lt;1.25²↑</th>
+<th>δ&lt;1.25³↑</th>
+<th>IT (ms)</th>
+<th>ΔAR%</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td><strong>Endo-Depth</strong></td>
 <td>none</td>
-<td>0.165</td>
-<td>12.47</td>
-<td>0.209</td>
-<td>—</td>
-<td>36.6</td>
+<td>0.1652</td>
+<td>2.6842</td>
+<td>12.468</td>
+<td>0.2119</td>
+<td>0.7764</td>
+<td>0.9420</td>
+<td>0.9900</td>
+<td>27.4</td>
+<td>baseline</td>
 </tr>
 <tr>
+<td></td>
 <td>retinex</td>
-<td>0.153</td>
-<td>11.58</td>
-<td>0.195</td>
-<td><strong>−7.2%</strong></td>
-<td>2.8</td>
+<td>0.1533</td>
+<td>2.3998</td>
+<td>11.578</td>
+<td>0.2137</td>
+<td>0.8015</td>
+<td>0.9394</td>
+<td>0.9823</td>
+<td>372.2</td>
+<td><strong>−7.2%</strong> ←</td>
 </tr>
 <tr>
+<td></td>
 <td>endolmspec</td>
-<td>0.164</td>
-<td>12.95</td>
-<td>0.203</td>
-<td>−1.0%</td>
-<td>7.7</td>
+<td>0.1635</td>
+<td>2.8055</td>
+<td>12.949</td>
+<td>0.2259</td>
+<td>0.7660</td>
+<td>0.9299</td>
+<td>0.9848</td>
+<td>143.6</td>
+<td>−1.0% ←</td>
 </tr>
 <tr>
+<td></td>
 <td><strong>iat</strong></td>
-<td><strong>0.145</strong></td>
-<td><strong>11.07</strong></td>
-<td><strong>0.184</strong></td>
-<td><strong>−12.0%</strong></td>
-<td>4.1</td>
+<td><strong>0.1454</strong></td>
+<td><strong>2.1133</strong></td>
+<td><strong>11.074</strong></td>
+<td>0.1899</td>
+<td><strong>0.8223</strong></td>
+<td><strong>0.9581</strong></td>
+<td>0.9910</td>
+<td>271.4</td>
+<td><strong>−12.0%</strong> ←</td>
 </tr>
-</tbody>
-</table>
-<h4 id="EndoSfMLearner">EndoSfMLearner<a class="anchor-link" href="#EndoSfMLearner">¶</a></h4><table>
-<thead>
 <tr>
-<th>Enhancement</th>
-<th>AbsRel</th>
-<th>RMSE mm</th>
-<th>AbsRel_spec</th>
-<th>Δ AbsRel</th>
-<th>FPS</th>
-</tr>
-</thead>
-<tbody>
-<tr>
+<td><strong>EndoSfMLearner</strong></td>
 <td>none</td>
-<td>0.291</td>
-<td>21.00</td>
-<td>0.320</td>
-<td>—</td>
-<td>160.5</td>
+<td>0.2906</td>
+<td>7.6026</td>
+<td>21.002</td>
+<td>0.3802</td>
+<td>0.4706</td>
+<td>0.7550</td>
+<td>0.9148</td>
+<td>6.2</td>
+<td>baseline</td>
 </tr>
 <tr>
-<td>iat</td>
-<td>0.290</td>
-<td>20.97</td>
-<td>0.320</td>
-<td>−0.1%</td>
-<td>4.5</td>
-</tr>
-<tr>
-<td>endolmspec</td>
-<td>0.290</td>
-<td>20.98</td>
-<td>0.320</td>
-<td>−0.1%</td>
-<td>9.3</td>
-</tr>
-<tr>
+<td></td>
 <td>retinex</td>
-<td>0.291</td>
-<td>21.00</td>
-<td>0.321</td>
+<td>0.2908</td>
+<td>7.6062</td>
+<td>21.000</td>
+<td>0.3804</td>
+<td>0.4706</td>
+<td>0.7548</td>
+<td>0.9142</td>
+<td>351.1</td>
 <td>+0.1%</td>
-<td>2.9</td>
 </tr>
-</tbody>
-</table>
-<h4 id="MonoViT">MonoViT<a class="anchor-link" href="#MonoViT">¶</a></h4><table>
-<thead>
 <tr>
-<th>Enhancement</th>
-<th>AbsRel</th>
-<th>RMSE mm</th>
-<th>AbsRel_spec</th>
-<th>Δ AbsRel</th>
-<th>FPS</th>
+<td></td>
+<td>endolmspec</td>
+<td>0.2904</td>
+<td>7.5904</td>
+<td>20.981</td>
+<td>0.3797</td>
+<td>0.4709</td>
+<td>0.7558</td>
+<td>0.9154</td>
+<td>122.4</td>
+<td>−0.1% ←</td>
 </tr>
-</thead>
-<tbody>
 <tr>
+<td></td>
+<td>iat</td>
+<td>0.2902</td>
+<td>7.5804</td>
+<td>20.969</td>
+<td>0.3795</td>
+<td>0.4712</td>
+<td>0.7560</td>
+<td>0.9157</td>
+<td>250.4</td>
+<td>−0.1% ←</td>
+</tr>
+<tr>
+<td><strong>MonoViT</strong></td>
 <td>none</td>
-<td>0.305</td>
-<td>23.73</td>
-<td>0.304</td>
-<td>—</td>
-<td>19.0</td>
+<td>0.3046</td>
+<td>10.2427</td>
+<td>23.729</td>
+<td>0.3532</td>
+<td>0.4838</td>
+<td>0.7896</td>
+<td>0.9348</td>
+<td>53.3</td>
+<td>baseline</td>
 </tr>
 <tr>
-<td><strong>iat</strong></td>
-<td><strong>0.283</strong></td>
-<td><strong>21.34</strong></td>
-<td><strong>0.288</strong></td>
-<td><strong>−7.3%</strong></td>
-<td>3.7</td>
-</tr>
-<tr>
+<td></td>
 <td>retinex</td>
-<td>0.314</td>
-<td>26.57</td>
-<td><strong>0.275</strong></td>
+<td>0.3139</td>
+<td>11.5943</td>
+<td>26.566</td>
+<td>0.3438</td>
+<td>0.4574</td>
+<td>0.8143</td>
+<td>0.9510</td>
+<td>397.7</td>
 <td>+3.1%</td>
-<td>2.6</td>
 </tr>
 <tr>
+<td></td>
 <td>endolmspec</td>
-<td>0.331</td>
-<td>26.42</td>
-<td>0.337</td>
+<td>0.3305</td>
+<td>12.3400</td>
+<td>26.422</td>
+<td>0.3712</td>
+<td>0.4422</td>
+<td>0.7657</td>
+<td>0.9273</td>
+<td>169.2</td>
 <td>+8.5%</td>
-<td>6.5</td>
 </tr>
-</tbody>
-</table>
-<h4 id="AF-SfMLearner">AF-SfMLearner<a class="anchor-link" href="#AF-SfMLearner">¶</a></h4><table>
-<thead>
 <tr>
-<th>Enhancement</th>
-<th>AbsRel</th>
-<th>RMSE mm</th>
-<th>AbsRel_spec</th>
-<th>Δ AbsRel</th>
-<th>FPS</th>
+<td></td>
+<td><strong>iat</strong></td>
+<td><strong>0.2825</strong></td>
+<td><strong>8.1560</strong></td>
+<td><strong>21.340</strong></td>
+<td>0.3280</td>
+<td><strong>0.4917</strong></td>
+<td><strong>0.8321</strong></td>
+<td>0.9485</td>
+<td>297.0</td>
+<td><strong>−7.3%</strong> ←</td>
 </tr>
-</thead>
-<tbody>
 <tr>
+<td><strong>AF-SfMLearner</strong></td>
 <td><strong>none</strong></td>
-<td><strong>0.106</strong></td>
-<td><strong>8.82</strong></td>
-<td><strong>0.105</strong></td>
-<td>—</td>
-<td>36.8</td>
+<td><strong>0.1060</strong></td>
+<td><strong>1.3628</strong></td>
+<td><strong>8.815</strong></td>
+<td><strong>0.1461</strong></td>
+<td><strong>0.9025</strong></td>
+<td>0.9829</td>
+<td>0.9912</td>
+<td>27.4</td>
+<td>baseline</td>
 </tr>
 <tr>
-<td>endolmspec</td>
-<td>0.107</td>
-<td>8.59</td>
-<td>0.114</td>
-<td>+1.3%</td>
-<td>7.7</td>
-</tr>
-<tr>
-<td>iat</td>
-<td>0.112</td>
-<td>9.08</td>
-<td>0.109</td>
-<td>+5.7%</td>
-<td>4.1</td>
-</tr>
-<tr>
+<td></td>
 <td>retinex</td>
-<td>0.127</td>
-<td>9.92</td>
-<td>0.151</td>
+<td>0.1271</td>
+<td>1.6887</td>
+<td>9.915</td>
+<td>0.1709</td>
+<td>0.8464</td>
+<td>0.9798</td>
+<td>0.9913</td>
+<td>372.2</td>
 <td>+19.9%</td>
-<td>2.8</td>
-</tr>
-</tbody>
-</table>
-<h4 id="HADepth">HADepth<a class="anchor-link" href="#HADepth">¶</a></h4><table>
-<thead>
-<tr>
-<th>Enhancement</th>
-<th>AbsRel</th>
-<th>RMSE mm</th>
-<th>AbsRel_spec</th>
-<th>Δ AbsRel</th>
-<th>FPS</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>none</strong></td>
-<td><strong>0.044</strong></td>
-<td><strong>3.68</strong></td>
-<td><strong>0.053</strong></td>
-<td>—</td>
-<td>31.4</td>
 </tr>
 <tr>
-<td>iat</td>
-<td>0.047</td>
-<td>3.92</td>
-<td>0.056</td>
-<td>+5.9%</td>
-<td>4.0</td>
-</tr>
-<tr>
+<td></td>
 <td>endolmspec</td>
-<td>0.051</td>
-<td>4.40</td>
-<td>0.058</td>
-<td>+15.3%</td>
-<td>7.5</td>
+<td>0.1074</td>
+<td>1.3426</td>
+<td>8.586</td>
+<td>0.1436</td>
+<td>0.9104</td>
+<td>0.9832</td>
+<td>0.9916</td>
+<td>143.4</td>
+<td>+1.3%</td>
 </tr>
 <tr>
+<td></td>
+<td>iat</td>
+<td>0.1120</td>
+<td>1.4800</td>
+<td>9.078</td>
+<td>0.1511</td>
+<td>0.8923</td>
+<td>0.9825</td>
+<td>0.9912</td>
+<td>271.6</td>
+<td>+5.7%</td>
+</tr>
+<tr>
+<td><strong>HADepth</strong></td>
+<td><strong>none</strong></td>
+<td><strong>0.0444</strong></td>
+<td><strong>0.2534</strong></td>
+<td><strong>3.683</strong></td>
+<td><strong>0.0592</strong></td>
+<td><strong>0.9945</strong></td>
+<td><strong>0.9990</strong></td>
+<td><strong>0.9996</strong></td>
+<td>32.1</td>
+<td>baseline</td>
+</tr>
+<tr>
+<td></td>
 <td>retinex</td>
-<td>0.085</td>
-<td>6.33</td>
-<td>0.117</td>
-<td><strong>+91.2%</strong></td>
-<td>2.7</td>
+<td>0.0849</td>
+<td>0.7427</td>
+<td>6.333</td>
+<td>0.1098</td>
+<td>0.9195</td>
+<td>0.9951</td>
+<td>0.9992</td>
+<td>376.9</td>
+<td>+91.2%</td>
+</tr>
+<tr>
+<td></td>
+<td>endolmspec</td>
+<td>0.0512</td>
+<td>0.3459</td>
+<td>4.399</td>
+<td>0.0713</td>
+<td>0.9827</td>
+<td>0.9982</td>
+<td>0.9995</td>
+<td>148.2</td>
+<td>+15.3%</td>
+</tr>
+<tr>
+<td></td>
+<td>iat</td>
+<td>0.0470</td>
+<td>0.2780</td>
+<td>3.919</td>
+<td>0.0645</td>
+<td>0.8995</td>
+<td>0.9985</td>
+<td>0.9997</td>
+<td>276.1</td>
+<td>+5.9%</td>
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p>δ &lt; 1.25ᵏ = fracción de píxeles con max(pred/gt, gt/pred) &lt; 1.25ᵏ (mayor = mejor). ΔAR% negativo = mejora vs. baseline. ← indica mejora.</p>
+</blockquote>
 <hr/>
-<h3 id="Hallazgos-principales">Hallazgos principales<a class="anchor-link" href="#Hallazgos-principales">¶</a></h3><h4 id="1.-HADepth-es-el-mejor-modelo-con-diferencia">1. HADepth es el mejor modelo con diferencia<a class="anchor-link" href="#1.-HADepth-es-el-mejor-modelo-con-diferencia">¶</a></h4><p>HADepth (DINOv2 + DoRA) alcanza AbsRel=<strong>0.044</strong> sin enhancement — <strong>más bajo que cualquier combinación modelo+enhancement del experimento</strong>. La segunda mejor opción es AF-SfMLearner+none (0.106), más del doble.</p>
-<h4 id="2.-Los-mejores-modelos-son-perjudicados-por-el-enhancement">2. Los mejores modelos son perjudicados por el enhancement<a class="anchor-link" href="#2.-Los-mejores-modelos-son-perjudicados-por-el-enhancement">¶</a></h4><p>AF-SfMLearner y HADepth son los únicos modelos donde el baseline (sin enhancement) es el óptimo. Esto se explica porque fueron entrenados específicamente con loss functions robustas a especulares: <strong>el enhancement modifica la distribución de entrada alejándola de lo visto en el entrenamiento</strong>.</p>
-<ul>
-<li>HADepth: Retinex lo destruye (+91.2% AbsRel)</li>
-<li>AF-SfMLearner: Retinex sube +19.9% AbsRel</li>
-</ul>
-<h4 id="3.-Los-modelos-ResNet-sin-dise%C3%B1o-especular-se-benefician-de-IAT">3. Los modelos ResNet sin diseño especular se benefician de IAT<a class="anchor-link" href="#3.-Los-modelos-ResNet-sin-dise%C3%B1o-especular-se-benefician-de-IAT">¶</a></h4><p>EndoDepth y MonoViT (entrenados sin consideración explícita de especulares) mejoran con IAT:</p>
-<ul>
-<li>EndoDepth + IAT: <strong>−12.0% AbsRel</strong>, −12.1% AbsRel_spec</li>
-<li>MonoViT + IAT: <strong>−7.3% AbsRel</strong></li>
-</ul>
-<p>IAT, por su corrección suave (local mul/add + gamma), preserva mejor la distribución de entrada que Retinex o EndoLMSPEC.</p>
-<h4 id="4.-EndoSfMLearner-es-completamente-inmune">4. EndoSfMLearner es completamente inmune<a class="anchor-link" href="#4.-EndoSfMLearner-es-completamente-inmune">¶</a></h4><p>Cambios &lt; 0.1% con cualquier enhancement. Su <strong>brightness-aware photometric loss</strong> durante entrenamiento lo hace insensible a variaciones de iluminación por diseño.</p>
-<h4 id="5.-EndoLMSPEC-nunca-es-la-mejor-opci%C3%B3n">5. EndoLMSPEC nunca es la mejor opción<a class="anchor-link" href="#5.-EndoLMSPEC-nunca-es-la-mejor-opci%C3%B3n">¶</a></h4><p>En todos los modelos, EndoLMSPEC es peor que IAT o que no hacer nada. El domain gap con SCARED (entrenado en colonoscopía Endo4IE) explica esta falta de transferencia.</p>
-<h4 id="6.-Retinex-mejora-AbsRel_spec-de-MonoViT-pero-empeora-el-global">6. Retinex mejora AbsRel_spec de MonoViT pero empeora el global<a class="anchor-link" href="#6.-Retinex-mejora-AbsRel_spec-de-MonoViT-pero-empeora-el-global">¶</a></h4><p>Retinex atenúa los especulares (AbsRel_spec −9.8% en MonoViT) pero introduce ruido fotométrico en el resto de la imagen que empeora el AbsRel global (+3.1%).</p>
+<h3 id="Hallazgos-principales">Hallazgos principales<a class="anchor-link" href="#Hallazgos-principales">¶</a></h3><h4 id="1.-HADepth-es-el-mejor-modelo-con-diferencia">1. HADepth es el mejor modelo con diferencia<a class="anchor-link" href="#1.-HADepth-es-el-mejor-modelo-con-diferencia">¶</a></h4><p>HADepth (DINOv2 + DoRA) alcanza AbsRel=<strong>0.044</strong>, δ&lt;1.25=<strong>0.9945</strong> sin enhancement — mejor que cualquier combinación modelo+enhancement. La segunda mejor opción (AF-SfMLearner+none, 0.106) tiene más del doble de error.</p>
+<h4 id="2.-Los-mejores-modelos-son-perjudicados-por-el-enhancement">2. Los mejores modelos son perjudicados por el enhancement<a class="anchor-link" href="#2.-Los-mejores-modelos-son-perjudicados-por-el-enhancement">¶</a></h4><p>AF-SfMLearner y HADepth son los únicos donde el baseline es óptimo. Fueron entrenados con loss functions robustas a especulares: el enhancement modifica la distribución de entrada alejándola del entrenamiento. Retinex es especialmente destructivo (HADepth +91.2%, AF-SfMLearner +19.9%).</p>
+<h4 id="3.-Los-modelos-ResNet/gen%C3%A9ricos-se-benefician-de-IAT">3. Los modelos ResNet/genéricos se benefician de IAT<a class="anchor-link" href="#3.-Los-modelos-ResNet/gen%C3%A9ricos-se-benefician-de-IAT">¶</a></h4><p>EndoDepth + IAT: <strong>−12.0% AbsRel</strong> (δ&lt;1.25 sube 0.776→0.822). MonoViT + IAT: <strong>−7.3%</strong>. IAT, por su corrección suave (local mul/add + gamma), preserva mejor la distribución de entrada.</p>
+<h4 id="4.-EndoSfMLearner-es-completamente-inmune">4. EndoSfMLearner es completamente inmune<a class="anchor-link" href="#4.-EndoSfMLearner-es-completamente-inmune">¶</a></h4><p>Cambios &lt; 0.1% con cualquier enhancement — su brightness-aware photometric loss lo hace insensible por diseño.</p>
+<h4 id="5.-EndoLMSPEC-nunca-es-la-mejor-opci%C3%B3n">5. EndoLMSPEC nunca es la mejor opción<a class="anchor-link" href="#5.-EndoLMSPEC-nunca-es-la-mejor-opci%C3%B3n">¶</a></h4><p>En todos los modelos es peor que IAT o que no hacer nada (domain gap Endo4IE→SCARED).</p>
 <hr/>
 <h3 id="Veredicto-final">Veredicto final<a class="anchor-link" href="#Veredicto-final">¶</a></h3><table>
 <thead>
 <tr>
 <th>Modelo</th>
-<th>Mejor enhancement</th>
+<th>Mejor config.</th>
 <th>AbsRel</th>
-<th>FPS</th>
+<th>δ&lt;1.25</th>
+<th>IT (ms)</th>
 <th>Conclusión</th>
 </tr>
 </thead>
@@ -8440,41 +8390,48 @@ flowchart LR
 <td><strong>HADepth</strong></td>
 <td><strong>none</strong></td>
 <td><strong>0.044</strong></td>
-<td><strong>31.4</strong></td>
-<td><strong>Mejor modelo; enhancement perjudica</strong></td>
+<td><strong>0.995</strong></td>
+<td>32.1</td>
+<td>★ Mejor absoluto; enhancement perjudica</td>
 </tr>
 <tr>
 <td>AF-SfMLearner</td>
 <td>none</td>
 <td>0.106</td>
-<td>36.8</td>
-<td>2o mejor; enhancement perjudica</td>
+<td>0.903</td>
+<td>27.4</td>
+<td>2º mejor; enhancement perjudica</td>
 </tr>
 <tr>
 <td>EndoDepth</td>
 <td>IAT</td>
 <td>0.145</td>
-<td>4.1</td>
+<td>0.822</td>
+<td>271.4</td>
 <td>Enhancement útil (+IAT)</td>
-</tr>
-<tr>
-<td>EndoSfMLearner</td>
-<td>—</td>
-<td>0.291</td>
-<td>160.5</td>
-<td>Enhancement innecesario</td>
 </tr>
 <tr>
 <td>MonoViT</td>
 <td>IAT</td>
 <td>0.283</td>
-<td>3.7</td>
+<td>0.492</td>
+<td>297.0</td>
 <td>Solo IAT; otros perjudican</td>
+</tr>
+<tr>
+<td>EndoSfMLearner</td>
+<td>—</td>
+<td>0.291</td>
+<td>0.471</td>
+<td>6.2</td>
+<td>Enhancement innecesario</td>
 </tr>
 </tbody>
 </table>
-<p><strong>La hipótesis se confirma parcialmente:</strong> el enhancement mejora modelos que no fueron diseñados para especulares (EndoDepth, MonoViT con IAT). Pero el hallazgo más importante es el inverso: los modelos <strong>específicamente</strong> diseñados para endoscopía con especulares (HADepth, AF-SfMLearner) no necesitan — y son perjudicados por — el enhancement.</p>
-<p><strong>Viabilidad clínica:</strong> HADepth sin enhancement es el único modelo que combina alta precisión (AbsRel 0.044) con velocidad viable (31.4 FPS), superando el umbral de 25 FPS.</p>
+<p><strong>La hipótesis se confirma parcialmente con un hallazgo inesperado:</strong> el enhancement mejora modelos genéricos (EndoDepth, MonoViT con IAT), pero los modelos <strong>específicamente diseñados para endoscopía</strong> (HADepth, AF-SfMLearner) no lo necesitan y son perjudicados. La mejor configuración global es HADepth sin ningún enhancement.</p>
+<blockquote>
+<p><strong>Avance 5:</strong> este experimento usa los pesos <strong>originales</strong> de cada paper. En el Avance 5 se repite con pesos <strong>re-entrenados en SCARED</strong> (Dr. Espinosa Loera) para medir si el fine-tuning en el dominio de evaluación cambia el comportamiento del enhancement.</p>
+</blockquote>
 <h2 id="Referencias">Referencias<a class="anchor-link" href="#Referencias">¶</a></h2><ul>
 <li>Shao, S., et al. (en revisión). HADepth: Highlight-aware monocular depth estimation for endoscopy. <em>Signal, Image and Video Processing</em>.</li>
 <li>Shao, S., et al. (2022). AF-SfMLearner. <em>Medical Image Analysis</em>, 77, 102338.</li>

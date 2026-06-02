@@ -94,6 +94,25 @@ html,body{font-family:var(--ff-sans);background:var(--m950);color:#e8f4fd;line-h
 .img-caption{font-family:var(--ff-mono);font-size:.72rem;color:var(--m400);
   text-align:center;margin-top:.3rem;}
 @media(max-width:600px){.img-row{grid-template-columns:1fr;}}
+
+/* Full metrics table */
+.metrics-table{width:100%;border-collapse:collapse;font-size:.78rem;margin:1.2rem 0;overflow-x:auto;display:block;}
+.metrics-table th{background:rgba(39,102,203,.35);color:var(--m200);padding:.5rem .6rem;
+  font-family:var(--ff-mono);font-size:.72rem;border-bottom:2px solid rgba(69,153,236,.4);
+  white-space:nowrap;text-align:right;}
+.metrics-table th:first-child,.metrics-table th:nth-child(2){text-align:left;}
+.metrics-table td{padding:.45rem .6rem;border-bottom:1px solid rgba(69,153,236,.07);
+  font-family:var(--ff-mono);font-size:.75rem;color:var(--m300);text-align:right;white-space:nowrap;}
+.metrics-table td:first-child,.metrics-table td:nth-child(2){text-align:left;color:var(--m200);}
+.metrics-table tr:hover td{background:rgba(69,153,236,.05);}
+.metrics-table .row-model{background:rgba(39,102,203,.08);}
+.metrics-table .best{color:#2ecc71;font-weight:700;}
+.metrics-table .worst{color:#e74c3c;}
+.metrics-table .delta-pos{color:#2ecc71;}
+.metrics-table .delta-neg{color:#e74c3c;}
+.metrics-table .delta-base{color:var(--m400);}
+.metrics-table .arrow{color:#2ecc71;font-size:.8rem;}
+.scroll-hint{font-family:var(--ff-mono);font-size:.7rem;color:var(--m500);margin-bottom:.3rem;}
 </style>
 </head>
 <body>
@@ -204,54 +223,94 @@ flowchart TD
   <!-- ── Resultados numéricos ── -->
   <div class="section">
     <div class="section-label">// resultados</div>
-    <h2>Resultados por modelo</h2>
-    <p style="color:var(--m400);font-size:.83rem;margin-bottom:1.2rem;">Promedio 10 keyframes · datasets 8–9 · SCARED · GPU L4 · median scaling a mm · cap 150 mm</p>
+    <h2>Resultados completos por modelo</h2>
+    <p style="color:var(--m400);font-size:.83rem;margin-bottom:.5rem;">Promedio 10 keyframes · datasets 8–9 · SCARED · GPU L4 · median scaling a mm · cap 150 mm</p>
+    <p class="scroll-hint">← desplazar horizontalmente para ver todas las columnas</p>
 
-    <h3><span class="model-pill pill-endo">Endo-Depth</span> <span style="font-size:.78rem;color:var(--m400);">ResNet-18 · Hamlyn</span></h3>
-    <table class="result-table">
-      <tr><th>Enhancement</th><th>AbsRel</th><th>RMSE mm</th><th>AbsRel especular</th><th>Δ AbsRel</th><th>FPS</th></tr>
-      <tr><td>none</td><td>0.165</td><td>12.47</td><td>0.209</td><td>—</td><td>36.6</td></tr>
-      <tr><td>retinex</td><td>0.153</td><td>11.58</td><td>0.195</td><td class="delta-pos">−7.2%</td><td>2.8</td></tr>
-      <tr><td>endolmspec</td><td>0.164</td><td>12.95</td><td>0.203</td><td class="delta-pos">−1.0%</td><td>7.7</td></tr>
-      <tr><td style="color:#fff;font-weight:600;">iat <span class="tag-best">mejor</span></td><td style="color:#fff;font-weight:600;">0.145</td><td style="color:#fff;font-weight:600;">11.07</td><td style="color:#fff;font-weight:600;">0.184</td><td class="delta-pos">−12.0%</td><td>4.1</td></tr>
-    </table>
+    <div style="overflow-x:auto;">
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th>Modelo</th><th>Enhancement</th>
+          <th>AbsRel↓</th><th>SqRel↓</th><th>RMSE↓</th><th>RMSELog↓</th>
+          <th>δ&lt;1.25↑</th><th>δ&lt;1.25²↑</th><th>δ&lt;1.25³↑</th>
+          <th>IT (ms)</th><th>ΔAR%</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- EndoDepth -->
+        <tr class="row-model"><td rowspan="4"><span class="model-pill pill-endo">Endo-Depth</span></td>
+          <td>none</td><td>0.1652</td><td>2.6842</td><td>12.468</td><td>0.2119</td>
+          <td>0.7764</td><td>0.9420</td><td>0.9900</td><td>27.4</td><td class="delta-base">baseline</td></tr>
+        <tr><td>retinex</td><td>0.1533</td><td>2.3998</td><td>11.578</td><td>0.2137</td>
+          <td>0.8015</td><td>0.9394</td><td>0.9823</td><td>372.2</td>
+          <td class="delta-pos">−7.2% <span class="arrow">←</span></td></tr>
+        <tr><td>endolmspec</td><td>0.1635</td><td>2.8055</td><td>12.949</td><td>0.2259</td>
+          <td>0.7660</td><td>0.9299</td><td>0.9848</td><td>143.6</td>
+          <td class="delta-pos">−1.0% <span class="arrow">←</span></td></tr>
+        <tr><td style="color:#fff;font-weight:600;">iat ★</td>
+          <td class="best">0.1454</td><td class="best">2.1133</td><td class="best">11.074</td><td>0.1899</td>
+          <td class="best">0.8223</td><td class="best">0.9581</td><td>0.9910</td><td>271.4</td>
+          <td class="delta-pos">−12.0% <span class="arrow">←</span></td></tr>
 
-    <h3><span class="model-pill pill-sfm">EndoSfMLearner</span> <span style="font-size:.78rem;color:var(--m400);">DispResNet-18 · EndoSLAM · brightness-aware loss</span></h3>
-    <table class="result-table">
-      <tr><th>Enhancement</th><th>AbsRel</th><th>RMSE mm</th><th>AbsRel especular</th><th>Δ AbsRel</th><th>FPS</th></tr>
-      <tr><td>none</td><td>0.291</td><td>21.00</td><td>0.320</td><td>—</td><td>160.5</td></tr>
-      <tr><td>iat</td><td>0.290</td><td>20.97</td><td>0.320</td><td class="delta-pos">−0.1%</td><td>4.5</td></tr>
-      <tr><td>endolmspec</td><td>0.290</td><td>20.98</td><td>0.320</td><td class="delta-pos">−0.1%</td><td>9.3</td></tr>
-      <tr><td>retinex</td><td>0.291</td><td>21.00</td><td>0.321</td><td class="delta-neg">+0.1%</td><td>2.9</td></tr>
-    </table>
+        <!-- EndoSfMLearner -->
+        <tr class="row-model"><td rowspan="4"><span class="model-pill pill-sfm">EndoSfMLearner</span></td>
+          <td>none</td><td>0.2906</td><td>7.6026</td><td>21.002</td><td>0.3802</td>
+          <td>0.4706</td><td>0.7550</td><td>0.9148</td><td>6.2</td><td class="delta-base">baseline</td></tr>
+        <tr><td>retinex</td><td>0.2908</td><td>7.6062</td><td>21.000</td><td>0.3804</td>
+          <td>0.4706</td><td>0.7548</td><td>0.9142</td><td>351.1</td><td class="delta-neg">+0.1%</td></tr>
+        <tr><td>endolmspec</td><td>0.2904</td><td>7.5904</td><td>20.981</td><td>0.3797</td>
+          <td>0.4709</td><td>0.7558</td><td>0.9154</td><td>122.4</td>
+          <td class="delta-pos">−0.1% <span class="arrow">←</span></td></tr>
+        <tr><td>iat</td><td>0.2902</td><td>7.5804</td><td>20.969</td><td>0.3795</td>
+          <td>0.4712</td><td>0.7560</td><td>0.9157</td><td>250.4</td>
+          <td class="delta-pos">−0.1% <span class="arrow">←</span></td></tr>
 
-    <h3><span class="model-pill pill-vit">MonoViT</span> <span style="font-size:.78rem;color:var(--m400);">MPViT-Small · KITTI (outdoor)</span></h3>
-    <table class="result-table">
-      <tr><th>Enhancement</th><th>AbsRel</th><th>RMSE mm</th><th>AbsRel especular</th><th>Δ AbsRel</th><th>FPS</th></tr>
-      <tr><td>none</td><td>0.305</td><td>23.73</td><td>0.304</td><td>—</td><td>19.0</td></tr>
-      <tr><td style="color:#fff;font-weight:600;">iat <span class="tag-best">mejor global</span></td><td style="color:#fff;font-weight:600;">0.283</td><td>21.34</td><td>0.288</td><td class="delta-pos">−7.3%</td><td>3.7</td></tr>
-      <tr><td>retinex <span class="tag-best">mejor spec.</span></td><td>0.314</td><td>26.57</td><td style="color:#2ecc71;font-weight:600;">0.275</td><td class="delta-neg">+3.1%</td><td>2.6</td></tr>
-      <tr><td>endolmspec <span class="tag-worst">peor</span></td><td>0.331</td><td>26.42</td><td>0.337</td><td class="delta-neg">+8.5%</td><td>6.5</td></tr>
-    </table>
+        <!-- MonoViT -->
+        <tr class="row-model"><td rowspan="4"><span class="model-pill pill-vit">MonoViT</span></td>
+          <td>none</td><td>0.3046</td><td>10.2427</td><td>23.729</td><td>0.3532</td>
+          <td>0.4838</td><td>0.7896</td><td>0.9348</td><td>53.3</td><td class="delta-base">baseline</td></tr>
+        <tr><td>retinex</td><td>0.3139</td><td>11.5943</td><td>26.566</td><td>0.3438</td>
+          <td>0.4574</td><td>0.8143</td><td>0.9510</td><td>397.7</td><td class="delta-neg">+3.1%</td></tr>
+        <tr><td>endolmspec <span class="tag-worst">peor</span></td><td class="worst">0.3305</td><td class="worst">12.3400</td><td>26.422</td><td>0.3712</td>
+          <td>0.4422</td><td>0.7657</td><td>0.9273</td><td>169.2</td><td class="delta-neg">+8.5%</td></tr>
+        <tr><td style="color:#fff;font-weight:600;">iat ★</td>
+          <td class="best">0.2825</td><td class="best">8.1560</td><td class="best">21.340</td><td>0.3280</td>
+          <td class="best">0.4917</td><td class="best">0.8321</td><td class="best">0.9485</td><td>297.0</td>
+          <td class="delta-pos">−7.3% <span class="arrow">←</span></td></tr>
 
-    <h3><span class="model-pill" style="background:rgba(231,76,60,.2);color:#e74c3c;">AF-SfMLearner</span> <span style="font-size:.78rem;color:var(--m400);">ResNet-18 + Appearance Flow · Endovis</span></h3>
-    <table class="result-table">
-      <tr><th>Enhancement</th><th>AbsRel</th><th>RMSE mm</th><th>AbsRel especular</th><th>Δ AbsRel</th><th>FPS</th></tr>
-      <tr><td style="color:#fff;font-weight:600;">none <span class="tag-best">mejor</span></td><td style="color:#fff;font-weight:600;">0.106</td><td style="color:#fff;font-weight:600;">8.82</td><td style="color:#fff;font-weight:600;">0.105</td><td>—</td><td>36.8</td></tr>
-      <tr><td>endolmspec</td><td>0.107</td><td>8.59</td><td>0.114</td><td class="delta-neg">+1.3%</td><td>7.7</td></tr>
-      <tr><td>iat</td><td>0.112</td><td>9.08</td><td>0.109</td><td class="delta-neg">+5.7%</td><td>4.1</td></tr>
-      <tr><td>retinex <span class="tag-worst">peor</span></td><td>0.127</td><td>9.92</td><td>0.151</td><td class="delta-neg">+19.9%</td><td>2.8</td></tr>
-    </table>
+        <!-- AF-SfMLearner -->
+        <tr class="row-model"><td rowspan="4"><span class="model-pill" style="background:rgba(231,76,60,.2);color:#e74c3c;">AF-SfMLearner</span></td>
+          <td style="color:#fff;font-weight:600;">none ★</td>
+          <td class="best">0.1060</td><td class="best">1.3628</td><td class="best">8.815</td><td class="best">0.1461</td>
+          <td class="best">0.9025</td><td class="best">0.9829</td><td>0.9912</td><td>27.4</td><td class="delta-base">baseline</td></tr>
+        <tr><td>retinex <span class="tag-worst">peor</span></td><td class="worst">0.1271</td><td class="worst">1.6887</td><td>9.915</td><td>0.1709</td>
+          <td>0.8464</td><td>0.9798</td><td>0.9913</td><td>372.2</td><td class="delta-neg">+19.9%</td></tr>
+        <tr><td>endolmspec</td><td>0.1074</td><td>1.3426</td><td>8.586</td><td>0.1436</td>
+          <td>0.9104</td><td>0.9832</td><td>0.9916</td><td>143.4</td><td class="delta-neg">+1.3%</td></tr>
+        <tr><td>iat</td><td>0.1120</td><td>1.4800</td><td>9.078</td><td>0.1511</td>
+          <td>0.8923</td><td>0.9825</td><td>0.9912</td><td>271.6</td><td class="delta-neg">+5.7%</td></tr>
 
-    <h3><span class="model-pill" style="background:rgba(155,89,182,.2);color:#9b59b6;">HADepth</span> <span style="font-size:.78rem;color:var(--m400);">DINOv2 ViT-Base + DoRA + DPTHead · Endovis</span></h3>
-    <table class="result-table">
-      <tr><th>Enhancement</th><th>AbsRel</th><th>RMSE mm</th><th>AbsRel especular</th><th>Δ AbsRel</th><th>FPS</th></tr>
-      <tr><td style="color:#fff;font-weight:600;">none <span class="tag-best">★ mejor absoluto</span></td><td style="color:#fff;font-weight:600;">0.044</td><td style="color:#fff;font-weight:600;">3.68</td><td style="color:#fff;font-weight:600;">0.053</td><td>—</td><td>31.4</td></tr>
-      <tr><td>iat</td><td>0.047</td><td>3.92</td><td>0.056</td><td class="delta-neg">+5.9%</td><td>4.0</td></tr>
-      <tr><td>endolmspec</td><td>0.051</td><td>4.40</td><td>0.058</td><td class="delta-neg">+15.3%</td><td>7.5</td></tr>
-      <tr><td>retinex <span class="tag-worst">destruye +91%</span></td><td style="color:#e74c3c;font-weight:600;">0.085</td><td style="color:#e74c3c;">6.33</td><td style="color:#e74c3c;">0.117</td><td class="delta-neg">+91.2%</td><td>2.7</td></tr>
+        <!-- HADepth -->
+        <tr class="row-model"><td rowspan="4"><span class="model-pill" style="background:rgba(155,89,182,.2);color:#9b59b6;">HADepth</span></td>
+          <td style="color:#fff;font-weight:600;">none ★★ mejor absoluto</td>
+          <td class="best">0.0444</td><td class="best">0.2534</td><td class="best">3.683</td><td class="best">0.0592</td>
+          <td class="best">0.9945</td><td class="best">0.9990</td><td class="best">0.9996</td><td>32.1</td><td class="delta-base">baseline</td></tr>
+        <tr><td>retinex <span class="tag-worst">destruye</span></td><td class="worst">0.0849</td><td class="worst">0.7427</td><td class="worst">6.333</td><td class="worst">0.1098</td>
+          <td class="worst">0.9195</td><td>0.9951</td><td>0.9992</td><td>376.9</td><td class="delta-neg">+91.2%</td></tr>
+        <tr><td>endolmspec</td><td>0.0512</td><td>0.3459</td><td>4.399</td><td>0.0713</td>
+          <td>0.9827</td><td>0.9982</td><td>0.9995</td><td>148.2</td><td class="delta-neg">+15.3%</td></tr>
+        <tr><td>iat</td><td>0.0470</td><td>0.2780</td><td>3.919</td><td>0.0645</td>
+          <td>0.8995</td><td>0.9985</td><td>0.9997</td><td>276.1</td><td class="delta-neg">+5.9%</td></tr>
+      </tbody>
     </table>
-    <div class="note">⭐ <strong>HADepth sin enhancement (AbsRel 0.044)</strong> supera a <em>cualquier combinación modelo+enhancement</em> del experimento. Es el único modelo que combina precisión top y viabilidad clínica (31.4 FPS &gt; umbral 25 FPS).</div>
+    </div>
+    <p style="font-size:.75rem;color:var(--m500);margin-top:.5rem;">
+      δ &lt; 1.25ᵏ = fracción de píxeles con max(pred/gt, gt/pred) &lt; 1.25ᵏ (mayor = mejor).
+      ΔAR% negativo = mejora vs. baseline (none). ← indica mejora.
+    </p>
+    <div class="note">⭐⭐ <strong>HADepth sin enhancement (AbsRel 0.044, 32.1 ms)</strong> supera a <em>cualquier combinación modelo+enhancement</em> y es el único que supera 25 FPS.</div>
+
   </div>
 
   <hr class="divider">
