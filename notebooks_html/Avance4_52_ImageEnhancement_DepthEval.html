@@ -7556,7 +7556,7 @@ CUDA OK  : True
 <th>Archivo(s) de pesos</th>
 <th>Backbone</th>
 <th>Dataset entrenamiento</th>
-<th>AbsRel (Endovis)</th>
+<th>AbsRel paper†</th>
 </tr>
 </thead>
 <tbody>
@@ -7565,7 +7565,7 @@ CUDA OK  : True
 <td><code>endo_depth_weights/encoder.pth</code> + <code>depth.pth</code></td>
 <td>ResNet-18</td>
 <td>Hamlyn (laparoscopy)</td>
-<td>0.071*</td>
+<td>0.094*</td>
 </tr>
 <tr>
 <td><strong>EndoSfMLearner</strong></td>
@@ -7586,7 +7586,7 @@ CUDA OK  : True
 <td><code>HADepth_fullmodel/depth_model.pth</code></td>
 <td>DINOv2 ViT-Base + DoRA</td>
 <td>Endovis</td>
-<td><strong>0.049</strong></td>
+<td>0.049</td>
 </tr>
 <tr>
 <td><strong>MonoViT</strong></td>
@@ -7597,7 +7597,8 @@ CUDA OK  : True
 </tr>
 </tbody>
 </table>
-<p>*Endo-Depth evaluado en Hamlyn, no directamente en Endovis.</p>
+<p>† Números <strong>reportados en los papers originales</strong> en sus propios splits de evaluación, sin enhancement. No son resultados de este experimento. Nuestros resultados se miden sobre datasets 8–9 de SCARED con protocolo unificado.<br>
+* EndoDepth-Perf según tabla de HADepth; Endo-Depth original evaluado en Hamlyn.</br></p>
 <h3 id="M%C3%A9todos-de-enhancement-%E2%80%94-resumen-de-pesos">Métodos de enhancement — resumen de pesos<a class="anchor-link" href="#M%C3%A9todos-de-enhancement-%E2%80%94-resumen-de-pesos">¶</a></h3><table>
 <thead>
 <tr>
@@ -7773,8 +7774,7 @@ EndoSfMLearner cargado ✓
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
-<h2 id="2d.-HADepth-%E2%80%94-Highlight-Aware-Monocular-Depth-para-Endoscop%C3%ADa-(Shao-et-al.,-en-revisi%C3%B3n)">2d. HADepth — Highlight-Aware Monocular Depth para Endoscopía (Shao et al., en revisión)<a class="anchor-link" href="#2d.-HADepth-%E2%80%94-Highlight-Aware-Monocular-Depth-para-Endoscop%C3%ADa-(Shao-et-al.,-en-revisi%C3%B3n)">¶</a></h2><p><strong>HADepth</strong> (<em>Highlight-aware monocular depth estimation for endoscopy</em>, Signal, Image and Video Processing) es el modelo más preciso de la comparativa (AbsRel <strong>0.049</strong> en Endovis), superando a AF-SfMLearner (0.059) y EndoDAC (0.051).</p>
-<p>Su aportación central: diseñar un pipeline de estimación de profundidad explícitamente consciente de los <strong>reflejos especulares</strong> (highlights), que son el principal factor de degradación en imágenes endoscópicas.</p>
+<h2 id="2d.-HADepth-%E2%80%94-Highlight-Aware-Monocular-Depth-para-Endoscop%C3%ADa-(Shao-et-al.,-en-revisi%C3%B3n)">2d. HADepth — Highlight-Aware Monocular Depth para Endoscopía (Shao et al., en revisión)<a class="anchor-link" href="#2d.-HADepth-%E2%80%94-Highlight-Aware-Monocular-Depth-para-Endoscop%C3%ADa-(Shao-et-al.,-en-revisi%C3%B3n)">¶</a></h2><p><strong>HADepth</strong> (<em>Highlight-aware monocular depth estimation for endoscopy</em>, Signal, Image and Video Processing) diseña un pipeline explícitamente consciente de los <strong>reflejos especulares</strong> (highlights), el principal factor de degradación en imágenes endoscópicas.</p>
 <h3 id="Arquitectura">Arquitectura<a class="anchor-link" href="#Arquitectura">¶</a></h3><div class="jp-Mermaid"><pre class="mermaid">
 flowchart LR
     IN["Imagen RGB\n224×280 px\n(resize interno)"] --&gt; VIT
@@ -7797,13 +7797,16 @@ flowchart LR
 
     style ENCODER fill:#e8f4fd,stroke:#2766CB
     style DECODER fill:#fff8e1,stroke:#E0A800
-</pre></div><p><strong>¿Por qué es el mejor?</strong></p>
+</pre></div><p><strong>Contribuciones clave:</strong></p>
 <ul>
-<li><strong>DINOv2</strong> como backbone: representaciones de largo rango capturadas por el Vision Transformer, más robustas a discontinuidades de iluminación que ResNet</li>
-<li><strong>DoRA</strong> (<em>Weight-Decomposed Low-Rank Adaptation</em>): fine-tune eficiente del ViT en datos endoscópicos preservando el conocimiento general</li>
-<li><strong>DPTHead</strong> multi-escala: fusión de features de 4 capas del transformer → captura tanto detalles locales como contexto global</li>
+<li><strong>DINOv2</strong> como backbone: representaciones de largo rango más robustas a discontinuidades de iluminación que ResNet</li>
+<li><strong>DoRA</strong> (<em>Weight-Decomposed Low-Rank Adaptation</em>): fine-tune eficiente del ViT en datos endoscópicos</li>
+<li><strong>DPTHead</strong> multi-escala: fusión de features de 4 capas del transformer</li>
 </ul>
-<h3 id="Resultados-en-Endovis-(SCARED)">Resultados en Endovis (SCARED)<a class="anchor-link" href="#Resultados-en-Endovis-(SCARED)">¶</a></h3><table>
+<h3 id="Referencia-de-resultados-(paper,-sin-enhancement)">Referencia de resultados (paper, sin enhancement)<a class="anchor-link" href="#Referencia-de-resultados-(paper,-sin-enhancement)">¶</a></h3><blockquote>
+<p>Los números siguientes son <strong>reportados por los autores</strong> en su split de Endovis — <strong>no son resultados de nuestro experimento</strong>. Los usamos solo como referencia de contexto para calibrar expectativas.</p>
+</blockquote>
+<table>
 <thead>
 <tr>
 <th>Método</th>
@@ -7836,7 +7839,7 @@ flowchart LR
 <td>0.082</td>
 </tr>
 <tr>
-<td><strong>HADepth (este experimento)</strong></td>
+<td>HADepth (paper)</td>
 <td><strong>0.049</strong></td>
 <td><strong>0.326</strong></td>
 <td><strong>4.286</strong></td>
@@ -7844,6 +7847,7 @@ flowchart LR
 </tr>
 </tbody>
 </table>
+<p>Nuestros resultados se medirán sobre <strong>datasets 8–9 de SCARED con y sin enhancement</strong> usando <code>compute_metrics</code> con median scaling, protocolo idéntico para todos los modelos del experimento.</p>
 <blockquote>
 <p>Shao, S., et al. HADepth: Highlight-aware monocular depth estimation for endoscopy. <em>Signal, Image and Video Processing</em> (en revisión).</p>
 </blockquote>
