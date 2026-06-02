@@ -205,33 +205,53 @@ flowchart TD
   <div class="section">
     <div class="section-label">// resultados</div>
     <h2>Resultados por modelo</h2>
+    <p style="color:var(--m400);font-size:.83rem;margin-bottom:1.2rem;">Promedio 10 keyframes · datasets 8–9 · SCARED · GPU L4 · median scaling a mm · cap 150 mm</p>
 
-    <h3><span class="model-pill pill-endo">Endo-Depth</span></h3>
+    <h3><span class="model-pill pill-endo">Endo-Depth</span> <span style="font-size:.78rem;color:var(--m400);">ResNet-18 · Hamlyn</span></h3>
     <table class="result-table">
       <tr><th>Enhancement</th><th>AbsRel</th><th>RMSE mm</th><th>AbsRel especular</th><th>Δ AbsRel</th><th>FPS</th></tr>
       <tr><td>none</td><td>0.165</td><td>12.47</td><td>0.209</td><td>—</td><td>36.6</td></tr>
       <tr><td>retinex</td><td>0.153</td><td>11.58</td><td>0.195</td><td class="delta-pos">−7.2%</td><td>2.8</td></tr>
-      <tr><td>endolmspec</td><td>0.164</td><td>12.95</td><td>0.203</td><td class="delta-pos">−1.0%</td><td>8.0</td></tr>
-      <tr><td style="color:#fff;font-weight:600;">iat <span class="tag-best">mejor</span></td><td style="color:#fff;font-weight:600;">0.145</td><td style="color:#fff;font-weight:600;">11.07</td><td style="color:#fff;font-weight:600;">0.184</td><td class="delta-pos">−12.0%</td><td>4.4</td></tr>
+      <tr><td>endolmspec</td><td>0.164</td><td>12.95</td><td>0.203</td><td class="delta-pos">−1.0%</td><td>7.7</td></tr>
+      <tr><td style="color:#fff;font-weight:600;">iat <span class="tag-best">mejor</span></td><td style="color:#fff;font-weight:600;">0.145</td><td style="color:#fff;font-weight:600;">11.07</td><td style="color:#fff;font-weight:600;">0.184</td><td class="delta-pos">−12.0%</td><td>4.1</td></tr>
     </table>
 
-    <h3><span class="model-pill pill-sfm">EndoSfMLearner</span></h3>
+    <h3><span class="model-pill pill-sfm">EndoSfMLearner</span> <span style="font-size:.78rem;color:var(--m400);">DispResNet-18 · EndoSLAM · brightness-aware loss</span></h3>
     <table class="result-table">
       <tr><th>Enhancement</th><th>AbsRel</th><th>RMSE mm</th><th>AbsRel especular</th><th>Δ AbsRel</th><th>FPS</th></tr>
-      <tr><td>none</td><td>0.291</td><td>21.00</td><td>0.320</td><td>—</td><td>158.9</td></tr>
-      <tr><td>iat</td><td>0.290</td><td>20.97</td><td>0.320</td><td class="delta-pos">−0.1%</td><td>4.8</td></tr>
-      <tr><td>endolmspec</td><td>0.290</td><td>20.98</td><td>0.320</td><td class="delta-pos">−0.1%</td><td>9.6</td></tr>
+      <tr><td>none</td><td>0.291</td><td>21.00</td><td>0.320</td><td>—</td><td>160.5</td></tr>
+      <tr><td>iat</td><td>0.290</td><td>20.97</td><td>0.320</td><td class="delta-pos">−0.1%</td><td>4.5</td></tr>
+      <tr><td>endolmspec</td><td>0.290</td><td>20.98</td><td>0.320</td><td class="delta-pos">−0.1%</td><td>9.3</td></tr>
       <tr><td>retinex</td><td>0.291</td><td>21.00</td><td>0.321</td><td class="delta-neg">+0.1%</td><td>2.9</td></tr>
     </table>
 
-    <h3><span class="model-pill pill-vit">MonoViT</span></h3>
+    <h3><span class="model-pill pill-vit">MonoViT</span> <span style="font-size:.78rem;color:var(--m400);">MPViT-Small · KITTI (outdoor)</span></h3>
     <table class="result-table">
       <tr><th>Enhancement</th><th>AbsRel</th><th>RMSE mm</th><th>AbsRel especular</th><th>Δ AbsRel</th><th>FPS</th></tr>
-      <tr><td>none</td><td>0.305</td><td>23.73</td><td>0.304</td><td>—</td><td>18.9</td></tr>
-      <tr><td style="color:#fff;font-weight:600;">iat <span class="tag-best">mejor global</span></td><td style="color:#fff;font-weight:600;">0.283</td><td>21.34</td><td>0.288</td><td class="delta-pos">−7.3%</td><td>4.0</td></tr>
+      <tr><td>none</td><td>0.305</td><td>23.73</td><td>0.304</td><td>—</td><td>19.0</td></tr>
+      <tr><td style="color:#fff;font-weight:600;">iat <span class="tag-best">mejor global</span></td><td style="color:#fff;font-weight:600;">0.283</td><td>21.34</td><td>0.288</td><td class="delta-pos">−7.3%</td><td>3.7</td></tr>
       <tr><td>retinex <span class="tag-best">mejor spec.</span></td><td>0.314</td><td>26.57</td><td style="color:#2ecc71;font-weight:600;">0.275</td><td class="delta-neg">+3.1%</td><td>2.6</td></tr>
-      <tr><td>endolmspec <span class="tag-worst">peor</span></td><td>0.331</td><td>26.42</td><td>0.337</td><td class="delta-neg">+8.5%</td><td>6.7</td></tr>
+      <tr><td>endolmspec <span class="tag-worst">peor</span></td><td>0.331</td><td>26.42</td><td>0.337</td><td class="delta-neg">+8.5%</td><td>6.5</td></tr>
     </table>
+
+    <h3><span class="model-pill" style="background:rgba(231,76,60,.2);color:#e74c3c;">AF-SfMLearner</span> <span style="font-size:.78rem;color:var(--m400);">ResNet-18 + Appearance Flow · Endovis</span></h3>
+    <table class="result-table">
+      <tr><th>Enhancement</th><th>AbsRel</th><th>RMSE mm</th><th>AbsRel especular</th><th>Δ AbsRel</th><th>FPS</th></tr>
+      <tr><td style="color:#fff;font-weight:600;">none <span class="tag-best">mejor</span></td><td style="color:#fff;font-weight:600;">0.106</td><td style="color:#fff;font-weight:600;">8.82</td><td style="color:#fff;font-weight:600;">0.105</td><td>—</td><td>36.8</td></tr>
+      <tr><td>endolmspec</td><td>0.107</td><td>8.59</td><td>0.114</td><td class="delta-neg">+1.3%</td><td>7.7</td></tr>
+      <tr><td>iat</td><td>0.112</td><td>9.08</td><td>0.109</td><td class="delta-neg">+5.7%</td><td>4.1</td></tr>
+      <tr><td>retinex <span class="tag-worst">peor</span></td><td>0.127</td><td>9.92</td><td>0.151</td><td class="delta-neg">+19.9%</td><td>2.8</td></tr>
+    </table>
+
+    <h3><span class="model-pill" style="background:rgba(155,89,182,.2);color:#9b59b6;">HADepth</span> <span style="font-size:.78rem;color:var(--m400);">DINOv2 ViT-Base + DoRA + DPTHead · Endovis</span></h3>
+    <table class="result-table">
+      <tr><th>Enhancement</th><th>AbsRel</th><th>RMSE mm</th><th>AbsRel especular</th><th>Δ AbsRel</th><th>FPS</th></tr>
+      <tr><td style="color:#fff;font-weight:600;">none <span class="tag-best">★ mejor absoluto</span></td><td style="color:#fff;font-weight:600;">0.044</td><td style="color:#fff;font-weight:600;">3.68</td><td style="color:#fff;font-weight:600;">0.053</td><td>—</td><td>31.4</td></tr>
+      <tr><td>iat</td><td>0.047</td><td>3.92</td><td>0.056</td><td class="delta-neg">+5.9%</td><td>4.0</td></tr>
+      <tr><td>endolmspec</td><td>0.051</td><td>4.40</td><td>0.058</td><td class="delta-neg">+15.3%</td><td>7.5</td></tr>
+      <tr><td>retinex <span class="tag-worst">destruye +91%</span></td><td style="color:#e74c3c;font-weight:600;">0.085</td><td style="color:#e74c3c;">6.33</td><td style="color:#e74c3c;">0.117</td><td class="delta-neg">+91.2%</td><td>2.7</td></tr>
+    </table>
+    <div class="note">⭐ <strong>HADepth sin enhancement (AbsRel 0.044)</strong> supera a <em>cualquier combinación modelo+enhancement</em> del experimento. Es el único modelo que combina precisión top y viabilidad clínica (31.4 FPS &gt; umbral 25 FPS).</div>
   </div>
 
   <hr class="divider">
@@ -290,15 +310,14 @@ flowchart TD
   <div class="section">
     <div class="section-label">// visualizaciones</div>
     <h2>Gráficas del experimento</h2>
-    <p>Figuras derivadas del experimento factorial completo (120 evaluaciones, promedio de 10
-    keyframes en datasets 8–9 de SCARED).</p>
+    <p>Figuras derivadas del experimento factorial completo (<strong>200 evaluaciones</strong>: 5 modelos × 4 enhancements × 10 keyframes, datasets 8–9 de SCARED, GPU L4).</p>
 
     <div class="img-row">
       <div class="img-full">
         <img src="https://raw.githubusercontent.com/jmtoral/proyecto_integrador_52/main/outcomes/avance4/avance4_metricas_comparativa.png"
              alt="Métricas comparativas por modelo y enhancement"
              onerror="this.parentElement.innerHTML='<div style=\'background:rgba(39,102,203,.1);border:1px dashed rgba(69,153,236,.3);border-radius:8px;padding:2rem;text-align:center;color:var(--m400);font-family:var(--ff-mono);font-size:.8rem;\'>📊 Imagen disponible tras correr el notebook en Colab</div>'">
-        <p class="img-caption">Matriz 3 modelos × 4 métricas. En verde, el mejor método por celda. IAT (verde) domina AbsRel y RMSE en Endo-Depth y MonoViT.</p>
+        <p class="img-caption">Matriz 5 modelos × 4 métricas. HADepth domina todas — su fila muestra los valores más bajos en AbsRel y RMSE con el baseline (none). IAT ayuda a Endo-Depth y MonoViT; los modelos endoscópicos (HADepth, AF-SfMLearner) son perjudicados por cualquier enhancement.</p>
       </div>
     </div>
     <div class="img-row">
@@ -327,24 +346,34 @@ flowchart TD
     <h2>Hallazgos principales</h2>
     <div class="findings">
       <div class="card highlight">
+        <div class="card-icon">★</div>
+        <h4>HADepth es el mejor modelo — y no necesita enhancement</h4>
+        <p>AbsRel <strong>0.044</strong> sin enhancement, 31.4 FPS. Es la única combinación que supera el umbral de tiempo real <em>y</em> la mínima precisión clínica. Retinex lo destruye (+91.2%). El DINOv2 backbone maneja los especulares por diseño.</p>
+      </div>
+      <div class="card highlight">
         <div class="card-icon">⚡</div>
-        <h4>IAT gana en 2 de 3 modelos</h4>
-        <p>IAT/EndoViT es el mejor enhancement para <strong>Endo-Depth</strong> (−12.0% AbsRel) y <strong>MonoViT</strong> (−7.3% AbsRel). Su corrección suave local+global preserva mejor la distribución de entrada.</p>
+        <h4>IAT mejora modelos ResNet no diseñados para especulares</h4>
+        <p>IAT/EndoViT mejora <strong>Endo-Depth −12.0%</strong> y <strong>MonoViT −7.3%</strong>. Su corrección suave (local mul/add + gamma) preserva la distribución de entrada sin alterar la geometría del tejido.</p>
       </div>
       <div class="card">
         <div class="card-icon">🛡️</div>
-        <h4>EndoSfMLearner es inmune</h4>
-        <p>Cambios &lt;0.1% con cualquier enhancement. Su <strong>brightness-aware photometric loss</strong> durante entrenamiento ya lo hace robusto a variaciones de iluminación.</p>
+        <h4>AF-SfMLearner y EndoSfMLearner son inmunes</h4>
+        <p>AF-SfMLearner: el appearance flow loss ya compensa especulares — enhancement solo lo perjudica (Retinex +19.9%). EndoSfMLearner: brightness-aware loss, cambios &lt;0.1% con cualquier enhancement.</p>
       </div>
       <div class="card warning">
         <div class="card-icon">⚠️</div>
-        <h4>EndoLMSPEC perjudica MonoViT +8.5%</h4>
-        <p>MonoViT fue entrenado en KITTI (outdoor). La corrección agresiva de EndoLMSPEC produce imágenes fuera de su distribución de entrenamiento.</p>
+        <h4>Retinex destruye los mejores modelos</h4>
+        <p>HADepth +91.2%, AF-SfMLearner +19.9%. Los modelos entrenados específicamente en endoscopía son los más sensibles a alteraciones del input. Retinex cambia la distribución de color de forma agresiva.</p>
       </div>
       <div class="card">
         <div class="card-icon">🔍</div>
-        <h4>Retinex → especulares de MonoViT −9.8%</h4>
-        <p>Retinex empeora AbsRel global (+3.1%) pero mejora <strong>AbsRel especular −9.8%</strong>. Los especulares son el punto débil de MonoViT.</p>
+        <h4>EndoLMSPEC nunca es la mejor opción</h4>
+        <p>En todos los modelos, EndoLMSPEC es peor que IAT o que no hacer nada. Fue entrenado en colonoscopía Endo4IE con domain gap respecto a SCARED (laparoscopía animal).</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📐</div>
+        <h4>Retinex mejora AbsRel_spec de MonoViT −9.8%</h4>
+        <p>Único caso donde Retinex reduce el error especular significativamente, aunque empeora el global (+3.1%). Los especulares son el talón de Aquiles de MonoViT (entrenado en KITTI sin especulares).</p>
       </div>
     </div>
   </div>
@@ -356,33 +385,44 @@ flowchart TD
     <div class="section-label">// lectura por modelo</div>
     <h2>Interpretación detallada</h2>
 
+    <h3><span class="model-pill" style="background:rgba(155,89,182,.2);color:#9b59b6;">HADepth</span> — el enhancement lo perjudica: DINOv2 ya maneja los especulares</h3>
+    <p>HADepth alcanza AbsRel <strong>0.044</strong> sin enhancement, el mejor resultado del experimento.
+    Cualquier corrección lo empeora: IAT +5.9%, EndoLMSPEC +15.3%, Retinex <strong>+91.2%</strong>.
+    Esto tiene una explicación directa: el backbone DINOv2 fue pre-entrenado con datos masivos y
+    los especulares ya están representados en su espacio de features. El DoRA fine-tuning en Endovis
+    afinó esa robustez para el dominio endoscópico. Alterar la distribución de entrada con enhancement
+    produce imágenes que el modelo nunca vio durante el entrenamiento. El Retinex es especialmente
+    destructivo porque modifica el color de forma global e irreversible.</p>
+
+    <h3><span class="model-pill" style="background:rgba(231,76,60,.2);color:#e74c3c;">AF-SfMLearner</span> — segundo mejor; el appearance flow ya compensa los especulares</h3>
+    <p>AbsRel baseline 0.106 — 2.4× mejor que EndoDepth y 2.7× mejor que MonoViT, ambos sin enhancement.
+    El módulo de appearance flow predice un campo de flujo que mapea especulares a regiones de tejido
+    cercanas durante el entrenamiento: el modelo aprendió a ignorar los reflejos. Consecuencia: el
+    enhancement no puede añadir información que el modelo no haya extraído ya, y si modifica la
+    distribución de entrada (especialmente Retinex, +19.9%), lo confunde.</p>
+
     <h3><span class="model-pill pill-endo">Endo-Depth</span> — IAT mejora de forma consistente</h3>
-    <p>IAT es el mejor enhancement en <strong>todas</strong> las métricas: −12.0% AbsRel, −12.1%
-    AbsRel especular y −11.2% RMSE. Que la mejora global (−12.0%) y la especular (−12.1%) sean casi
-    idénticas indica que IAT <strong>no</strong> actúa selectivamente sobre los reflejos, sino que
-    mejora la imagen de forma homogénea. Retinex también ayuda (−7.2%) con un perfil más selectivo.
-    EndoLMSPEC apenas mueve la aguja (−1.0%): probable <em>domain gap</em> entre Endo4IE y SCARED.</p>
+    <p>IAT es el mejor enhancement: −12.0% AbsRel, −12.1% AbsRel especular, −11.2% RMSE. Que la mejora
+    global y especular sean casi idénticas indica que IAT actúa de forma homogénea, no selectivamente.
+    Retinex también ayuda (−7.2%). EndoLMSPEC apenas mueve la aguja (−1.0%): probable domain gap
+    entre Endo4IE (colonoscopía) y SCARED (laparoscopía).</p>
 
-    <h3><span class="model-pill pill-sfm">EndoSfMLearner</span> — insensible al enhancement</h3>
-    <p>Todos los métodos producen cambios &lt;0.1%. EndoSfMLearner se entrenó con una
-    <strong>brightness-aware photometric loss</strong> que ya lo hace robusto a variaciones de
-    iluminación por diseño: el enhancement no aporta información que el modelo no haya aprendido a
-    ignorar. Es el modelo más rápido en baseline (158.9 FPS), pero cualquier enhancement lo frena a
-    la velocidad del corrector (≤9.6 FPS), sin ganancia de precisión que lo justifique.</p>
+    <h3><span class="model-pill pill-sfm">EndoSfMLearner</span> — completamente inmune al enhancement</h3>
+    <p>Cambios &lt;0.1% con cualquier enhancement. La brightness-aware photometric loss durante
+    entrenamiento lo hace insensible por diseño. Es el más rápido en baseline (160.5 FPS), pero
+    cualquier enhancement lo frena a ≤9.3 FPS sin ganancia de precisión.</p>
 
-    <h3><span class="model-pill pill-vit">MonoViT</span> — IAT ayuda, Retinex y EndoLMSPEC perjudican</h3>
-    <p>IAT mejora AbsRel −7.3%, pero Retinex (+3.1%) y EndoLMSPEC (+8.5%) lo <strong>empeoran</strong>.
-    Es esperable: MonoViT se entrenó en KITTI (outdoor) y las correcciones agresivas de color/iluminación
-    producen imágenes fuera de su distribución. IAT, con su corrección suave (local mul/add + gamma),
-    preserva mejor lo que el modelo espera. El matiz interesante: Retinex <strong>sí</strong> mejora el
-    AbsRel especular (0.275, −9.8%) aunque empeore el global — atenúa los brillos puntuales, que son
-    el punto débil de MonoViT, pero introduce ruido en el resto de la escena.</p>
+    <h3><span class="model-pill pill-vit">MonoViT</span> — IAT ayuda; Retinex y EndoLMSPEC perjudican</h3>
+    <p>IAT: −7.3% AbsRel. Retinex (+3.1%) y EndoLMSPEC (+8.5%) lo empeoran — MonoViT fue entrenado
+    en KITTI outdoor y las correcciones agresivas producen imágenes fuera de su distribución.
+    Matiz: Retinex mejora AbsRel especular (0.275, −9.8%) aunque empeore el global — atenúa brillos
+    puntuales pero introduce ruido en el resto de la escena.</p>
 
-    <div class="note">
-      <strong>Lectura transversal:</strong> el beneficio del enhancement no es universal —
-      depende de <em>cómo fue entrenado</em> cada modelo de profundidad. Modelos con pérdidas
-      robustas a iluminación (EndoSfMLearner) son inmunes; modelos sin ellas (Endo-Depth) se
-      benefician; modelos fuera de dominio (MonoViT) son frágiles a correcciones agresivas.
+    <div class="note" style="margin-top:1.2rem;">
+      <strong>Patrón general:</strong> el beneficio del enhancement es <em>inversamente proporcional</em>
+      a qué tan específicamente fue diseñado el modelo para endoscopía. HADepth y AF-SfMLearner (los
+      mejores) son perjudicados. EndoDepth y MonoViT (los más genéricos) se benefician de IAT.
+      EndoSfMLearner (intermedio) es inmune por diseño explícito.
     </div>
   </div>
 
@@ -393,23 +433,40 @@ flowchart TD
     <div class="section-label">// conclusión</div>
     <h2>Veredicto final</h2>
     <table class="result-table">
-      <tr><th>Modelo</th><th>Mejor enhancement</th><th>Mejora AbsRel</th><th>FPS</th><th>Veredicto</th></tr>
-      <tr><td><span class="model-pill pill-endo">Endo-Depth</span></td><td>IAT</td><td class="delta-pos">−12.0%</td><td>4.4</td><td style="color:#2ecc71;">✓ Enhancement útil</td></tr>
-      <tr><td><span class="model-pill pill-sfm">EndoSfMLearner</span></td><td>Ninguno</td><td>~0%</td><td>≤9.6</td><td style="color:var(--m400);">Enhancement innecesario</td></tr>
-      <tr><td><span class="model-pill pill-vit">MonoViT</span></td><td>IAT (global) / Retinex (spec.)</td><td class="delta-pos">−7.3%</td><td>4.0</td><td style="color:#2ecc71;">✓ Solo IAT — evitar otros</td></tr>
+      <tr><th>Modelo</th><th>Mejor config.</th><th>AbsRel</th><th>FPS</th><th>Veredicto</th></tr>
+      <tr style="background:rgba(155,89,182,.06);">
+        <td><span class="model-pill" style="background:rgba(155,89,182,.2);color:#9b59b6;">HADepth</span></td>
+        <td style="color:#fff;font-weight:600;">none (sin enhancement)</td>
+        <td style="color:#fff;font-weight:600;">0.044</td>
+        <td style="color:#2ecc71;font-weight:600;">31.4</td>
+        <td style="color:#2ecc71;">★ Mejor absoluto — no añadir enhancement</td>
+      </tr>
+      <tr style="background:rgba(231,76,60,.04);">
+        <td><span class="model-pill" style="background:rgba(231,76,60,.2);color:#e74c3c;">AF-SfMLearner</span></td>
+        <td>none</td><td>0.106</td><td>36.8</td>
+        <td style="color:#2ecc71;">✓ 2o mejor — enhancement perjudica</td>
+      </tr>
+      <tr><td><span class="model-pill pill-endo">Endo-Depth</span></td><td>IAT</td><td>0.145</td><td>4.1</td><td style="color:#2ecc71;">✓ Enhancement útil (+IAT)</td></tr>
+      <tr><td><span class="model-pill pill-vit">MonoViT</span></td><td>IAT (global) / Retinex (spec.)</td><td>0.283</td><td>3.7</td><td style="color:#2ecc71;">✓ Solo IAT — evitar otros</td></tr>
+      <tr><td><span class="model-pill pill-sfm">EndoSfMLearner</span></td><td>—</td><td>0.291</td><td>160.5</td><td style="color:var(--m400);">Enhancement innecesario</td></tr>
     </table>
+
     <div class="note" style="margin-top:1.2rem;">
-      <strong>Viabilidad clínica:</strong> ninguna combinación supera 25 FPS. IAT + Endo-Depth logra 4.4 FPS. Para uso clínico se requiere optimización: TensorRT, inferencia FP16 o reducción de resolución.
+      <strong>Viabilidad clínica (≥25 FPS):</strong> solo HADepth sin enhancement (31.4 FPS) y
+      AF-SfMLearner sin enhancement (36.8 FPS) superan el umbral. Cualquier enhancement los frena a
+      &lt;10 FPS. Para los modelos que sí se benefician de IAT (Endo-Depth, MonoViT),
+      se requiere optimización: TensorRT, FP16 o reducción de resolución.
     </div>
 
     <h3 style="margin-top:1.8rem;">Estado de la hipótesis</h3>
-    <p>La hipótesis del proyecto —<em>la corrección de iluminación reduce el error de profundidad,
-    con mayor efecto en zonas especulares</em>— se <strong>confirma parcialmente</strong>:</p>
+    <p>La hipótesis —<em>el enhancement entrenado en Endo4IE mejora la profundidad, especialmente en
+    zonas especulares</em>— se <strong>confirma parcialmente con un hallazgo inesperado</strong>:</p>
     <table class="result-table">
       <tr><th>Afirmación</th><th>Evidencia</th><th>Veredicto</th></tr>
-      <tr><td>El enhancement reduce AbsRel</td><td>IAT: −12.0% (Endo-Depth), −7.3% (MonoViT)</td><td style="color:#2ecc71;">✓ Sí, en 2/3 modelos</td></tr>
-      <tr><td>El efecto se concentra en especulares</td><td>En Endo-Depth la mejora global ≈ especular; solo Retinex/MonoViT es selectivo</td><td style="color:var(--gold);">≈ Parcial</td></tr>
-      <tr><td>Aplica a todos los modelos</td><td>EndoSfMLearner inmune; EndoLMSPEC daña MonoViT</td><td style="color:#e74c3c;">✗ Depende del modelo</td></tr>
+      <tr><td>El enhancement reduce AbsRel</td><td>IAT: −12.0% (Endo-Depth), −7.3% (MonoViT)</td><td style="color:#2ecc71;">✓ Sí, en modelos genéricos</td></tr>
+      <tr><td>El efecto es mayor en especulares</td><td>Endo-Depth: mejora global ≈ especular. MonoViT: solo Retinex es selectivo</td><td style="color:var(--gold);">≈ Parcial</td></tr>
+      <tr><td>Aplica a todos los modelos</td><td>HADepth y AF-SfMLearner son perjudicados. EndoSfMLearner es inmune.</td><td style="color:#e74c3c;">✗ Depende del diseño del modelo</td></tr>
+      <tr><td style="color:var(--gold);font-weight:600;">Hallazgo inesperado</td><td>Los modelos diseñados específicamente para especulares (HADepth, AF-SfMLearner) <strong>no necesitan</strong> y son perjudicados por el enhancement</td><td style="color:var(--gold);">★ Resultado clave</td></tr>
     </table>
   </div>
 
