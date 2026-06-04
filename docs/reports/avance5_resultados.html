@@ -6,6 +6,8 @@
 <title>Avance 5 — Pesos SCARED · Equipo 52</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true, theme:'dark', securityLevel:'loose'});</script>
 <style>
 :root{
   --m50:#F0F8FE;--m100:#DDEEFC;--m200:#C3E2FA;--m300:#99D0F7;
@@ -41,37 +43,50 @@ html,body{font-family:var(--ff-sans);background:var(--m950);color:#e8f4fd;line-h
 .section-label{font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.12em;
   color:var(--m500);text-transform:uppercase;margin-bottom:.6rem;}
 .section h2{font-family:var(--ff-serif);font-size:1.6rem;color:#fff;margin-bottom:1.2rem;}
-.section h3{font-size:1rem;font-weight:600;color:var(--m200);margin:1.5rem 0 .6rem;}
+.section h3{font-size:1.05rem;font-weight:600;color:var(--m200);margin:1.6rem 0 .6rem;}
+.section h4{font-size:.95rem;font-weight:600;color:var(--m300);margin:1rem 0 .4rem;}
 .section p{color:var(--m300);margin-bottom:.8rem;}
+.section ul{color:var(--m300);margin:.4rem 0 1rem 1.4rem;font-size:.92rem;}
+.section li{margin-bottom:.35rem;}
 .note{background:rgba(39,102,203,.1);border-left:3px solid var(--m500);
   border-radius:0 6px 6px 0;padding:.8rem 1rem;font-size:.83rem;color:var(--m300);margin:1rem 0;}
 .note.gold{border-left-color:var(--gold);background:rgba(224,168,0,.08);}
+.note.purple{border-left-color:var(--purple);background:rgba(155,89,182,.1);}
+.note.red{border-left-color:var(--red);background:rgba(231,76,60,.08);}
 .divider{border:none;border-top:1px solid rgba(69,153,236,.15);margin:2rem 0;}
 .model-pill{display:inline-block;padding:.2rem .7rem;border-radius:20px;
   font-family:var(--ff-mono);font-size:.72rem;margin:.1rem;}
+.pill-mono2{background:rgba(69,153,236,.2);color:var(--m300);}
+.pill-vit{background:rgba(224,168,0,.15);color:var(--gold);}
+.pill-sfm{background:rgba(46,204,113,.15);color:#2ecc71;}
+.pill-af{background:rgba(231,76,60,.2);color:#e74c3c;}
+.pill-iit{background:rgba(155,89,182,.2);color:#c89be0;}
 .findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin:1rem 0;}
 .card{background:rgba(39,102,203,.12);border:1px solid rgba(69,153,236,.2);border-radius:10px;padding:1.2rem;}
 .card-icon{font-size:1.8rem;margin-bottom:.5rem;}
-.card h4{color:#fff;font-size:.95rem;margin-bottom:.4rem;}
+.card h4{color:#fff;font-size:.95rem;margin-bottom:.4rem;margin-top:0;}
 .card p{color:var(--m300);font-size:.83rem;line-height:1.6;}
 .card.highlight{border-color:var(--gold);background:rgba(224,168,0,.08);}
 .card.warning{border-color:var(--red);background:rgba(231,76,60,.08);}
+.card.purple{border-color:var(--purple);background:rgba(155,89,182,.1);}
+.mermaid{background:rgba(39,102,203,.08);border:1px solid rgba(69,153,236,.2);
+  border-radius:10px;padding:1.5rem;margin:1rem 0;overflow-x:auto;text-align:center;}
 .metrics-table{width:100%;border-collapse:collapse;font-size:.78rem;margin:1.2rem 0;overflow-x:auto;display:block;}
-.metrics-table th{background:rgba(39,102,203,.35);color:var(--m200);padding:.5rem .6rem;
-  font-family:var(--ff-mono);font-size:.72rem;border-bottom:2px solid rgba(69,153,236,.4);
+.metrics-table th{background:rgba(39,102,203,.35);color:var(--m200);padding:.5rem .55rem;
+  font-family:var(--ff-mono);font-size:.7rem;border-bottom:2px solid rgba(69,153,236,.4);
   white-space:nowrap;text-align:right;}
 .metrics-table th:first-child,.metrics-table th:nth-child(2){text-align:left;}
-.metrics-table td{padding:.45rem .6rem;border-bottom:1px solid rgba(69,153,236,.07);
-  font-family:var(--ff-mono);font-size:.75rem;color:var(--m300);text-align:right;white-space:nowrap;}
+.metrics-table td{padding:.42rem .55rem;border-bottom:1px solid rgba(69,153,236,.07);
+  font-family:var(--ff-mono);font-size:.74rem;color:var(--m300);text-align:right;white-space:nowrap;}
 .metrics-table td:first-child,.metrics-table td:nth-child(2){text-align:left;color:var(--m200);}
 .metrics-table tr:hover td{background:rgba(69,153,236,.05);}
-.metrics-table .row-model{background:rgba(39,102,203,.08);}
 .metrics-table .best{color:#2ecc71;font-weight:700;}
 .metrics-table .worst{color:#e74c3c;}
 .metrics-table .delta-pos{color:#2ecc71;}
 .metrics-table .delta-neg{color:#e74c3c;}
 .metrics-table .delta-base{color:var(--m400);}
 .metrics-table .arrow{color:#2ecc71;font-size:.8rem;}
+.metrics-table .grp{border-top:2px solid rgba(69,153,236,.3);}
 .scroll-hint{font-family:var(--ff-mono);font-size:.7rem;color:var(--m500);margin-bottom:.3rem;}
 .result-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:1rem 0;}
 .result-table th{background:rgba(39,102,203,.3);color:var(--m200);padding:.6rem .8rem;text-align:left;
@@ -82,6 +97,15 @@ html,body{font-family:var(--ff-sans);background:var(--m950);color:#e8f4fd;line-h
 .delta-pos{color:#2ecc71;font-weight:600;}
 .delta-neg{color:#e74c3c;font-weight:600;}
 .tag-best{background:rgba(46,204,113,.15);color:#2ecc71;border-radius:4px;padding:.1rem .4rem;font-size:.7rem;}
+.tag-worst{background:rgba(231,76,60,.15);color:#e74c3c;border-radius:4px;padding:.1rem .4rem;font-size:.7rem;}
+.podium{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.8rem;margin:1.2rem 0;}
+.podium-item{background:rgba(39,102,203,.12);border:1px solid rgba(69,153,236,.2);border-radius:10px;
+  padding:1rem;text-align:center;}
+.podium-item .rank{font-family:var(--ff-mono);font-size:.7rem;color:var(--m500);}
+.podium-item .name{font-weight:600;color:#fff;font-size:.9rem;margin:.3rem 0;}
+.podium-item .val{font-family:var(--ff-mono);font-size:1.3rem;font-weight:700;}
+.podium-item.gold{border-color:var(--gold);background:rgba(224,168,0,.1);}
+.podium-item.gold .val{color:var(--gold);}
 </style>
 </head>
 <body>
@@ -97,105 +121,224 @@ html,body{font-family:var(--ff-sans);background:var(--m950);color:#e8f4fd;line-h
 
 <div class="hero">
   <h1>Image Enhancement × Modelos de Profundidad Entrenados en SCARED</h1>
-  <p>Réplica del experimento del Avance 4 usando pesos re-entrenados en SCARED por el Dr. Ricardo Espinosa Loera. ¿Cambia el impacto del enhancement cuando el modelo conoce el dominio de evaluación?</p>
+  <p>Réplica del experimento del Avance 4 usando pesos re-entrenados en SCARED por el Dr. Ricardo Espinosa Loera. La pregunta central: <em>¿sigue ayudando el enhancement cuando el modelo ya conoce el dominio de evaluación?</em></p>
   <div class="hero-badges">
     <span class="badge">SCARED · datasets 8–9</span>
     <span class="badge">240 evaluaciones</span>
     <span class="badge">6 modelos · pesos SCARED</span>
     <span class="badge">4 enhancements</span>
+    <span class="badge">7 métricas</span>
     <span class="badge">Equipo 52 · 2026</span>
   </div>
 </div>
 
 <div class="container">
 
-  <!-- ── Diferencia con Avance 4 ── -->
+  <!-- ── Podio ── -->
   <div class="section">
-    <div class="section-label">// motivación</div>
-    <h2>¿Qué cambia respecto al Avance 4?</h2>
-    <p>En el <strong>Avance 4</strong> se usaron los pesos <strong>originales de cada paper</strong>
-    (entrenados en Hamlyn, KITTI o Endovis). Aquí, en el <strong>Avance 5</strong>, se usan pesos
-    <strong>re-entrenados en SCARED</strong> — el mismo dominio de evaluación — proporcionados por el
-    Dr. Ricardo Espinosa Loera. Esto aísla una pregunta clave: <em>¿el beneficio del enhancement
-    persiste cuando el modelo ya conoce el dominio?</em></p>
-    <div class="note gold">⭐ <strong>Hallazgo central:</strong> el fine-tuning en SCARED reduce el error
-    de profundidad <strong>41–66%</strong> — mucho más que cualquier corrección de imagen (que en
-    Avance 4 daba como máximo −12%). Con estos pesos, el enhancement deja de ser útil.</div>
+    <div class="section-label">// resumen ejecutivo</div>
+    <h2>Los 3 mejores modelos del proyecto completo</h2>
+    <div class="podium">
+      <div class="podium-item gold">
+        <div class="rank">🥇 #1 · Avance 5</div>
+        <div class="name">MonoIIT</div>
+        <div class="val">0.0373</div>
+        <div class="rank">AbsRel · pesos SCARED</div>
+      </div>
+      <div class="podium-item">
+        <div class="rank">🥈 #2 · Avance 4</div>
+        <div class="name">HADepth</div>
+        <div class="val" style="color:var(--purple);">0.0444</div>
+        <div class="rank">AbsRel · Endovis</div>
+      </div>
+      <div class="podium-item">
+        <div class="rank">🥉 #3 · Avance 5</div>
+        <div class="name">w19-MonoViT</div>
+        <div class="val" style="color:var(--m300);">0.0459</div>
+        <div class="rank">AbsRel · pesos SCARED</div>
+      </div>
+    </div>
+    <div class="note gold">⭐ <strong>Hallazgo central:</strong> el re-entrenamiento en SCARED (el dominio de
+    evaluación) reduce el error de profundidad <strong>41–66%</strong> — un efecto mucho mayor que
+    cualquier corrección de imagen, que en el Avance 4 daba como máximo −12%. Con estos pesos, el
+    enhancement deja de ser útil. <strong>MonoIIT</strong> destrona a HADepth como mejor modelo del proyecto.</div>
   </div>
 
   <hr class="divider">
 
-  <!-- ── Comparativa baseline ── -->
+  <!-- ── Pipeline ── -->
   <div class="section">
-    <div class="section-label">// comparativa</div>
-    <h2>Avance 4 vs. Avance 5 — baseline (sin enhancement)</h2>
+    <div class="section-label">// pipeline</div>
+    <h2>Diseño del experimento</h2>
+    <p>Mismo protocolo factorial que el Avance 4, pero sustituyendo los pesos originales de cada
+    paper por los pesos <strong>re-entrenados en SCARED</strong>. Se evalúan 4 métodos de enhancement
+    sobre 6 modelos de profundidad en 10 keyframes de los datasets 8–9.</p>
+    <div class="mermaid">
+flowchart TD
+    A["SCARED - datasets 8-9, keyframes 0-4"] --> B
+    B["Imagen RGB 1280x1024 px"] --> C1 & C2 & C3 & C4
+
+    subgraph ENH ["Image Enhancement (Endo4IE)"]
+        C1["None - baseline"]
+        C2["Retinex SSR"]
+        C3["EndoLMSPEC"]
+        C4["IAT - EndoViT"]
+    end
+
+    C1 & C2 & C3 & C4 --> D1 & D2 & D3 & D4 & D5 & D6
+
+    subgraph DEPTH ["Modelos - pesos SCARED (Dr. Espinosa Loera)"]
+        D1["Monodepth2 - ResNet18"]
+        D2["MonoViT - MPViT + decoder simple"]
+        D3["EndoSfMLearner - DispResNet18"]
+        D4["AF-SfMLearner - ResNet18 + AppFlow"]
+        D5["MonoIIT - MPViT + HR-Depth + lighting"]
+        D6["w19-MonoViT - MPViT + HR-Depth + lighting"]
+    end
+
+    D1 & D2 & D3 & D4 & D5 & D6 --> E["Median Scaling a mm"]
+    E --> F["AbsRel - SqRel - RMSE - RMSELog - delta - IT"]
+
+    style ENH fill:#1a2e51,stroke:#E0A800,stroke-width:2px,color:#e8f4fd
+    style DEPTH fill:#1a2e51,stroke:#9b59b6,stroke-width:2px,color:#e8f4fd
+    </div>
+    <p style="font-size:.85rem;"><strong>Diseño factorial:</strong> 4 enhancements × 6 modelos × 10 keyframes = <strong>240 evaluaciones</strong>.</p>
+
+    <h3>Modelos y su procedencia</h3>
     <table class="result-table">
-      <tr><th>Modelo</th><th>AbsRel A4 (paper)</th><th>AbsRel A5 (SCARED)</th><th>Δ AbsRel</th><th>δ&lt;1.25 (A4→A5)</th></tr>
-      <tr><td><span class="model-pill pill-endo" style="background:rgba(69,153,236,.2);color:var(--m300);">Monodepth2 / EndoDepth</span></td><td>0.1652</td><td style="color:#fff;font-weight:600;">0.0568</td><td class="delta-pos">−65.6%</td><td>0.776 → 0.985</td></tr>
-      <tr><td><span class="model-pill" style="background:rgba(224,168,0,.15);color:var(--gold);">MonoViT</span></td><td>0.3046</td><td style="color:#fff;font-weight:600;">0.1328</td><td class="delta-pos">−56.4%</td><td>0.484 → 0.848</td></tr>
-      <tr><td><span class="model-pill" style="background:rgba(46,204,113,.15);color:#2ecc71;">EndoSfMLearner</span></td><td>0.2906</td><td style="color:#fff;font-weight:600;">0.1706</td><td class="delta-pos">−41.3%</td><td>0.471 → 0.775</td></tr>
-      <tr><td><span class="model-pill" style="background:rgba(231,76,60,.2);color:#e74c3c;">AF-SfMLearner</span></td><td>0.1060</td><td>0.1103</td><td class="delta-neg">+4.1%</td><td>0.903 → 0.901</td></tr>
+      <tr><th>Modelo</th><th>Encoder</th><th>Decoder</th><th>Nota</th></tr>
+      <tr><td><span class="model-pill pill-mono2">Monodepth2</span></td><td>ResNet-18</td><td>Monodepth2</td><td>En A4 se llamó "EndoDepth"</td></tr>
+      <tr><td><span class="model-pill pill-vit">MonoViT</span></td><td>MPViT-Small</td><td>Monodepth2 (simple)</td><td>num_ch_dec = num_ch_enc</td></tr>
+      <tr><td><span class="model-pill pill-sfm">EndoSfMLearner</span></td><td>DispResNet-18</td><td>DispNet</td><td>brightness-aware loss</td></tr>
+      <tr><td><span class="model-pill pill-af">AF-SfMLearner</span></td><td>ResNet-18</td><td>Monodepth2</td><td>+ módulo appearance flow</td></tr>
+      <tr><td><span class="model-pill pill-iit">MonoIIT</span></td><td>MPViT-Small</td><td>HR-Depth</td><td>+ módulo de iluminación (lighting.pth)</td></tr>
+      <tr><td><span class="model-pill pill-iit">w19-MonoViT</span></td><td>MPViT-Small</td><td>HR-Depth</td><td>variante con lighting (¿MonoIIF?)</td></tr>
     </table>
-    <div class="note">AF-SfMLearner apenas cambia (+4.1%) porque ya estaba entrenado en datos endoscópicos
-    comparables — confirma que la ganancia del fine-tuning viene de <strong>cerrar el domain gap</strong>.</div>
+    <div class="note">El Dr. Espinosa indicó que <strong>MonoIIT corre con el código de testing de MonoViT</strong>.
+    Al inspeccionar los checkpoints encontramos que MonoViT usa un decoder Monodepth2 simple mientras
+    que MonoIIT y w19-MonoViT usan el decoder <strong>HR-Depth</strong> — el código auto-detecta cuál cargar.</div>
   </div>
 
   <hr class="divider">
 
-  <!-- ── Tabla completa A4 vs A5 ── -->
+  <!-- ── Tabla completa de resultados (6 modelos × 4 enh) ── -->
   <div class="section">
-    <div class="section-label">// tabla completa</div>
-    <h2>Comparación por modelo × enhancement</h2>
-    <p class="scroll-hint">← ordenado de mayor a menor mejora en AbsRel · Δ negativo = mejora con pesos SCARED</p>
+    <div class="section-label">// resultados completos</div>
+    <h2>Resultados: 6 modelos × 4 enhancements</h2>
+    <p class="scroll-hint">← desplazar horizontalmente para ver todas las columnas · promedio 10 keyframes · ΔAR% negativo = mejora vs. baseline</p>
     <div style="overflow-x:auto;">
     <table class="metrics-table">
       <thead>
         <tr>
-          <th>Modelo</th><th>Enhancement</th>
-          <th>AbsRel A4</th><th>AbsRel A5</th><th>Δ AbsRel</th>
-          <th>RMSE A4</th><th>RMSE A5</th><th>Δ RMSE</th>
+          <th>Modelo</th><th>Enh.</th>
+          <th>AbsRel↓</th><th>SqRel↓</th><th>RMSE↓</th><th>RMSELog↓</th>
+          <th>δ&lt;1.25↑</th><th>δ&lt;1.25²↑</th><th>δ&lt;1.25³↑</th><th>IT(ms)</th><th>ΔAR%</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>EndoDepth / Monodepth2</td><td>none</td><td>0.1652</td><td class="best">0.0568</td><td class="delta-pos">−65.6%</td><td>12.468</td><td>4.771</td><td class="delta-pos">−61.7%</td></tr>
-        <tr><td>EndoDepth / Monodepth2</td><td>iat</td><td>0.1454</td><td>0.0581</td><td class="delta-pos">−60.0%</td><td>11.074</td><td>4.796</td><td class="delta-pos">−56.7%</td></tr>
-        <tr><td>EndoDepth / Monodepth2</td><td>endolmspec</td><td>0.1635</td><td>0.0662</td><td class="delta-pos">−59.5%</td><td>12.949</td><td>5.324</td><td class="delta-pos">−58.9%</td></tr>
-        <tr><td>MonoViT</td><td>retinex</td><td>0.3139</td><td>0.1339</td><td class="delta-pos">−57.3%</td><td>26.566</td><td>9.809</td><td class="delta-pos">−63.1%</td></tr>
-        <tr><td>MonoViT</td><td>endolmspec</td><td>0.3305</td><td>0.1425</td><td class="delta-pos">−56.9%</td><td>26.422</td><td>10.541</td><td class="delta-pos">−60.1%</td></tr>
-        <tr><td>MonoViT</td><td>none</td><td>0.3046</td><td>0.1328</td><td class="delta-pos">−56.4%</td><td>23.729</td><td>9.966</td><td class="delta-pos">−58.0%</td></tr>
-        <tr><td>MonoViT</td><td>iat</td><td>0.2825</td><td>0.1353</td><td class="delta-pos">−52.1%</td><td>21.340</td><td>9.930</td><td class="delta-pos">−53.5%</td></tr>
-        <tr><td>EndoSfMLearner</td><td>none</td><td>0.2906</td><td>0.1706</td><td class="delta-pos">−41.3%</td><td>21.002</td><td>12.754</td><td class="delta-pos">−39.3%</td></tr>
-        <tr><td>EndoSfMLearner</td><td>retinex</td><td>0.2908</td><td>0.1710</td><td class="delta-pos">−41.2%</td><td>21.000</td><td>12.777</td><td class="delta-pos">−39.2%</td></tr>
-        <tr><td>EndoSfMLearner</td><td>endolmspec</td><td>0.2904</td><td>0.1707</td><td class="delta-pos">−41.2%</td><td>20.981</td><td>12.761</td><td class="delta-pos">−39.2%</td></tr>
-        <tr><td>EndoSfMLearner</td><td>iat</td><td>0.2902</td><td>0.1707</td><td class="delta-pos">−41.2%</td><td>20.969</td><td>12.761</td><td class="delta-pos">−39.1%</td></tr>
-        <tr><td>EndoDepth / Monodepth2</td><td>retinex</td><td>0.1533</td><td>0.1114</td><td class="delta-pos">−27.3%</td><td>11.578</td><td>8.236</td><td class="delta-pos">−28.9%</td></tr>
-        <tr><td>AF-SfMLearner</td><td>iat</td><td>0.1120</td><td>0.1079</td><td class="delta-pos">−3.7%</td><td>9.078</td><td>8.678</td><td class="delta-pos">−4.4%</td></tr>
-        <tr><td>AF-SfMLearner</td><td>endolmspec</td><td>0.1074</td><td>0.1055</td><td class="delta-pos">−1.8%</td><td>8.586</td><td>8.483</td><td class="delta-pos">−1.2%</td></tr>
-        <tr><td>AF-SfMLearner</td><td>none</td><td>0.1060</td><td>0.1103</td><td class="delta-neg">+4.1%</td><td>8.815</td><td>8.970</td><td class="delta-neg">+1.8%</td></tr>
-        <tr><td>AF-SfMLearner</td><td>retinex</td><td>0.1271</td><td>0.1326</td><td class="delta-neg">+4.3%</td><td>9.915</td><td>9.682</td><td class="delta-pos">−2.3%</td></tr>
+        <!-- Monodepth2 -->
+        <tr class="grp"><td>Monodepth2</td><td style="color:#fff;font-weight:600;">none</td><td class="best">0.0568</td><td class="best">0.6821</td><td class="best">4.771</td><td class="best">0.0777</td><td class="best">0.9852</td><td>0.9915</td><td>0.9939</td><td>27.4</td><td class="delta-base">base</td></tr>
+        <tr><td></td><td>iat</td><td>0.0581</td><td>0.6269</td><td>4.796</td><td>0.0791</td><td>0.9832</td><td>0.9913</td><td>0.9948</td><td>285.3</td><td class="delta-neg">+2.3%</td></tr>
+        <tr><td></td><td>endolmspec</td><td>0.0662</td><td>0.8576</td><td>5.324</td><td>0.0876</td><td>0.9787</td><td>0.9912</td><td>0.9929</td><td>150.0</td><td class="delta-neg">+16.5%</td></tr>
+        <tr><td></td><td>retinex <span class="tag-worst">peor</span></td><td class="worst">0.1114</td><td class="worst">1.4798</td><td class="worst">8.236</td><td>0.1489</td><td>0.8656</td><td>0.9742</td><td>0.9897</td><td>413.0</td><td class="delta-neg">+96.1%</td></tr>
+        <!-- MonoViT -->
+        <tr class="grp"><td>MonoViT</td><td style="color:#fff;font-weight:600;">none</td><td class="best">0.1328</td><td>1.9229</td><td>9.966</td><td>0.1752</td><td class="best">0.8476</td><td>0.9685</td><td>0.9868</td><td>51.4</td><td class="delta-base">base</td></tr>
+        <tr><td></td><td>retinex</td><td>0.1339</td><td class="best">1.9151</td><td class="best">9.809</td><td>0.1755</td><td>0.8397</td><td>0.9535</td><td>0.9887</td><td>437.5</td><td class="delta-neg">+0.8%</td></tr>
+        <tr><td></td><td>iat</td><td>0.1353</td><td>1.9456</td><td>9.930</td><td>0.1758</td><td>0.8464</td><td>0.9643</td><td>0.9874</td><td>309.4</td><td class="delta-neg">+1.9%</td></tr>
+        <tr><td></td><td>endolmspec</td><td>0.1425</td><td>2.1251</td><td>10.541</td><td>0.1841</td><td>0.8173</td><td>0.9666</td><td>0.9864</td><td>173.9</td><td class="delta-neg">+7.3%</td></tr>
+        <!-- EndoSfMLearner -->
+        <tr class="grp"><td>EndoSfMLearner</td><td style="color:#fff;font-weight:600;">none</td><td>0.1706</td><td>3.1434</td><td>12.754</td><td>0.2074</td><td>0.7750</td><td>0.9387</td><td>0.9884</td><td>6.4</td><td class="delta-base">base</td></tr>
+        <tr><td></td><td>iat</td><td class="best">0.1707</td><td>3.1476</td><td>12.761</td><td>0.2075</td><td>0.7747</td><td>0.9387</td><td>0.9884</td><td>264.3</td><td class="delta-neg">+0.1%</td></tr>
+        <tr><td></td><td>endolmspec</td><td>0.1707</td><td>3.1466</td><td>12.761</td><td>0.2074</td><td>0.7747</td><td>0.9387</td><td>0.9884</td><td>129.1</td><td class="delta-neg">+0.1%</td></tr>
+        <tr><td></td><td>retinex</td><td>0.1710</td><td>3.1565</td><td>12.777</td><td>0.2077</td><td>0.7743</td><td>0.9386</td><td>0.9884</td><td>392.2</td><td class="delta-neg">+0.2%</td></tr>
+        <!-- AF-SfMLearner -->
+        <tr class="grp"><td>AF-SfMLearner</td><td>endolmspec <span class="tag-best">mejor</span></td><td class="best">0.1055</td><td class="best">1.2379</td><td class="best">8.483</td><td class="best">0.1365</td><td class="best">0.9179</td><td>0.9869</td><td>0.9968</td><td>150.2</td><td class="delta-pos">−4.4% <span class="arrow">←</span></td></tr>
+        <tr><td></td><td>iat</td><td>0.1079</td><td>1.2953</td><td>8.678</td><td>0.1408</td><td>0.9026</td><td>0.9844</td><td>0.9967</td><td>285.3</td><td class="delta-pos">−2.2% <span class="arrow">←</span></td></tr>
+        <tr><td></td><td>none</td><td>0.1103</td><td>1.3733</td><td>8.970</td><td>0.1420</td><td>0.9008</td><td>0.9870</td><td>0.9966</td><td>27.2</td><td class="delta-base">base</td></tr>
+        <tr><td></td><td>retinex</td><td class="worst">0.1326</td><td>1.8277</td><td>9.682</td><td>0.1786</td><td>0.8552</td><td>0.9600</td><td>0.9874</td><td>413.1</td><td class="delta-neg">+20.2%</td></tr>
+        <!-- MonoIIT -->
+        <tr class="grp"><td><span style="color:#c89be0;font-weight:600;">MonoIIT</span></td><td style="color:#fff;font-weight:600;">none ★</td><td class="best">0.0373</td><td class="best">0.2642</td><td class="best">3.487</td><td class="best">0.0572</td><td class="best">0.9886</td><td>0.9958</td><td>0.9995</td><td>72.7</td><td class="delta-base">base</td></tr>
+        <tr><td></td><td>iat</td><td>0.0411</td><td>0.3067</td><td>3.637</td><td>0.0600</td><td>0.9848</td><td>0.9941</td><td>0.9994</td><td>330.7</td><td class="delta-neg">+10.2%</td></tr>
+        <tr><td></td><td>endolmspec</td><td>0.0424</td><td>0.3540</td><td>3.700</td><td>0.0618</td><td>0.9817</td><td>0.9926</td><td>0.9985</td><td>195.5</td><td class="delta-neg">+13.7%</td></tr>
+        <tr><td></td><td>retinex <span class="tag-worst">destruye</span></td><td class="worst">0.0988</td><td class="worst">1.1629</td><td class="worst">7.732</td><td>0.1353</td><td>0.8911</td><td>0.9822</td><td>0.9947</td><td>458.5</td><td class="delta-neg">+164.9%</td></tr>
+        <!-- w19-MonoViT -->
+        <tr class="grp"><td><span style="color:#c89be0;font-weight:600;">w19-MonoViT</span></td><td style="color:#fff;font-weight:600;">none</td><td class="best">0.0459</td><td class="best">0.2755</td><td class="best">3.913</td><td class="best">0.0637</td><td>0.9881</td><td class="best">0.9986</td><td class="best">0.9997</td><td>72.5</td><td class="delta-base">base</td></tr>
+        <tr><td></td><td>iat</td><td>0.0524</td><td>0.3212</td><td>4.108</td><td>0.0689</td><td>0.9880</td><td>0.9978</td><td>0.9996</td><td>330.6</td><td class="delta-neg">+14.2%</td></tr>
+        <tr><td></td><td>endolmspec</td><td>0.0597</td><td>0.3932</td><td>4.705</td><td>0.0786</td><td>0.9827</td><td>0.9984</td><td>0.9997</td><td>195.4</td><td class="delta-neg">+30.1%</td></tr>
+        <tr><td></td><td>retinex <span class="tag-worst">destruye</span></td><td class="worst">0.1342</td><td class="worst">2.2202</td><td class="worst">9.920</td><td>0.1850</td><td>0.8114</td><td>0.9305</td><td>0.9740</td><td>458.4</td><td class="delta-neg">+192.4%</td></tr>
       </tbody>
     </table>
     </div>
     <p style="font-size:.75rem;color:var(--m500);margin-top:.5rem;">
-      Solo se comparan los 4 modelos presentes en ambos avances. Δ negativo (verde) = mejora con los pesos SCARED.
+      δ &lt; 1.25ᵏ = fracción de píxeles con max(pred/gt, gt/pred) &lt; 1.25ᵏ (mayor = mejor).
+      ΔAR% negativo = mejora vs. baseline (none). ← indica mejora. En verde el mejor valor por modelo.
     </p>
   </div>
 
   <hr class="divider">
 
-  <!-- ── Modelos nuevos ── -->
+  <!-- ── Comparativa A4 vs A5 ── -->
   <div class="section">
-    <div class="section-label">// modelos exclusivos del avance 5</div>
-    <h2>Nuevos modelos: MonoIIT y w19-MonoViT</h2>
-    <p>Dos modelos del Dr. Espinosa que no estaban en el Avance 4. Ambos usan encoder MPViT con
-    un módulo de iluminación adicional (<code>lighting.pth</code>).</p>
+    <div class="section-label">// fine-tuning vs. enhancement</div>
+    <h2>Avance 4 vs. Avance 5 — el efecto del re-entrenamiento</h2>
+    <p>La comparación más reveladora: el mismo modelo con pesos del paper (A4) vs. pesos SCARED (A5),
+    en el baseline sin enhancement. El fine-tuning en el dominio reduce el error drásticamente.</p>
     <table class="result-table">
-      <tr><th>Modelo</th><th>AbsRel</th><th>RMSE mm</th><th>δ&lt;1.25</th><th>Decoder</th></tr>
-      <tr><td style="color:#fff;font-weight:600;">MonoIIT <span class="tag-best">★ mejor del proyecto</span></td><td style="color:#fff;font-weight:600;">0.0373</td><td>3.487</td><td>0.989</td><td>HR-Depth</td></tr>
-      <tr><td>w19-MonoViT</td><td>0.0459</td><td>3.913</td><td>0.988</td><td>HR-Depth</td></tr>
+      <tr><th>Modelo</th><th>AbsRel A4 (paper)</th><th>AbsRel A5 (SCARED)</th><th>Δ AbsRel</th><th>δ&lt;1.25 (A4→A5)</th></tr>
+      <tr><td><span class="model-pill pill-mono2">Monodepth2 / EndoDepth</span></td><td>0.1652</td><td style="color:#fff;font-weight:600;">0.0568</td><td class="delta-pos">−65.6%</td><td>0.776 → 0.985</td></tr>
+      <tr><td><span class="model-pill pill-vit">MonoViT</span></td><td>0.3046</td><td style="color:#fff;font-weight:600;">0.1328</td><td class="delta-pos">−56.4%</td><td>0.484 → 0.848</td></tr>
+      <tr><td><span class="model-pill pill-sfm">EndoSfMLearner</span></td><td>0.2906</td><td style="color:#fff;font-weight:600;">0.1706</td><td class="delta-pos">−41.3%</td><td>0.471 → 0.775</td></tr>
+      <tr><td><span class="model-pill pill-af">AF-SfMLearner</span></td><td>0.1060</td><td>0.1103</td><td class="delta-neg">+4.1%</td><td>0.903 → 0.901</td></tr>
     </table>
-    <div class="note gold">⭐ <strong>MonoIIT (AbsRel 0.0373) es el mejor modelo de todo el proyecto</strong>,
-    superando incluso a HADepth del Avance 4 (0.0444).</div>
+    <div class="note">El re-entrenamiento mejora <strong>~55–66%</strong> a los modelos genéricos
+    (Monodepth2, MonoViT) y <strong>~41%</strong> a EndoSfMLearner. <strong>AF-SfMLearner es la única
+    excepción</strong> (+4.1%): ya estaba entrenado en datos endoscópicos comparables, así que el
+    fine-tuning en SCARED no cierra ningún domain gap. Esto confirma que la ganancia proviene de
+    <strong>adaptar el modelo al dominio de evaluación</strong>, no del enhancement.</div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── Interpretación por modelo ── -->
+  <div class="section">
+    <div class="section-label">// lectura por modelo</div>
+    <h2>Interpretación detallada</h2>
+
+    <h3><span class="model-pill pill-iit">MonoIIT</span> — el nuevo mejor modelo del proyecto</h3>
+    <p>Con AbsRel <strong>0.0373</strong> y δ&lt;1.25 = 0.989, MonoIIT supera a HADepth del Avance 4
+    (0.0444). Combina el encoder transformer MPViT con el decoder HR-Depth de alta resolución y un
+    módulo de iluminación durante el entrenamiento. El enhancement <strong>solo lo perjudica</strong>:
+    IAT +10.2%, EndoLMSPEC +13.7%, y Retinex lo destruye con <strong>+164.9%</strong>. La razón:
+    su baseline ya maneja los reflejos especulares por diseño, y cualquier corrección de imagen
+    lo saca de su distribución de entrenamiento.</p>
+
+    <h3><span class="model-pill pill-iit">w19-MonoViT</span> — segundo mejor, misma familia</h3>
+    <p>AbsRel <strong>0.0459</strong>, tercer lugar del proyecto. Comparte arquitectura con MonoIIT
+    (MPViT + HR-Depth + lighting) y muestra el mismo patrón: el enhancement empeora todo, con Retinex
+    en <strong>+192.4%</strong> — el peor deterioro de todo el experimento. Probablemente sea la
+    variante MonoIIF (pendiente de confirmar con el Dr. Espinosa).</p>
+
+    <h3><span class="model-pill pill-mono2">Monodepth2</span> — la mayor transformación con el fine-tuning</h3>
+    <p>Pasa de AbsRel 0.1652 (Hamlyn, A4) a <strong>0.0568</strong> (SCARED, A5): una mejora del
+    <strong>−65.6%</strong>, la más grande del experimento. Con los pesos SCARED, el enhancement deja
+    de ayudar (IAT apenas +2.3%, Retinex +96.1%). Es el modelo más rápido útil del experimento:
+    27.4 ms sin enhancement.</p>
+
+    <h3><span class="model-pill pill-vit">MonoViT</span> — mejora a la mitad del error, pero sigue siendo el menos preciso</h3>
+    <p>De 0.3046 a <strong>0.1328</strong> (−56.4%). Aun re-entrenado en SCARED, queda como el modelo
+    menos preciso del grupo: el encoder MPViT con decoder simple (no HR-Depth) no aprovecha toda la
+    capacidad del transformer. El enhancement no ayuda en ninguna variante.</p>
+
+    <h3><span class="model-pill pill-sfm">EndoSfMLearner</span> — mejora moderada, sigue inmune al enhancement</h3>
+    <p>De 0.2906 a <strong>0.1706</strong> (−41.3%). Su brightness-aware photometric loss lo hace
+    insensible al enhancement (cambios &lt;0.2% en todas las variantes), igual que en el Avance 4.
+    Es el más rápido en baseline (6.4 ms) pero el segundo menos preciso.</p>
+
+    <h3><span class="model-pill pill-af">AF-SfMLearner</span> — el único donde el enhancement aún ayuda</h3>
+    <p>No mejora con el re-entrenamiento (+4.1% vs. A4) porque ya estaba adaptado al dominio
+    endoscópico. Curiosamente, es el <strong>único modelo del Avance 5 donde el enhancement reduce el
+    error</strong>: EndoLMSPEC −4.4% e IAT −2.2%. Su módulo de appearance flow se complementa bien con
+    una corrección de exposición suave.</p>
   </div>
 
   <hr class="divider">
@@ -208,37 +351,72 @@ html,body{font-family:var(--ff-sans);background:var(--m950);color:#e8f4fd;line-h
       <div class="card highlight">
         <div class="card-icon">🎯</div>
         <h4>El fine-tuning domina sobre el enhancement</h4>
-        <p>Re-entrenar en SCARED reduce el error <strong>41–66%</strong>. El enhancement, en el mejor caso del Avance 4, daba −12%. El domain gap pesa mucho más que la corrección de imagen.</p>
+        <p>Re-entrenar en SCARED reduce el error <strong>41–66%</strong>. El enhancement, en el mejor caso del Avance 4, daba −12%. Cerrar el domain gap pesa mucho más que corregir la imagen.</p>
       </div>
       <div class="card warning">
         <div class="card-icon">⚠️</div>
         <h4>Con pesos SCARED, el enhancement estorba</h4>
-        <p>Los baselines ya son tan buenos que casi cualquier enhancement empeora. Retinex destruye MonoIIT (+165%) y w19-MonoViT (+192%).</p>
+        <p>Los baselines ya son tan buenos que casi cualquier enhancement empeora. Retinex destruye MonoIIT (+164.9%) y w19-MonoViT (+192.4%): los peores deterioros del proyecto.</p>
+      </div>
+      <div class="card purple">
+        <div class="card-icon">🏆</div>
+        <h4>MonoIIT: nuevo campeón</h4>
+        <p>AbsRel <strong>0.0373</strong>, δ&lt;1.25 = 0.989. Supera a HADepth (0.044) y a todos los modelos de ambos avances. MPViT + HR-Depth entrenado en SCARED.</p>
       </div>
       <div class="card">
         <div class="card-icon">🛡️</div>
-        <h4>AF-SfMLearner: única excepción</h4>
-        <p>Es el único modelo donde el enhancement aún ayuda (EndoLMSPEC −4.4%, IAT −2.2%) — y el único que NO mejora con el re-entrenamiento, porque ya estaba adaptado al dominio.</p>
+        <h4>AF-SfMLearner: la excepción</h4>
+        <p>Único modelo donde el enhancement aún ayuda (EndoLMSPEC −4.4%, IAT −2.2%) y único que NO mejora con el re-entrenamiento: ya estaba adaptado al dominio.</p>
       </div>
-      <div class="card highlight">
-        <div class="card-icon">🏆</div>
-        <h4>MonoIIT: nuevo mejor modelo</h4>
-        <p>AbsRel <strong>0.0373</strong>, δ&lt;1.25 = 0.989. Supera a HADepth (0.044) y a todos los modelos de ambos avances. Encoder MPViT + decoder HR-Depth entrenado en SCARED.</p>
+      <div class="card">
+        <div class="card-icon">🔵</div>
+        <h4>Retinex: siempre el peor</h4>
+        <p>En los 6 modelos, Retinex es el enhancement más dañino. Su corrección global de color saca a los modelos de su distribución de entrenamiento, especialmente a los más precisos.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⏱️</div>
+        <h4>Viabilidad clínica recuperada</h4>
+        <p>Con pesos SCARED y sin enhancement, MonoIIT (72.7 ms) y Monodepth2 (27.4 ms) son rápidos y precisos. El enhancement los frena a &gt;150 ms sin ganancia.</p>
       </div>
     </div>
   </div>
 
   <hr class="divider">
 
-  <!-- ── Conclusión ── -->
+  <!-- ── Conclusiones ── -->
   <div class="section">
-    <div class="section-label">// conclusión</div>
-    <h2>Veredicto</h2>
-    <p>El Avance 5 reordena por completo la conclusión del Avance 4. Mientras que con pesos del paper
-    el enhancement (IAT) ayudaba a los modelos genéricos, con <strong>pesos adaptados al dominio</strong>
-    el enhancement se vuelve innecesario o contraproducente. La estrategia ganadora para profundidad
-    endoscópica en SCARED no es corregir la imagen, sino <strong>entrenar el modelo en el dominio
-    objetivo</strong> — y entre esos modelos, <strong>MonoIIT</strong> es el más preciso del proyecto.</p>
+    <div class="section-label">// conclusiones</div>
+    <h2>Conclusiones</h2>
+
+    <h4>1. La adaptación al dominio supera por amplio margen al enhancement</h4>
+    <p>El resultado más contundente del proyecto: re-entrenar en SCARED reduce el error 41–66%, frente
+    al máximo de 12% que lograba el mejor enhancement (IAT) en el Avance 4. Si el objetivo es maximizar
+    la precisión de profundidad en un dominio, <strong>invertir en datos de entrenamiento del dominio
+    rinde mucho más que invertir en corrección de imagen</strong>.</p>
+
+    <h4>2. El Avance 5 invierte la conclusión del Avance 4</h4>
+    <p>En el Avance 4, con pesos del paper, IAT ayudaba a los modelos genéricos (EndoDepth −12%,
+    MonoViT −7.3%). En el Avance 5, con pesos ya adaptados a SCARED, ese beneficio <strong>desaparece</strong>:
+    el enhancement se vuelve neutro o contraproducente. La utilidad del enhancement era, en realidad,
+    una forma indirecta de compensar el domain gap — que el fine-tuning resuelve de raíz.</p>
+
+    <h4>3. MonoIIT es la mejor combinación de precisión y viabilidad</h4>
+    <p>MonoIIT sin enhancement alcanza AbsRel 0.0373 a 72.7 ms (~14 FPS), el mejor del proyecto.
+    Para uso clínico en SCARED, la recomendación es clara: <strong>MonoIIT con pesos SCARED, sin
+    ningún enhancement</strong>.</p>
+
+    <h4>4. La hipótesis del proyecto se confirma con un matiz importante</h4>
+    <p>La hipótesis original —que la corrección de iluminación mejora la profundidad— solo se cumple
+    cuando el modelo <em>no</em> conoce el dominio. Una vez adaptado al dominio (pesos SCARED), la
+    corrección de iluminación es innecesaria. La única excepción persistente es AF-SfMLearner, donde
+    la combinación appearance flow + EndoLMSPEC sí aporta una mejora marginal.</p>
+
+    <div class="note purple" style="margin-top:1.5rem;">
+      <strong>Ranking final del proyecto (AbsRel, mejor configuración de cada modelo):</strong><br>
+      🥇 MonoIIT 0.0373 (SCARED) · 🥈 HADepth 0.0444 (A4) · 🥉 w19-MonoViT 0.0459 (SCARED) ·
+      4º Monodepth2 0.0568 (SCARED) · 5º AF-SfMLearner 0.106 · 6º MonoViT 0.1328 (SCARED) ·
+      7º EndoSfMLearner 0.1706 (SCARED)
+    </div>
   </div>
 
 </div>
