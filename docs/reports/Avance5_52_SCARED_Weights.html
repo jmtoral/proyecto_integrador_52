@@ -7494,7 +7494,20 @@ flowchart TD
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=e1c96dc1-b1b9-4668-8388-5d20e6995f20">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=e1c96dc1-b1b9-4668-8388-5d20e6995f20">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>torch  : 2.11.0+cu128
+CUDA   : True
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2ec6e749-0107-47c2-b1d1-f4caeb0d5405">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -7568,7 +7581,30 @@ con un módulo de iluminación adicional que no se usa en inferencia de profundi
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=9d7dde49-d8f3-41c8-9491-a9025203b593">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=9d7dde49-d8f3-41c8-9491-a9025203b593">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Drive already mounted at /content/drive; to attempt to forcibly remount, call drive.mount("/content/drive", force_remount=True).
+Entorno : Colab
+OUT_DIR : /content/repo_52/outcomes/avance5
+  SCARED_ROOT         : ✓
+  LMSPEC_WEIGHTS      : ✓
+  IAT_WEIGHTS         : ✓
+  ENDOSFM_WEIGHTS     : ✓
+  W_MONO2             : ✓
+  W_MONOVIT           : ✓
+  W_AFSFM             : ✓
+  W_MONOIIT           : ✓
+  W_W19MONO           : ✓
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=668244e8-3f56-423e-a7d4-30a802a7d7ac">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -7580,7 +7616,34 @@ con un módulo de iluminación adicional que no se usa en inferencia de profundi
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput" id="cell-id=b3a8d5cd-ea84-4fdc-9a56-d7bc1b02e99f">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput" id="cell-id=b3a8d5cd-ea84-4fdc-9a56-d7bc1b02e99f">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Dispositivo: cuda
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>/usr/local/lib/python3.12/dist-packages/torchvision/models/_utils.py:135: UserWarning: Using 'weights' as positional parameter(s) is deprecated since 0.13 and may be removed in the future. Please use keyword parameter(s) instead.
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=None`.
+  warnings.warn(msg)
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Monodepth2 (SCARED): 256x320 — cargado OK
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8d173985-a97c-4d8b-b3ec-08e4143578a8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -7633,7 +7696,7 @@ se usa durante el entrenamiento; para inferencia de profundidad se usan solo <co
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="2f.-weights19-MonoViT-(%C2%BFMonoIIF?-%E2%80%94-confirmar-con-Dr.-Espinosa-Loera)">2f. weights19-MonoViT (¿MonoIIF? — confirmar con Dr. Espinosa Loera)<a class="anchor-link" href="#2f.-weights19-MonoViT-(%C2%BFMonoIIF?-%E2%80%94-confirmar-con-Dr.-Espinosa-Loera)">¶</a></h3><p>Esta carpeta tiene la misma estructura que MonoIIT (con <code>lighting.pth</code>).
+<h3 id="2f.-weights19-MonoViT">2f. weights19-MonoViT<a class="anchor-link" href="#2f.-weights19-MonoViT">¶</a></h3><p>Esta carpeta tiene la misma estructura que MonoIIT (con <code>lighting.pth</code>).
 Podría ser MonoIIF, el tercer modelo propuesto. <strong>Pendiente de confirmación.</strong></p>
 </div>
 </div>
