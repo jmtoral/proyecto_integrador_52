@@ -1,0 +1,129 @@
+\documentclass{article}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{microtype}
+
+% Hoja horizontal (landscape)
+\usepackage[landscape, left=2cm, right=2cm, top=2cm, bottom=2cm]{geometry}
+
+\begin{document}
+
+% ======================================================================
+% TABLA 1 — AVANCE 4 (pesos originales del paper)
+% ======================================================================
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+
+\caption{\textbf{Avance 4} — Resultados con \textbf{pesos originales del paper}. Comparación de métodos de mejora (Enhancement) frente al baseline.}
+\label{tab:avance4}
+
+\begin{tabular}{llccccccccc@{\hspace{12pt}}l}
+\toprule
+\textbf{Modelo} & \textbf{Enhancement} & \textbf{AbsRel} & \textbf{SqRel} & \textbf{RMSE} & \textbf{RMSELog} & $\mathbf{\delta < 1.25}$ & $\mathbf{\delta < 1.25^2}$ & $\mathbf{\delta < 1.25^3}$ & \textbf{IT (ms)} & \textbf{$\mathbf{\Delta\text{AR}\%}$} & \\
+\midrule
+
+EndoDepth & none       & 0.1652 &  2.6842 & 12.468 & 0.2119 & 0.7764 & 0.9420 & 0.9900 &  27.4 & baseline & \\
+          & retinex    & 0.1533 &  2.3998 & 11.578 & 0.2137 & 0.8015 & 0.9394 & 0.9823 & 372.2 &  -7.2\%  & $\leftarrow$ \\
+          & endolmspec & 0.1635 &  2.8055 & 12.949 & 0.2259 & 0.7660 & 0.9299 & 0.9848 & 143.6 &  -1.0\%  & $\leftarrow$ \\
+          & iat        & 0.1454 &  2.1133 & 11.074 & 0.1899 & 0.8223 & 0.9581 & 0.9910 & 271.4 & -12.0\%  & $\leftarrow$ \\
+\addlinespace[0.8em]
+
+EndoSfMLearner & none       & 0.2906 & 7.6026 & 21.002 & 0.3802 & 0.4706 & 0.7550 & 0.9148 &   6.2 & baseline & \\
+               & retinex    & 0.2908 & 7.6062 & 21.000 & 0.3804 & 0.4706 & 0.7548 & 0.9142 & 351.1 &  +0.1\%  & \\
+               & endolmspec & 0.2904 & 7.5904 & 20.981 & 0.3797 & 0.4709 & 0.7558 & 0.9154 & 122.4 &  -0.1\%  & $\leftarrow$ \\
+               & iat        & 0.2902 & 7.5804 & 20.969 & 0.3795 & 0.4712 & 0.7560 & 0.9157 & 250.4 &  -0.1\%  & $\leftarrow$ \\
+\addlinespace[0.8em]
+
+MonoViT & none       & 0.3046 & 10.2427 & 23.729 & 0.3532 & 0.4838 & 0.7896 & 0.9348 &  53.3 & baseline & \\
+        & retinex    & 0.3139 & 11.5943 & 26.566 & 0.3438 & 0.4574 & 0.8143 & 0.9510 & 397.7 &  +3.1\%  & \\
+        & endolmspec & 0.3305 & 12.3400 & 26.422 & 0.3712 & 0.4422 & 0.7657 & 0.9273 & 169.2 &  +8.5\%  & \\
+        & iat        & 0.2825 &  8.1560 & 21.340 & 0.3280 & 0.4917 & 0.8321 & 0.9485 & 297.0 &  -7.3\%  & $\leftarrow$ \\
+\addlinespace[0.8em]
+
+AF-SfMLearner & none       & 0.1060 & 1.3628 & 8.815 & 0.1461 & 0.9025 & 0.9829 & 0.9912 &  27.4 & baseline & \\
+              & retinex    & 0.1271 & 1.6887 & 9.915 & 0.1709 & 0.8464 & 0.9798 & 0.9913 & 372.2 & +19.9\%  & \\
+              & endolmspec & 0.1074 & 1.3426 & 8.586 & 0.1436 & 0.9104 & 0.9832 & 0.9916 & 143.4 &  +1.3\%  & \\
+              & iat        & 0.1120 & 1.4800 & 9.078 & 0.1511 & 0.8923 & 0.9825 & 0.9912 & 271.6 &  +5.7\%  & \\
+\addlinespace[0.8em]
+
+HADepth & none       & 0.0444 & 0.2534 & 3.683 & 0.0592 & 0.9945 & 0.9990 & 0.9996 &  32.1 & baseline & \\
+        & retinex    & 0.0849 & 0.7427 & 6.333 & 0.1098 & 0.9195 & 0.9951 & 0.9992 & 376.9 & +91.2\%  & \\
+        & endolmspec & 0.0512 & 0.3459 & 4.399 & 0.0713 & 0.9827 & 0.9982 & 0.9995 & 148.2 & +15.3\%  & \\
+        & iat        & 0.0470 & 0.2780 & 3.919 & 0.0645 & 0.9895 & 0.9985 & 0.9997 & 276.1 &  +5.9\%  & \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\begin{minipage}{\linewidth}
+    \footnotesize
+    \textbf{Nota (Avance 4):} Pesos originales de cada paper (Hamlyn, KITTI, Endovis). $\delta < 1.25^k$ = fracción de píxeles con $\max(\text{pred}/\text{gt}, \text{gt}/\text{pred}) < 1.25^k$. $\Delta\text{AR}\%$ negativo indica mejora respecto a \textit{none}; señalado con $\leftarrow$.
+\end{minipage}
+
+\end{table}
+
+% ======================================================================
+% TABLA 2 — AVANCE 5 (pesos re-entrenados en SCARED)
+% ======================================================================
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+
+\caption{\textbf{Avance 5} — Resultados con \textbf{pesos re-entrenados en SCARED} (Dr. Ricardo Espinosa Loera). Comparación de métodos de mejora (Enhancement) frente al baseline.}
+\label{tab:avance5}
+
+\begin{tabular}{llccccccccc@{\hspace{12pt}}l}
+\toprule
+\textbf{Modelo} & \textbf{Enhancement} & \textbf{AbsRel} & \textbf{SqRel} & \textbf{RMSE} & \textbf{RMSELog} & $\mathbf{\delta < 1.25}$ & $\mathbf{\delta < 1.25^2}$ & $\mathbf{\delta < 1.25^3}$ & \textbf{IT (ms)} & \textbf{$\mathbf{\Delta\text{AR}\%}$} & \\
+\midrule
+
+Monodepth2 & none       & 0.0568 & 0.6821 &  4.771 & 0.0777 & 0.9852 & 0.9915 & 0.9939 &  27.4 & baseline  & \\
+           & retinex    & 0.1114 & 1.4798 &  8.236 & 0.1489 & 0.8656 & 0.9742 & 0.9897 & 413.0 & +96.1\%   & \\
+           & endolmspec & 0.0662 & 0.8576 &  5.324 & 0.0876 & 0.9787 & 0.9912 & 0.9929 & 150.0 & +16.5\%   & \\
+           & iat        & 0.0581 & 0.6269 &  4.796 & 0.0791 & 0.9832 & 0.9913 & 0.9948 & 285.3 &  +2.3\%   & \\
+\addlinespace[0.8em]
+
+MonoViT & none       & 0.1328 & 1.9229 &  9.966 & 0.1752 & 0.8476 & 0.9685 & 0.9868 &  51.4 & baseline  & \\
+        & retinex    & 0.1339 & 1.9151 &  9.809 & 0.1755 & 0.8397 & 0.9535 & 0.9887 & 437.5 &  +0.8\%   & \\
+        & endolmspec & 0.1425 & 2.1251 & 10.541 & 0.1841 & 0.8173 & 0.9666 & 0.9864 & 173.9 &  +7.3\%   & \\
+        & iat        & 0.1353 & 1.9456 &  9.930 & 0.1758 & 0.8464 & 0.9643 & 0.9874 & 309.4 &  +1.9\%   & \\
+\addlinespace[0.8em]
+
+EndoSfMLearner & none       & 0.1706 & 3.1434 & 12.754 & 0.2074 & 0.7750 & 0.9387 & 0.9884 &   6.4 & baseline  & \\
+               & retinex    & 0.1710 & 3.1565 & 12.777 & 0.2077 & 0.7743 & 0.9386 & 0.9884 & 392.2 &  +0.2\%   & \\
+               & endolmspec & 0.1707 & 3.1466 & 12.761 & 0.2074 & 0.7747 & 0.9387 & 0.9884 & 129.1 &  +0.1\%   & \\
+               & iat        & 0.1707 & 3.1476 & 12.761 & 0.2075 & 0.7747 & 0.9387 & 0.9884 & 264.3 &  +0.1\%   & \\
+\addlinespace[0.8em]
+
+AF-SfMLearner & none       & 0.1103 & 1.3733 & 8.970 & 0.1420 & 0.9008 & 0.9870 & 0.9966 &  27.2 & baseline  & \\
+              & retinex    & 0.1326 & 1.8277 & 9.682 & 0.1786 & 0.8552 & 0.9600 & 0.9874 & 413.1 & +20.2\%   & \\
+              & endolmspec & 0.1055 & 1.2379 & 8.483 & 0.1365 & 0.9179 & 0.9869 & 0.9968 & 150.2 &  -4.4\%   & $\leftarrow$ \\
+              & iat        & 0.1079 & 1.2953 & 8.678 & 0.1408 & 0.9026 & 0.9844 & 0.9967 & 285.3 &  -2.2\%   & $\leftarrow$ \\
+\addlinespace[0.8em]
+
+MonoIIT & none       & 0.0373 & 0.2642 & 3.487 & 0.0572 & 0.9886 & 0.9958 & 0.9995 &  72.7 & baseline  & \\
+        & retinex    & 0.0988 & 1.1629 & 7.732 & 0.1353 & 0.8911 & 0.9822 & 0.9947 & 458.5 & +164.9\%  & \\
+        & endolmspec & 0.0424 & 0.3540 & 3.700 & 0.0618 & 0.9817 & 0.9926 & 0.9985 & 195.5 & +13.7\%   & \\
+        & iat        & 0.0411 & 0.3067 & 3.637 & 0.0600 & 0.9848 & 0.9941 & 0.9994 & 330.7 & +10.2\%   & \\
+\addlinespace[0.8em]
+
+w19-MonoViT & none       & 0.0459 & 0.2755 & 3.913 & 0.0637 & 0.9881 & 0.9986 & 0.9997 &  72.5 & baseline  & \\
+            & retinex    & 0.1342 & 2.2202 & 9.920 & 0.1850 & 0.8114 & 0.9305 & 0.9740 & 458.4 & +192.4\%  & \\
+            & endolmspec & 0.0597 & 0.3932 & 4.705 & 0.0786 & 0.9827 & 0.9984 & 0.9997 & 195.4 & +30.1\%   & \\
+            & iat        & 0.0524 & 0.3212 & 4.108 & 0.0689 & 0.9880 & 0.9978 & 0.9996 & 330.6 & +14.2\%   & \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\begin{minipage}{\linewidth}
+    \footnotesize
+    \textbf{Nota (Avance 5):} Pesos re-entrenados en SCARED. El fine-tuning en el dominio de evaluación reduce drásticamente el error del baseline frente al Avance 4 (p.\,ej. Monodepth2 / EndoDepth: AbsRel $0.1652 \to 0.0568$). Con estos pesos, el enhancement deja de ser beneficioso salvo para AF-SfMLearner ($\leftarrow$). \textbf{MonoIIT} (AbsRel $0.0373$) es el mejor modelo del proyecto.
+\end{minipage}
+
+\end{table}
+
+\end{document}
