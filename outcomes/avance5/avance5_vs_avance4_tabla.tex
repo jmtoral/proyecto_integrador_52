@@ -1,0 +1,31 @@
+% Comparativa baseline (none): Avance 4 (pesos paper) vs Avance 5 (pesos SCARED)
+% Equipo 52 — Proyecto Integrador TC5035.10
+% Requiere: \usepackage{booktabs}
+\begin{table}[t]
+\centering
+\caption{Efecto del fine-tuning en SCARED sobre el baseline (sin enhancement). Comparación entre los pesos originales del paper (Avance 4) y los pesos re-entrenados en SCARED (Avance 5). $\Delta$ negativo indica mejora con los pesos SCARED.}
+\label{tab:a4vsa5}
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.15}
+\small
+\begin{tabular}{lcccccc}
+\toprule
+\multirow{2}{*}{\textbf{Modelo}} & \multicolumn{3}{c}{$\epsilon_{\text{AbsRel}}\!\downarrow$} & \multicolumn{2}{c}{$\delta < 1.25\!\uparrow$} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-6}
+ & A4 (paper) & A5 (SCARED) & $\Delta$ & A4 & A5 \\
+\midrule
+Monodepth2     & 0.1652 & \textbf{0.0568} & $-65.6\%$ & 0.7764 & \textbf{0.9852} \\
+MonoViT        & 0.3046 & \textbf{0.1328} & $-56.4\%$ & 0.4838 & \textbf{0.8476} \\
+EndoSfMLearner & 0.2906 & \textbf{0.1706} & $-41.3\%$ & 0.4706 & \textbf{0.7750} \\
+AF-SfMLearner  & 0.1060 & 0.1103 & $+4.1\%$ & 0.9025 & 0.9008 \\
+\midrule
+\multicolumn{6}{l}{\emph{Modelos exclusivos del Avance 5 (no evaluados en Avance 4):}} \\
+MonoIIT        & --- & \textbf{0.0373} & --- & --- & 0.9886 \\
+w19-MonoViT    & --- & 0.0459 & --- & --- & 0.9881 \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+\footnotesize
+\textbf{Nota:} El fine-tuning en SCARED mejora drásticamente el baseline de los modelos genéricos (Monodepth2, MonoViT) y endoscópicos de cápsula (EndoSfMLearner). AF-SfMLearner, ya entrenado en datos endoscópicos comparables, no mejora significativamente. \textbf{MonoIIT (AbsRel 0.0373)} es el mejor modelo de todo el proyecto, superando a HADepth del Avance 4 (0.0444).
+\end{table}
