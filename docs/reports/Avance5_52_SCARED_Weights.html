@@ -7782,8 +7782,77 @@ Podría ser MonoIIF, el tercer modelo propuesto. <strong>Pendiente de confirmaci
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
-<h2 id="9.-Comparativa-Avance-4-vs.-Avance-5-(baseline-none)">9. Comparativa Avance 4 vs. Avance 5 (baseline none)<a class="anchor-link" href="#9.-Comparativa-Avance-4-vs.-Avance-5-(baseline-none)">¶</a></h2><p>La siguiente celda carga los resultados del Avance 4 (si están en Drive/repo)
-y compara el baseline <code>none</code> de cada modelo entre pesos originales y pesos SCARED.</p>
+<h2 id="9.-Comparativa-Avance-4-vs.-Avance-5-(baseline-none)">9. Comparativa Avance 4 vs. Avance 5 (baseline none)<a class="anchor-link" href="#9.-Comparativa-Avance-4-vs.-Avance-5-(baseline-none)">¶</a></h2><p>Compara el baseline <code>none</code> de cada modelo entre <strong>pesos originales del paper</strong> (Avance 4)
+y <strong>pesos re-entrenados en SCARED</strong> (Avance 5). Δ negativo = el fine-tuning en SCARED mejora.</p>
+<h3 id="Hallazgo-principal:-el-fine-tuning-en-SCARED-mejora-dr%C3%A1sticamente-el-baseline">Hallazgo principal: el fine-tuning en SCARED mejora drásticamente el baseline<a class="anchor-link" href="#Hallazgo-principal:-el-fine-tuning-en-SCARED-mejora-dr%C3%A1sticamente-el-baseline">¶</a></h3><table>
+<thead>
+<tr>
+<th>Modelo</th>
+<th>AbsRel A4 (paper)</th>
+<th>AbsRel A5 (SCARED)</th>
+<th>Δ AbsRel</th>
+<th>δ&lt;1.25 A4 → A5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Monodepth2 / EndoDepth</strong></td>
+<td>0.165</td>
+<td><strong>0.057</strong></td>
+<td><strong>−65.6%</strong></td>
+<td>0.776 → 0.985</td>
+</tr>
+<tr>
+<td><strong>MonoViT</strong></td>
+<td>0.305</td>
+<td><strong>0.133</strong></td>
+<td><strong>−56.4%</strong></td>
+<td>0.484 → 0.848</td>
+</tr>
+<tr>
+<td><strong>EndoSfMLearner</strong></td>
+<td>0.291</td>
+<td><strong>0.171</strong></td>
+<td><strong>−41.3%</strong></td>
+<td>0.471 → 0.775</td>
+</tr>
+<tr>
+<td><strong>AF-SfMLearner</strong></td>
+<td>0.106</td>
+<td>0.110</td>
+<td>+4.1%</td>
+<td>0.903 → 0.901</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Modelos nuevos (solo en A5):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Modelo</th>
+<th>AbsRel</th>
+<th>RMSE</th>
+<th>δ&lt;1.25</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MonoIIT</strong></td>
+<td><strong>0.0373</strong></td>
+<td>3.487</td>
+<td>0.989</td>
+</tr>
+<tr>
+<td><strong>w19-MonoViT</strong></td>
+<td>0.0459</td>
+<td>3.913</td>
+<td>0.988</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>MonoIIT (AbsRel 0.0373) es el mejor modelo de todo el proyecto</strong> — supera incluso a HADepth del Avance 4 (0.044).</p>
+</blockquote>
 </div>
 </div>
 </div>
