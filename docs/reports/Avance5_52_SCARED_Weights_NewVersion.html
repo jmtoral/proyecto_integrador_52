@@ -7457,6 +7457,43 @@ a.anchor-link {
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=51c70c4a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="New-Version-%E2%80%94-Evaluaci%C3%B3n-con-el-split-oficial-y-Endo-STTN">New Version — Evaluación con el <em>split</em> oficial y Endo-STTN<a class="anchor-link" href="#New-Version-%E2%80%94-Evaluaci%C3%B3n-con-el-split-oficial-y-Endo-STTN">¶</a></h2><blockquote>
+<p><strong>Equipo 52 · Proyecto Integrador TC5035.10 — MNA, Tecnológico de Monterrey</strong></p>
+</blockquote>
+<p>Esta <strong>New Version</strong> del Avance 5 incorpora las dos peticiones del profesor que modifican sustancialmente la metodología de evaluación:</p>
+<ol>
+<li><p><strong>Protocolo de prueba estándar.</strong> En lugar de evaluar sobre 10 <em>keyframes</em> sueltos (datasets 8–9), ahora usamos el ***split* oficial de AF-SfMLearner** (<code>splits/endovis/test_files.txt</code>): <strong>550 fotogramas</strong> de los <em>datasets</em> 1–7 de SCARED. Este es el mismo conjunto de prueba que reportan los artículos del estado del arte, de modo que nuestros números son <strong>directamente comparables con la literatura</strong>.</p>
+</li>
+<li><p><strong>Endo-STTN como nuevo método de mejora.</strong> Añadimos un quinto <em>enhancement</em>: <strong>Endo-STTN</strong> (<em>Spatio-Temporal Transformer Network</em>), un modelo de <em>inpainting</em> de vídeo que elimina los <strong>reflejos especulares</strong> aprovechando la información <strong>temporal</strong> de los fotogramas vecinos.</p>
+</li>
+</ol>
+<h3 id="%C2%BFQu%C3%A9-pregunta-de-investigaci%C3%B3n-respondemos?">¿Qué pregunta de investigación respondemos?<a class="anchor-link" href="#%C2%BFQu%C3%A9-pregunta-de-investigaci%C3%B3n-respondemos?">¶</a></h3><blockquote>
+<p><em>¿Los métodos de realce de imagen (image enhancement) mejoran la estimación de profundidad monocular en endoscopía?</em></p>
+</blockquote>
+<p>Comparamos, para <strong>6 modelos de profundidad entrenados en SCARED</strong> (pesos del Dr. Ricardo Espinosa Loera) y <strong>5 métodos de realce</strong>, el error de profundidad respecto al <em>ground-truth</em> estéreo de SCARED.</p>
+<h3 id="Flujo-general-del-experimento">Flujo general del experimento<a class="anchor-link" href="#Flujo-general-del-experimento">¶</a></h3><div class="jp-Mermaid"><pre class="mermaid">
+flowchart LR
+    A[SCARED zip<br>rgb.mp4 + scene_points] --&gt; B[Extracción<br>550 frames del split]
+    B --&gt; C{Enhancement}
+    C --&gt;|none| D[Modelo de<br>profundidad]
+    C --&gt;|retinex| D
+    C --&gt;|endolmspec| D
+    C --&gt;|iat| D
+    C --&gt;|endosttn| D
+    D --&gt; E[Profundidad<br>predicha]
+    E --&gt; F[Métricas vs GT<br>AbsRel, RMSE, delta...]
+    F --&gt; G[Tabla + CSV<br>+ visualizaciones]
+</br></br></br></br></br></br></pre></div><p>A lo largo del <em>notebook</em> las celdas de texto explican cada etapa con el detalle suficiente para que el reporte sea <strong>autoexplicativo</strong>.</p>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f3583eb1-5c7b-48f6-97f2-3552687deee2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -7605,6 +7642,26 @@ con un módulo de iluminación adicional que no se usa en inferencia de profundi
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a17804e4">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="1.-Configuraci%C3%B3n-del-entorno-y-el-split-oficial">1. Configuración del entorno y el <em>split</em> oficial<a class="anchor-link" href="#1.-Configuraci%C3%B3n-del-entorno-y-el-split-oficial">¶</a></h2><p>Esta celda define todas las rutas (en <strong>Google Colab</strong> los datos viven en Drive; en <strong>local</strong> en disco <code>E:</code>) y carga el ***split* oficial**.</p>
+<h3 id="%C2%BFQu%C3%A9-es-el-split-de-prueba?">¿Qué es el <em>split</em> de prueba?<a class="anchor-link" href="#%C2%BFQu%C3%A9-es-el-split-de-prueba?">¶</a></h3><p>Un <em>split</em> es simplemente una <strong>lista fija de qué fotogramas se usan para evaluar</strong>, para que todos los trabajos midan sobre exactamente los mismos datos. El de AF-SfMLearner (<code>endovis/test_files.txt</code>) tiene 550 líneas con este formato:</p>
+<pre><code>dataset3/keyframe4 390 l
+└─────┬─────┘     └┬┘ └┬┘
+ carpeta        frame  lado (left)
+</code></pre>
+<p>Cada línea dice: <em>"el fotograma 390 del keyframe 4 del dataset 3, cámara izquierda"</em>. La función <code>load_split()</code> traduce eso a tuplas <code>(dataset_3, keyframe_4, 390)</code> que el resto del <em>notebook</em> consume.</p>
+<blockquote>
+<p><strong>Por qué importa:</strong> usar este <em>split</em> es lo que hace que nuestros resultados sean <strong>comparables</strong> con AF-SfMLearner, MonoViT y los demás artículos — no es un detalle administrativo, es el corazón del rigor experimental.</p>
+</blockquote>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9d7dde49-d8f3-41c8-9491-a9025203b593">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -7741,6 +7798,43 @@ con un módulo de iluminación adicional que no se usa en inferencia de profundi
 <hr/>
 <h3 id="Extracci%C3%B3n-del-split-oficial-(550-frames)">Extracción del split oficial (550 frames)<a class="anchor-link" href="#Extracci%C3%B3n-del-split-oficial-(550-frames)">¶</a></h3><p>El split de AF-SfMLearner (<code>endovis/test_files.txt</code>) referencia <strong>frames concretos dentro de los vídeos</strong> de cada <em>keyframe</em> (<code>data/rgb.mp4</code>) y su <em>ground-truth</em> de profundidad (<code>data/scene_points.tar.gz</code>, un <code>.tiff</code> por frame). Esta celda extrae <strong>solo</strong> los frames listados en el split —imagen + GT, recortados a la mitad izquierda <code>[0:1024,:]</code> como en el código oficial— y los cachea en disco para no re-extraer.</p>
 <p>Mapeo oficial: para el frame <code>N</code> → imagen = frame <code>N</code> del vídeo, GT = <code>scene_points{N-1:06d}.tiff</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b024f021">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="2.-Extracci%C3%B3n-de-los-550-fotogramas-del-split">2. Extracción de los 550 fotogramas del <em>split</em><a class="anchor-link" href="#2.-Extracci%C3%B3n-de-los-550-fotogramas-del-split">¶</a></h2><p>Aquí está la diferencia técnica más grande respecto a versiones anteriores. El <em>split</em> referencia fotogramas que <strong>no existen como archivos sueltos</strong> dentro de los <code>.zip</code> de SCARED — están <strong>dentro de dos contenedores comprimidos</strong> por cada <em>keyframe</em>:</p>
+<table>
+<thead>
+<tr>
+<th>Contenedor</th>
+<th>Qué contiene</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data/rgb.mp4</code></td>
+<td>El <strong>vídeo</strong> completo del <em>keyframe</em> (~830 fotogramas)</td>
+</tr>
+<tr>
+<td><code>data/scene_points.tar.gz</code></td>
+<td>El <em><strong>ground-truth</strong></em> de profundidad, un <code>.tiff</code> por fotograma</td>
+</tr>
+</tbody>
+</table>
+<h3 id="C%C3%B3mo-se-mapea-cada-fotograma-a-su-ground-truth">Cómo se mapea cada fotograma a su <em>ground-truth</em><a class="anchor-link" href="#C%C3%B3mo-se-mapea-cada-fotograma-a-su-ground-truth">¶</a></h3><p>El código sigue <strong>exactamente</strong> la convención oficial de AF-SfMLearner:</p>
+<ul>
+<li><strong>Imagen</strong> del fotograma <code>N</code> → fotograma <code>N</code> del <code>rgb.mp4</code></li>
+<li><strong>Profundidad</strong> del fotograma <code>N</code> → archivo <code>scene_points{N-1:06d}.tiff</code> (¡ojo: índice <strong>desfasado en 1</strong>!)</li>
+<li>Ambos se <strong>recortan a la mitad izquierda</strong> <code>[0:1024, :]</code> (SCARED es estéreo; usamos la cámara izquierda)</li>
+<li>El <code>.tiff</code> de GT guarda coordenadas 3D; tomamos el <strong>canal Z</strong> (la profundidad en mm)</li>
+</ul>
+<h3 id="Cach%C3%A9-persistente-(para-no-re-extraer-nunca-m%C3%A1s)">Caché persistente (para no re-extraer nunca más)<a class="anchor-link" href="#Cach%C3%A9-persistente-(para-no-re-extraer-nunca-m%C3%A1s)">¶</a></h3><p>La extracción es <strong>lenta</strong> (decodificar vídeo es trabajo de CPU). Por eso, la <strong>primera vez</strong> se extraen los 550 fotogramas y se guardan <strong>empaquetados</strong> en <code>BASE/split_frames.npz</code> (en tu Drive). En <strong>todas las sesiones siguientes</strong>, el <em>notebook</em> detecta ese <code>.npz</code> y <strong>carga todo en segundos</strong>, saltándose la extracción. Para forzar una re-extracción, define <code>FORCE_REEXTRACT = True</code> antes de esta celda.</p>
 </div>
 </div>
 </div>
@@ -8195,6 +8289,62 @@ Podría ser MonoIIF, el tercer modelo propuesto. <strong>Pendiente de confirmaci
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c61a5f64">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="4.-M%C3%A9todos-de-realce-de-imagen-(enhancement)">4. Métodos de realce de imagen (<em>enhancement</em>)<a class="anchor-link" href="#4.-M%C3%A9todos-de-realce-de-imagen-(enhancement)">¶</a></h2><p>El experimento compara <strong>5 estrategias</strong> de pre-procesamiento aplicadas a la imagen <em>antes</em> de estimar profundidad. La hipótesis es que corregir la iluminación/reflejos podría ayudar al modelo de profundidad.</p>
+<table>
+<thead>
+<tr>
+<th>Método</th>
+<th>Tipo</th>
+<th>Idea</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>none</strong></td>
+<td>—</td>
+<td>Imagen original, sin tocar (línea base)</td>
+</tr>
+<tr>
+<td><strong>retinex</strong></td>
+<td>Clásico</td>
+<td><em>Single-Scale Retinex</em>: separa reflectancia de iluminación para homogenizar el brillo</td>
+</tr>
+<tr>
+<td><strong>endolmspec</strong></td>
+<td><em>Deep</em></td>
+<td>EndoLMSPEC: pirámide Laplaciana + U-Nets, entrenado para realce endoscópico</td>
+</tr>
+<tr>
+<td><strong>iat</strong></td>
+<td><em>Deep</em></td>
+<td>IAT (<em>Illumination-Adaptive Transformer</em>): corrige exposición con mapeo local + global</td>
+</tr>
+<tr>
+<td><strong>endosttn</strong></td>
+<td><em>Deep · temporal</em></td>
+<td><strong>Endo-STTN</strong> (nuevo): elimina reflejos especulares</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Endo-STTN-%E2%80%94-el-m%C3%A9todo-nuevo,-y-por-qu%C3%A9-es-especial">Endo-STTN — el método nuevo, y por qué es especial<a class="anchor-link" href="#Endo-STTN-%E2%80%94-el-m%C3%A9todo-nuevo,-y-por-qu%C3%A9-es-especial">¶</a></h3><p>A diferencia de los otros cuatro (que procesan <strong>una imagen aislada</strong>), Endo-STTN es <strong>temporal</strong>: trata la secuencia de fotogramas de un <em>keyframe</em> como un vídeo y rellena (<em>inpainting</em>) las zonas de <strong>reflejo especular</strong> usando lo que se ve en los <strong>fotogramas vecinos</strong>. El procedimiento:</p>
+<ol>
+<li>Detecta los reflejos especulares (zonas muy brillantes) → genera una <strong>máscara</strong>.</li>
+<li>Un <em>transformer</em> espacio-temporal "mira" una ventana de <strong>10 fotogramas vecinos</strong> y reconstruye el contenido oculto bajo el reflejo.</li>
+<li>Devuelve cada fotograma con los reflejos sustituidos por tejido plausible.</li>
+</ol>
+<blockquote>
+<p>Por eso el <em>split</em> de 550 fotogramas <strong>consecutivos</strong> es ideal para Endo-STTN: necesita vecindad temporal, algo imposible con los <em>keyframes</em> sueltos de antes. La salida se **cachea por *keyframe*** para no re-procesar la misma secuencia.</p>
+</blockquote>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2a46e60d-c10a-4807-bda5-88fcdef6cc21">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -8407,6 +8557,101 @@ Podría ser MonoIIF, el tercer modelo propuesto. <strong>Pendiente de confirmaci
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d0f3b8dc">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="3.-Modelos-de-profundidad-y-m%C3%A9tricas-de-evaluaci%C3%B3n">3. Modelos de profundidad y métricas de evaluación<a class="anchor-link" href="#3.-Modelos-de-profundidad-y-m%C3%A9tricas-de-evaluaci%C3%B3n">¶</a></h2><h3 id="Los-6-modelos-(todos-re-entrenados-en-SCARED-por-el-Dr.-Espinosa-Loera)">Los 6 modelos (todos re-entrenados en SCARED por el Dr. Espinosa Loera)<a class="anchor-link" href="#Los-6-modelos-(todos-re-entrenados-en-SCARED-por-el-Dr.-Espinosa-Loera)">¶</a></h3><table>
+<thead>
+<tr>
+<th>Modelo</th>
+<th>Arquitectura</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Monodepth2</strong></td>
+<td>ResNet-18 + <em>DepthDecoder</em> (auto-supervisado clásico)</td>
+</tr>
+<tr>
+<td><strong>MonoViT</strong></td>
+<td><em>Encoder</em> MPViT-Small + decodificador estilo Monodepth2</td>
+</tr>
+<tr>
+<td><strong>EndoSfMLearner</strong></td>
+<td>DispResNet-18 (especializado en endoscopía)</td>
+</tr>
+<tr>
+<td><strong>AF-SfMLearner</strong></td>
+<td>ResNet-18 + <em>Appearance Flow</em> (corrige cambios de brillo entre cuadros)</td>
+</tr>
+<tr>
+<td><strong>MonoIIT</strong></td>
+<td>MPViT + módulo de iluminación (mismo código que MonoViT, pesos distintos)</td>
+</tr>
+<tr>
+<td><strong>w19-MonoViT</strong></td>
+<td>Variante MonoViT (posible MonoIIF)</td>
+</tr>
+</tbody>
+</table>
+<p>Todos predicen <strong>profundidad relativa</strong>; para comparar con el GT en mm aplicamos <em><strong>median scaling</strong></em> (escalado por la mediana), el estándar en profundidad monocular auto-supervisada.</p>
+<h3 id="Las-m%C3%A9tricas">Las métricas<a class="anchor-link" href="#Las-m%C3%A9tricas">¶</a></h3><p>Sobre los píxeles válidos del GT (profundidad en <code>(0, 150] mm</code>) calculamos:</p>
+<table>
+<thead>
+<tr>
+<th>Métrica</th>
+<th>Qué mide</th>
+<th>Mejor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AbsRel</strong></td>
+<td>Error relativo absoluto medio <code>\|pred−gt\|/gt</code></td>
+<td>↓ menor</td>
+</tr>
+<tr>
+<td><strong>SqRel</strong></td>
+<td>Error relativo cuadrático</td>
+<td>↓ menor</td>
+</tr>
+<tr>
+<td><strong>RMSE</strong></td>
+<td>Raíz del error cuadrático medio (mm)</td>
+<td>↓ menor</td>
+</tr>
+<tr>
+<td><strong>RMSELog</strong></td>
+<td>RMSE en escala logarítmica</td>
+<td>↓ menor</td>
+</tr>
+<tr>
+<td><strong>δ &lt; 1.25ᵏ</strong></td>
+<td>Fracción de píxeles "casi correctos" (k = 1,2,3)</td>
+<td>↑ mayor</td>
+</tr>
+<tr>
+<td><strong>Chamfer</strong></td>
+<td>Distancia entre nubes de puntos 3D</td>
+<td>↓ menor</td>
+</tr>
+<tr>
+<td><strong>AbsRel_spec / _nospec</strong></td>
+<td>AbsRel <strong>dentro</strong> vs. <strong>fuera</strong> de zonas de reflejo</td>
+<td>↓ menor</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>La separación <strong>spec / nospec</strong> es clave para esta versión: nos permite medir si Endo-STTN (que ataca los especulares) realmente <strong>mejora la profundidad justo en las zonas de reflejo</strong>.</p>
+</blockquote>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9cc8b3f3-77d6-41fc-82fa-0c0dcf7d4b44">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -8584,6 +8829,21 @@ Podría ser MonoIIF, el tercer modelo propuesto. <strong>Pendiente de confirmaci
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0c41fc8a">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="5.-Bucle-de-evaluaci%C3%B3n-con-checkpointing">5. Bucle de evaluación con <em>checkpointing</em><a class="anchor-link" href="#5.-Bucle-de-evaluaci%C3%B3n-con-checkpointing">¶</a></h2><p>Se recorren los <strong>550 fotogramas × 5 <em>enhancements</em> × 6 modelos</strong>. Para cada combinación se mide el error de profundidad y los tiempos de cómputo.</p>
+<p>Como es un experimento largo, el bucle <strong>guarda el CSV cada 50 evaluaciones</strong> y, si se reinicia, <strong>reanuda donde quedó</strong> (lee lo ya hecho y solo calcula lo que falta). Así, aunque la sesión de Colab se interrumpa, no se pierde el progreso.</p>
+<blockquote>
+<p>El <em>enhancement</em> <code>endosttn</code> se invoca de forma distinta (necesita saber <code>dataset/keyframe/frame</code> para usar su contexto temporal); el resto recibe solo la imagen.</p>
+</blockquote>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=36b044a7-d19a-42ca-9ce9-da242dba36d5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -8656,6 +8916,17 @@ Podría ser MonoIIF, el tercer modelo propuesto. <strong>Pendiente de confirmaci
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
 <h2 id="7.-Resumen-de-resultados">7. Resumen de resultados<a class="anchor-link" href="#7.-Resumen-de-resultados">¶</a></h2>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a0900763">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="6.-Resumen-de-resultados">6. Resumen de resultados<a class="anchor-link" href="#6.-Resumen-de-resultados">¶</a></h2><p>Se agregan los resultados por <strong>(modelo, método)</strong> promediando sobre los 550 fotogramas, y se calcula la <strong>mejora porcentual de AbsRel</strong> de cada <em>enhancement</em> respecto a su línea base (<code>none</code>). Un valor <strong>negativo</strong> (marcado con ←) indica que el realce <strong>mejoró</strong> la profundidad.</p>
 </div>
 </div>
 </div>
@@ -8771,6 +9042,17 @@ Podría ser MonoIIF, el tercer modelo propuesto. <strong>Pendiente de confirmaci
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3abbe4f7">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="7.-Visualizaci%C3%B3n-cualitativa">7. Visualización cualitativa<a class="anchor-link" href="#7.-Visualizaci%C3%B3n-cualitativa">¶</a></h2><p>Para inspeccionar visualmente, se elige un fotograma representativo de dos <em>keyframes</em> distintos del <em>split</em> y se muestran, lado a lado, los mapas de profundidad predichos por cada modelo bajo cada <em>enhancement</em>, junto al <em>ground-truth</em>. El mapa de color <code>plasma_r</code> codifica <strong>amarillo = cerca, azul = lejos</strong>, normalizado por percentiles (p2–p98) para que los detalles sean visibles.</p>
 </div>
 </div>
 </div>
