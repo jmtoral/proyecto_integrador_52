@@ -63,3 +63,29 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+---
+
+# Contexto del proyecto (Equipo 52 · TC5035.10 · MNA Tec)
+
+Pregunta de investigación: **¿los métodos de image enhancement mejoran la estimación de profundidad monocular en endoscopía (SCARED)?**
+- **Avance 4**: pesos originales de cada paper. **Avance 5**: pesos re-entrenados en SCARED (Dr. Ricardo Espinosa Loera).
+- **New Version** de ambos: usan el **split oficial de AF-SfMLearner** (`data/splits/endovis/test_files.txt`, 550 frames, datasets 1-7) y añaden **Endo-STTN** como 5º enhancement.
+
+## Cómo se ejecuta (CRÍTICO)
+- **El kernel corre en Google Colab; el repo vive en el disco local del usuario.** Yo NO veo Drive ni el disco externo `E:` (TOSHIBA EXT) desde mi sesión — debo pedir al usuario que corra snippets en Colab y me pegue la salida.
+- En Colab el repo se clona en `/content/repo_52`. Si ya existe de una sesión previa, hace `git pull --ff-only` (no se re-clona solo). **Editar/recargar un archivo NO cambia lo que ya está corriendo en el kernel de Colab**: una celda en ejecución conserva en memoria la versión vieja de las funciones hasta que se re-ejecuta esa celda.
+- **Editar notebooks vía Python + json.dump**: SIEMPRE normalizar `source` a lista (`splitlines(keepends=True)`) y quitar `outputs`/`execution_count` de celdas markdown, o GitHub deja de renderizar (nbconvert error). Validar con `nbconvert --to html` antes de commitear. Ver [[feedback_notebook_json_editing]].
+- HTML de notebooks se generan a `docs/reports/` (CON código, sin `--no-input`) y se parchean con `patch_mermaid.py`. Enlazados en `reader.html` (tabs) e `index.html`.
+- Entorno local de validación: `C:\Users\User\anaconda3\envs\computer_vision\python.exe`. Ver [[reference_python_env]].
+
+## Rendimiento del experimento
+- **Chamfer es el cuello de botella** (KD-Trees en CPU, ~16500×, lleva la corrida a ~7h) y **NO está en la tabla que pide el profe**. Está tras el flag `COMPUTE_CHAMFER = False` (default). Reactivable solo si se necesita métrica 3D (p.ej. para un paper MICAI). Hay una celda opcional "5b" que calcula Chamfer rápido solo para `none` vs `endosttn`.
+- El A100 NO acelera la extracción (es CPU + I/O de Drive), solo la inferencia.
+- **Caché persistente**: la extracción de los 550 frames se guarda en `BASE/split_frames.npz` (Drive). Primera vez extrae; sesiones siguientes cargan en segundos. Flag `FORCE_REEXTRACT`.
+- El loop tiene **checkpointing** (CSV cada 50 evals): parar y reanudar NO pierde avance.
+- Usar **`tqdm` clásico, NO `tqdm.notebook`** (los ipywidgets rompen el render en VS Code/GitHub).
+
+## Git
+- Commit/push con usuario `jmtoral` / `jmtoralcruz@gmail.com`. Mensajes simples SIN tildes ni caracteres que rompan PowerShell here-strings.
+- `git add` con rutas explícitas (no `-A`: dispara bloqueos del sandbox). Evitar `Select-String`/`find`/`grep` por shell.
