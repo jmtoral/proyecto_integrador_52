@@ -9339,83 +9339,6 @@ flowchart LR
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2f594201">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="5b.-(Opcional-para-publicaci%C3%B3n)-Chamfer-3D:-baseline-vs.-Endo-STTN">5b. (Opcional para publicación) Chamfer 3D: baseline vs. Endo-STTN<a class="anchor-link" href="#5b.-(Opcional-para-publicaci%C3%B3n)-Chamfer-3D:-baseline-vs.-Endo-STTN">¶</a></h2><p>Chamfer es una métrica de <strong>calidad geométrica 3D</strong> (distancia entre la nube de puntos predicha y la del <em>ground-truth</em>). <strong>No</strong> se incluye en el bucle principal porque es cara (KD-Trees en CPU) y no forma parte de la tabla estándar de profundidad.</p>
-<p>Pero para un artículo (p. ej. <strong>MICAI/MICCAI</strong>), donde el aporte es que <strong>Endo-STTN</strong> mejora la reconstrucción de la superficie, una métrica 3D refuerza el argumento. Esta celda calcula Chamfer <strong>solo</strong> para la comparación relevante —<code>none</code> (baseline) vs. <code>endosttn</code>— sobre los 6 modelos, en vez de las 30 combinaciones. Así corre en <strong>minutos</strong>, no horas.</p>
-<blockquote>
-<p>Es <strong>independiente</strong> del experimento principal: ejecútala solo si la necesitas para el paper. No afecta la entrega del profesor.</p>
-</blockquote>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dc6f2f1b">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-python"><pre><span></span><span class="c1"># Chamfer 3D solo para baseline (none) vs Endo-STTN — uso en publicacion.</span>
-<span class="c1"># Independiente del loop principal. Ejecutar bajo demanda.</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
-
-<span class="n">PAPER_METHODS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"none"</span><span class="p">,</span> <span class="s2">"endosttn"</span><span class="p">]</span>   <span class="c1"># comparacion clave para el paper</span>
-<span class="n">CHAMFER_CSV</span> <span class="o">=</span> <span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"chamfer_paper_none_vs_endosttn.csv"</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_apply_corr_paper</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">img_rgb</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">kf</span><span class="p">,</span> <span class="n">fid</span><span class="p">):</span>
-    <span class="n">fn</span> <span class="o">=</span> <span class="n">CORRECTIONS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"endosttn"</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="n">img_rgb</span><span class="p">,</span> <span class="n">ds</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span> <span class="n">kf</span><span class="o">=</span><span class="n">kf</span><span class="p">,</span> <span class="n">fid</span><span class="o">=</span><span class="n">fid</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="n">img_rgb</span><span class="p">)</span>
-
-<span class="n">ch_rows</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">kf</span><span class="p">,</span> <span class="n">fid</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">SPLIT_ITEMS</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">"Chamfer (none vs endosttn)"</span><span class="p">):</span>
-    <span class="n">img_rgb</span><span class="p">,</span> <span class="n">gt_mm</span> <span class="o">=</span> <span class="n">load_split_frame</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">kf</span><span class="p">,</span> <span class="n">fid</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">gt_mm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">continue</span>
-    <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">gt_mm</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">gt_mm</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">gt_mm</span> <span class="o">&lt;</span> <span class="n">CAP_MM</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">valid</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">continue</span>
-    <span class="n">pc_gt</span> <span class="o">=</span> <span class="n">depth_to_pc</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid</span><span class="p">,</span> <span class="n">gt_mm</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span> <span class="n">valid</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">corr_name</span> <span class="ow">in</span> <span class="n">PAPER_METHODS</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">corr_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">CORRECTIONS</span><span class="p">:</span>
-            <span class="k">continue</span>
-        <span class="n">img_corr</span> <span class="o">=</span> <span class="n">_apply_corr_paper</span><span class="p">(</span><span class="n">corr_name</span><span class="p">,</span> <span class="n">img_rgb</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">kf</span><span class="p">,</span> <span class="n">fid</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">depth_fn</span> <span class="ow">in</span> <span class="n">DEPTH_MODELS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">depth_rel</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">depth_fn</span><span class="p">(</span><span class="n">img_corr</span><span class="p">)</span>
-            <span class="n">scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">gt_mm</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">depth_rel</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">)</span>
-            <span class="n">pred</span> <span class="o">=</span> <span class="n">depth_rel</span> <span class="o">*</span> <span class="n">scale</span>
-            <span class="n">pc_pred</span> <span class="o">=</span> <span class="n">depth_to_pc</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span> <span class="n">valid</span><span class="p">)</span>
-            <span class="n">ch</span> <span class="o">=</span> <span class="n">chamfer</span><span class="p">(</span><span class="n">pc_pred</span><span class="p">,</span> <span class="n">pc_gt</span><span class="p">)</span>
-            <span class="n">ch_rows</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"Dataset"</span><span class="p">:</span> <span class="n">ds</span><span class="p">,</span> <span class="s2">"Keyframe"</span><span class="p">:</span> <span class="n">kf</span><span class="p">,</span> <span class="s2">"Frame"</span><span class="p">:</span> <span class="n">fid</span><span class="p">,</span>
-                            <span class="s2">"Modelo"</span><span class="p">:</span> <span class="n">model_name</span><span class="p">,</span> <span class="s2">"Metodo"</span><span class="p">:</span> <span class="n">corr_name</span><span class="p">,</span> <span class="s2">"Chamfer"</span><span class="p">:</span> <span class="n">ch</span><span class="p">})</span>
-
-<span class="n">df_chamfer</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">ch_rows</span><span class="p">)</span>
-<span class="n">df_chamfer</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">CHAMFER_CSV</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="c1"># Resumen: Chamfer medio por modelo y metodo + mejora de endosttn vs none</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Chamfer 3D medio (mm) — menor es mejor</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span><span class="o">*</span><span class="mi">52</span><span class="p">)</span>
-<span class="n">piv</span> <span class="o">=</span> <span class="n">df_chamfer</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">"Modelo"</span><span class="p">,</span> <span class="s2">"Metodo"</span><span class="p">])[</span><span class="s2">"Chamfer"</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">piv</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
-    <span class="n">base</span> <span class="o">=</span> <span class="n">piv</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">model</span><span class="p">,</span> <span class="s2">"none"</span><span class="p">]</span> <span class="k">if</span> <span class="s2">"none"</span> <span class="ow">in</span> <span class="n">piv</span><span class="o">.</span><span class="n">columns</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
-    <span class="n">sttn</span> <span class="o">=</span> <span class="n">piv</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">model</span><span class="p">,</span> <span class="s2">"endosttn"</span><span class="p">]</span> <span class="k">if</span> <span class="s2">"endosttn"</span> <span class="ow">in</span> <span class="n">piv</span><span class="o">.</span><span class="n">columns</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
-    <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">sttn</span> <span class="o">-</span> <span class="n">base</span><span class="p">)</span> <span class="o">/</span> <span class="n">base</span> <span class="o">*</span> <span class="mi">100</span> <span class="k">if</span> <span class="n">base</span> <span class="o">==</span> <span class="n">base</span> <span class="ow">and</span> <span class="n">base</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
-    <span class="n">mark</span> <span class="o">=</span> <span class="s2">"  &lt;- mejora"</span> <span class="k">if</span> <span class="n">delta</span> <span class="o">==</span> <span class="n">delta</span> <span class="ow">and</span> <span class="n">delta</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">""</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">model</span><span class="si">:</span><span class="s2">16s</span><span class="si">}</span><span class="s2"> none=</span><span class="si">{</span><span class="n">base</span><span class="si">:</span><span class="s2">7.3f</span><span class="si">}</span><span class="s2">  endosttn=</span><span class="si">{</span><span class="n">sttn</span><span class="si">:</span><span class="s2">7.3f</span><span class="si">}</span><span class="s2">  (</span><span class="si">{</span><span class="n">delta</span><span class="si">:</span><span class="s2">+.1f</span><span class="si">}</span><span class="s2">%)</span><span class="si">{</span><span class="n">mark</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Guardado: </span><span class="si">{</span><span class="n">CHAMFER_CSV</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8ffaf04a-d722-46cc-ae00-c3f4821e850e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -10196,6 +10119,83 @@ Créalo en <a href="https://github.com/settings/tokens">https://github.com/setti
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Push OK: </span><span class="si">{</span><span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">new_files</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Sin cambios nuevos (archivos ya en el repo)"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2f594201">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="5b.-(Opcional-para-publicaci%C3%B3n)-Chamfer-3D:-baseline-vs.-Endo-STTN">5b. (Opcional para publicación) Chamfer 3D: baseline vs. Endo-STTN<a class="anchor-link" href="#5b.-(Opcional-para-publicaci%C3%B3n)-Chamfer-3D:-baseline-vs.-Endo-STTN">¶</a></h2><p>Chamfer es una métrica de <strong>calidad geométrica 3D</strong> (distancia entre la nube de puntos predicha y la del <em>ground-truth</em>). <strong>No</strong> se incluye en el bucle principal porque es cara (KD-Trees en CPU) y no forma parte de la tabla estándar de profundidad.</p>
+<p>Pero para un artículo (p. ej. <strong>MICAI/MICCAI</strong>), donde el aporte es que <strong>Endo-STTN</strong> mejora la reconstrucción de la superficie, una métrica 3D refuerza el argumento. Esta celda calcula Chamfer <strong>solo</strong> para la comparación relevante —<code>none</code> (baseline) vs. <code>endosttn</code>— sobre los 6 modelos, en vez de las 30 combinaciones. Así corre en <strong>minutos</strong>, no horas.</p>
+<blockquote>
+<p>Es <strong>independiente</strong> del experimento principal: ejecútala solo si la necesitas para el paper. No afecta la entrega del profesor.</p>
+</blockquote>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=dc6f2f1b">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-python"><pre><span></span><span class="c1"># Chamfer 3D solo para baseline (none) vs Endo-STTN — uso en publicacion.</span>
+<span class="c1"># Independiente del loop principal. Ejecutar bajo demanda.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="n">PAPER_METHODS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"none"</span><span class="p">,</span> <span class="s2">"endosttn"</span><span class="p">]</span>   <span class="c1"># comparacion clave para el paper</span>
+<span class="n">CHAMFER_CSV</span> <span class="o">=</span> <span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"chamfer_paper_none_vs_endosttn.csv"</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_apply_corr_paper</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">img_rgb</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">kf</span><span class="p">,</span> <span class="n">fid</span><span class="p">):</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">CORRECTIONS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"endosttn"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="n">img_rgb</span><span class="p">,</span> <span class="n">ds</span><span class="o">=</span><span class="n">ds</span><span class="p">,</span> <span class="n">kf</span><span class="o">=</span><span class="n">kf</span><span class="p">,</span> <span class="n">fid</span><span class="o">=</span><span class="n">fid</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="n">img_rgb</span><span class="p">)</span>
+
+<span class="n">ch_rows</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">kf</span><span class="p">,</span> <span class="n">fid</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">SPLIT_ITEMS</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">"Chamfer (none vs endosttn)"</span><span class="p">):</span>
+    <span class="n">img_rgb</span><span class="p">,</span> <span class="n">gt_mm</span> <span class="o">=</span> <span class="n">load_split_frame</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">kf</span><span class="p">,</span> <span class="n">fid</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">gt_mm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">gt_mm</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">gt_mm</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">gt_mm</span> <span class="o">&lt;</span> <span class="n">CAP_MM</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">valid</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="n">pc_gt</span> <span class="o">=</span> <span class="n">depth_to_pc</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid</span><span class="p">,</span> <span class="n">gt_mm</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span> <span class="n">valid</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">corr_name</span> <span class="ow">in</span> <span class="n">PAPER_METHODS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">corr_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">CORRECTIONS</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">img_corr</span> <span class="o">=</span> <span class="n">_apply_corr_paper</span><span class="p">(</span><span class="n">corr_name</span><span class="p">,</span> <span class="n">img_rgb</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">kf</span><span class="p">,</span> <span class="n">fid</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">depth_fn</span> <span class="ow">in</span> <span class="n">DEPTH_MODELS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">depth_rel</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">depth_fn</span><span class="p">(</span><span class="n">img_corr</span><span class="p">)</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">gt_mm</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">depth_rel</span><span class="p">[</span><span class="n">valid</span><span class="p">])</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">)</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">depth_rel</span> <span class="o">*</span> <span class="n">scale</span>
+            <span class="n">pc_pred</span> <span class="o">=</span> <span class="n">depth_to_pc</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span> <span class="n">valid</span><span class="p">)</span>
+            <span class="n">ch</span> <span class="o">=</span> <span class="n">chamfer</span><span class="p">(</span><span class="n">pc_pred</span><span class="p">,</span> <span class="n">pc_gt</span><span class="p">)</span>
+            <span class="n">ch_rows</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">"Dataset"</span><span class="p">:</span> <span class="n">ds</span><span class="p">,</span> <span class="s2">"Keyframe"</span><span class="p">:</span> <span class="n">kf</span><span class="p">,</span> <span class="s2">"Frame"</span><span class="p">:</span> <span class="n">fid</span><span class="p">,</span>
+                            <span class="s2">"Modelo"</span><span class="p">:</span> <span class="n">model_name</span><span class="p">,</span> <span class="s2">"Metodo"</span><span class="p">:</span> <span class="n">corr_name</span><span class="p">,</span> <span class="s2">"Chamfer"</span><span class="p">:</span> <span class="n">ch</span><span class="p">})</span>
+
+<span class="n">df_chamfer</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">ch_rows</span><span class="p">)</span>
+<span class="n">df_chamfer</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">CHAMFER_CSV</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Resumen: Chamfer medio por modelo y metodo + mejora de endosttn vs none</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Chamfer 3D medio (mm) — menor es mejor</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span><span class="o">*</span><span class="mi">52</span><span class="p">)</span>
+<span class="n">piv</span> <span class="o">=</span> <span class="n">df_chamfer</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">"Modelo"</span><span class="p">,</span> <span class="s2">"Metodo"</span><span class="p">])[</span><span class="s2">"Chamfer"</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">piv</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">piv</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">model</span><span class="p">,</span> <span class="s2">"none"</span><span class="p">]</span> <span class="k">if</span> <span class="s2">"none"</span> <span class="ow">in</span> <span class="n">piv</span><span class="o">.</span><span class="n">columns</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
+    <span class="n">sttn</span> <span class="o">=</span> <span class="n">piv</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">model</span><span class="p">,</span> <span class="s2">"endosttn"</span><span class="p">]</span> <span class="k">if</span> <span class="s2">"endosttn"</span> <span class="ow">in</span> <span class="n">piv</span><span class="o">.</span><span class="n">columns</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">sttn</span> <span class="o">-</span> <span class="n">base</span><span class="p">)</span> <span class="o">/</span> <span class="n">base</span> <span class="o">*</span> <span class="mi">100</span> <span class="k">if</span> <span class="n">base</span> <span class="o">==</span> <span class="n">base</span> <span class="ow">and</span> <span class="n">base</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
+    <span class="n">mark</span> <span class="o">=</span> <span class="s2">"  &lt;- mejora"</span> <span class="k">if</span> <span class="n">delta</span> <span class="o">==</span> <span class="n">delta</span> <span class="ow">and</span> <span class="n">delta</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">""</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">model</span><span class="si">:</span><span class="s2">16s</span><span class="si">}</span><span class="s2"> none=</span><span class="si">{</span><span class="n">base</span><span class="si">:</span><span class="s2">7.3f</span><span class="si">}</span><span class="s2">  endosttn=</span><span class="si">{</span><span class="n">sttn</span><span class="si">:</span><span class="s2">7.3f</span><span class="si">}</span><span class="s2">  (</span><span class="si">{</span><span class="n">delta</span><span class="si">:</span><span class="s2">+.1f</span><span class="si">}</span><span class="s2">%)</span><span class="si">{</span><span class="n">mark</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Guardado: </span><span class="si">{</span><span class="n">CHAMFER_CSV</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
