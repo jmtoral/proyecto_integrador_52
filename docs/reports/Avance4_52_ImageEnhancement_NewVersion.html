@@ -7514,7 +7514,7 @@ flowchart LR
 <hr/>
 <h2 id="0.-Pipeline-general-del-experimento">0. Pipeline general del experimento<a class="anchor-link" href="#0.-Pipeline-general-del-experimento">¶</a></h2><div class="jp-Mermaid"><pre class="mermaid">
 flowchart TD
-    A["SCARED - datasets 8-9, keyframes 0-4"] --&gt; B
+    A["SCARED - split oficial: 550 frames, datasets 1-7"] --&gt; B
     B["Imagen RGB 1280x1024 px"] --&gt; C1 &amp; C2 &amp; C3 &amp; C4
 
     subgraph ENHANCEMENT ["Image Enhancement"]
@@ -7539,7 +7539,7 @@ flowchart TD
 
     style ENHANCEMENT fill:#fff8e1,stroke:#E0A800,stroke-width:2px
     style DEPTH fill:#e8f4fd,stroke:#2766CB,stroke-width:2px
-</pre></div><p><strong>Diseño factorial</strong>: 4 enhancements × 5 modelos de depth × 10 keyframes = <strong>200 evaluaciones</strong></p>
+</pre></div><p><strong>Diseño factorial</strong>: 5 enhancements × 5 modelos de depth × 550 frames = <strong>13,750 evaluaciones</strong></p>
 <h3 id="Hip%C3%B3tesis">Hipótesis<a class="anchor-link" href="#Hip%C3%B3tesis">¶</a></h3><p>Los métodos de enhancement reducen el error de profundidad con mayor efecto en zonas especulares. HADepth y AF-SfMLearner, diseñados explícitamente para endoscopía con highlight-awareness y appearance flow, deberían ser los más robustos al enhancement por diseño.</p>
 </div>
 </div>
@@ -7658,7 +7658,7 @@ CUDA OK  : True
 </tr>
 </tbody>
 </table>
-<p>† Números <strong>reportados en los papers originales</strong> en sus propios splits de evaluación, sin enhancement. No son resultados de este experimento. Nuestros resultados se miden sobre datasets 8–9 de SCARED con protocolo unificado.<br>
+<p>† Números <strong>reportados en los papers originales</strong> en sus propios splits de evaluación, sin enhancement. No son resultados de este experimento. Nuestros resultados se miden sobre el <strong>split oficial de AF-SfMLearner</strong> (550 frames, datasets 1–7) con protocolo unificado.<br>
 * EndoDepth-Perf según tabla de HADepth; Endo-Depth original evaluado en Hamlyn.</br></p>
 <h3 id="M%C3%A9todos-de-enhancement-%E2%80%94-resumen-de-pesos">Métodos de enhancement — resumen de pesos<a class="anchor-link" href="#M%C3%A9todos-de-enhancement-%E2%80%94-resumen-de-pesos">¶</a></h3><table>
 <thead>
@@ -8348,7 +8348,7 @@ flowchart LR
 </tr>
 </tbody>
 </table>
-<p>Nuestros resultados se medirán sobre <strong>datasets 8–9 de SCARED con y sin enhancement</strong> usando <code>compute_metrics</code> con median scaling, protocolo idéntico para todos los modelos del experimento.</p>
+<p>Nuestros resultados se medirán sobre el <strong>split oficial (550 frames, datasets 1–7) con y sin enhancement</strong> usando <code>compute_metrics</code> con median scaling, protocolo idéntico para todos los modelos del experimento.</p>
 <blockquote>
 <p>Shao, S., et al. HADepth: Highlight-aware monocular depth estimation for endoscopy. <em>Signal, Image and Video Processing</em> (en revisión).</p>
 </blockquote>
@@ -8904,7 +8904,7 @@ flowchart LR
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
-<h2 id="5.-Carga-de-datos-SCARED">5. Carga de datos SCARED<a class="anchor-link" href="#5.-Carga-de-datos-SCARED">¶</a></h2><p>Mismo protocolo que Avance 3: datasets 8–9 (split de test, animal distinto al de train). Cada keyframe contiene <code>Left_Image.png</code> y <code>left_depth_map.tiff</code> (canal Z en mm).</p>
+<h2 id="5.-Carga-de-datos-SCARED">5. Carga de datos SCARED<a class="anchor-link" href="#5.-Carga-de-datos-SCARED">¶</a></h2><p>Protocolo: <strong>split oficial de AF-SfMLearner</strong> (550 frames, datasets 1–7). Imagen = frame N del <code>rgb.mp4</code>; GT = <code>scene_points{N-1}.tiff</code> (canal Z en mm), recorte mitad izquierda.</p>
 </div>
 </div>
 </div>
@@ -9229,7 +9229,7 @@ flowchart LR
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
-<h2 id="7.-Experimento-factorial:-4-enhancements-%C3%97-5-modelos-%C3%97-10-keyframes">7. Experimento factorial: 4 enhancements × 5 modelos × 10 keyframes<a class="anchor-link" href="#7.-Experimento-factorial:-4-enhancements-%C3%97-5-modelos-%C3%97-10-keyframes">¶</a></h2><p>Total: <strong>200 evaluaciones</strong>.</p>
+<h2 id="7.-Experimento-factorial:-5-enhancements-%C3%97-5-modelos-%C3%97-550-frames-(split-oficial)">7. Experimento factorial: 5 enhancements × 5 modelos × 550 frames (split oficial)<a class="anchor-link" href="#7.-Experimento-factorial:-5-enhancements-%C3%97-5-modelos-%C3%97-550-frames-(split-oficial)">¶</a></h2><p>Total: <strong>200 evaluaciones</strong>.</p>
 </div>
 </div>
 </div>
@@ -9504,7 +9504,7 @@ flowchart LR
 
 <span class="n">models_list</span>  <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">"Modelo"</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
 <span class="n">methods_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">"Método"</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
-<span class="n">colors</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"none"</span><span class="p">:</span><span class="s2">"#888888"</span><span class="p">,</span> <span class="s2">"retinex"</span><span class="p">:</span><span class="s2">"#2766CB"</span><span class="p">,</span> <span class="s2">"endolmspec"</span><span class="p">:</span><span class="s2">"#E0A800"</span><span class="p">,</span> <span class="s2">"iat"</span><span class="p">:</span><span class="s2">"#2ecc71"</span><span class="p">}</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"none"</span><span class="p">:</span><span class="s2">"#888888"</span><span class="p">,</span> <span class="s2">"retinex"</span><span class="p">:</span><span class="s2">"#2766CB"</span><span class="p">,</span> <span class="s2">"endolmspec"</span><span class="p">:</span><span class="s2">"#E0A800"</span><span class="p">,</span> <span class="s2">"iat"</span><span class="p">:</span><span class="s2">"#2ecc71"</span><span class="p">,</span> <span class="s2">"endosttn"</span><span class="p">:</span><span class="s2">"#9b59b6"</span><span class="p">}</span>
 
 <span class="n">metrics_plot</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">(</span><span class="s2">"AbsRel"</span><span class="p">,</span>       <span class="s2">"AbsRel (↓ mejor)"</span><span class="p">,</span>       <span class="s2">"Geométrica — primaria"</span><span class="p">),</span>
@@ -9523,7 +9523,7 @@ flowchart LR
                          <span class="n">sharey</span><span class="o">=</span><span class="s2">"col"</span><span class="p">)</span>   <span class="c1"># mismo eje Y por columna (métrica)</span>
 
 <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">"Evaluación: Image Enhancement × Modelos de Depth en SCARED</span><span class="se">\n</span><span class="s2">"</span>
-             <span class="s2">"(promedio 10 keyframes, datasets 8–9)"</span><span class="p">,</span>
+             <span class="s2">"(promedio split oficial: 550 frames, datasets 1–7)"</span><span class="p">,</span>
              <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">model</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">models_list</span><span class="p">):</span>
@@ -9755,7 +9755,7 @@ flowchart LR
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <hr/>
-<h2 id="11.-Conclusiones">11. Conclusiones<a class="anchor-link" href="#11.-Conclusiones">¶</a></h2><h3 id="Tabla-completa-de-resultados-(promedio-10-keyframes,-datasets-8%E2%80%939-SCARED)">Tabla completa de resultados (promedio 10 keyframes, datasets 8–9 SCARED)<a class="anchor-link" href="#Tabla-completa-de-resultados-(promedio-10-keyframes,-datasets-8%E2%80%939-SCARED)">¶</a></h3><table>
+<h2 id="11.-Conclusiones">11. Conclusiones<a class="anchor-link" href="#11.-Conclusiones">¶</a></h2><h3 id="Tabla-completa-de-resultados-(promedio-split-oficial:-550-frames,-datasets-1%E2%80%937)">Tabla completa de resultados (promedio split oficial: 550 frames, datasets 1–7)<a class="anchor-link" href="#Tabla-completa-de-resultados-(promedio-split-oficial:-550-frames,-datasets-1%E2%80%937)">¶</a></h3><table>
 <thead>
 <tr>
 <th>Modelo</th>
