@@ -7848,7 +7848,7 @@ con un módulo de iluminación adicional que no se usa en inferencia de profundi
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">io</span><span class="o">,</span><span class="w"> </span><span class="nn">zipfile</span><span class="o">,</span><span class="w"> </span><span class="nn">tarfile</span><span class="o">,</span><span class="w"> </span><span class="nn">cv2</span><span class="o">,</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="o">,</span><span class="w"> </span><span class="nn">tifffile</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.notebook</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
 <span class="c1"># Caché persistente empaquetado en Drive (sobrevive entre sesiones de Colab)</span>
 <span class="n">NPZ_CACHE</span> <span class="o">=</span> <span class="n">BASE</span> <span class="o">/</span> <span class="s2">"split_frames.npz"</span>
@@ -8859,7 +8859,7 @@ Podría ser MonoIIF, el tercer modelo propuesto. <strong>Pendiente de confirmaci
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.notebook</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
 <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">DEPTH_MODELS</span><span class="p">)</span><span class="o">==</span><span class="mi">6</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"Se esperan 6 modelos, hay </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">DEPTH_MODELS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
 <span class="n">CKPT_CSV</span> <span class="o">=</span> <span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"avance5_newversion_results.csv"</span>
@@ -8939,7 +8939,7 @@ Podría ser MonoIIF, el tercer modelo propuesto. <strong>Pendiente de confirmaci
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Chamfer 3D solo para baseline (none) vs Endo-STTN — uso en publicacion.</span>
 <span class="c1"># Independiente del loop principal. Ejecutar bajo demanda.</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.notebook</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
 <span class="n">PAPER_METHODS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"none"</span><span class="p">,</span> <span class="s2">"endosttn"</span><span class="p">]</span>   <span class="c1"># comparacion clave para el paper</span>
 <span class="n">CHAMFER_CSV</span> <span class="o">=</span> <span class="n">OUT_DIR</span> <span class="o">/</span> <span class="s2">"chamfer_paper_none_vs_endosttn.csv"</span>
