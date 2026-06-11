@@ -8653,6 +8653,48 @@ Podría ser MonoIIF, el tercer modelo propuesto. <strong>Pendiente de confirmaci
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3505a7d3">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Nota-metodol%C3%B3gica:-consistencia-de-los-baselines-por-arquitectura">Nota metodológica: consistencia de los <em>baselines</em> por arquitectura<a class="anchor-link" href="#Nota-metodol%C3%B3gica:-consistencia-de-los-baselines-por-arquitectura">¶</a></h3><p>Cada arquitectura tiene <strong>particularidades de inferencia</strong> (rango de profundidad, resolución de entrada, normalización) que deben respetarse para reproducir los valores de referencia de los pesos. Al contrastar la fila <code>none</code> (sin enhancement) con la tabla de referencia de los pesos, se detectaron y corrigieron dos desviaciones:</p>
+<table>
+<thead>
+<tr>
+<th>Arquitectura</th>
+<th>Parámetro</th>
+<th>Antes</th>
+<th>Corregido</th>
+<th>Motivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AF-SfMLearner</strong></td>
+<td><code>max_depth</code> (disp→depth)</td>
+<td>100</td>
+<td><strong>150</strong></td>
+<td>Su <code>options.py</code> usa <code>--max_depth default=150.0</code>. La conversión disp→depth es no lineal, así que el <em>median scaling</em> no absorbe la diferencia.</td>
+</tr>
+<tr>
+<td><strong>EndoSfMLearner</strong></td>
+<td>resolución de entrada</td>
+<td>256×832</td>
+<td><strong>256×256</strong></td>
+<td>256×832 es resolución estilo KITTI; EndoSfMLearner (DispResNet) opera sobre imágenes endoscópicas cuadradas (README EndoSLAM: 256×256).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Modelos ya consistentes (sin cambios):</strong> Monodepth2 y MonoIIT reproducían su <em>baseline</em> de referencia (AbsRel $pprox$ 0.070 y 0.055 respectivamente), confirmando que su protocolo de inferencia (<code>max_depth=100</code>, resolución leída del <em>checkpoint</em>) era correcto.</p>
+<blockquote>
+<p><strong>Pendiente de verificación:</strong> MonoViT presenta una desviación moderada (AbsRel 0.099 vs. 0.079 de referencia). Usa <code>disp_to_depth</code> con <code>max_depth=100</code> (default de Monodepth2); la diferencia podría deberse a la configuración de entrenamiento específica de los pesos. Tras estas correcciones es necesario <strong>re-ejecutar el experimento</strong> para validar que los <em>baselines</em> corregidos se alinean con la referencia.</p>
+</blockquote>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9cc8b3f3-77d6-41fc-82fa-0c0dcf7d4b44">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -8670,8 +8712,9 @@ Podría ser MonoIIF, el tercer modelo propuesto. <strong>Pendiente de confirmaci
 
 <span class="n">FX</span><span class="p">,</span> <span class="n">FY</span><span class="p">,</span> <span class="n">CX</span><span class="p">,</span> <span class="n">CY</span> <span class="o">=</span> <span class="mf">1078.0</span><span class="p">,</span> <span class="mf">1078.0</span><span class="p">,</span> <span class="mf">640.0</span><span class="p">,</span> <span class="mf">512.0</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_predict_monodepth2_style</span><span class="p">(</span><span class="n">img_rgb</span><span class="p">,</span> <span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Monodepth2/AF-SfMLearner: ToTensor sin normalizacion ImageNet."""</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_predict_monodepth2_style</span><span class="p">(</span><span class="n">img_rgb</span><span class="p">,</span> <span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mf">100.0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Monodepth2/AF-SfMLearner: ToTensor sin normalizacion ImageNet.</span>
+<span class="sd">    max_depth define el rango de disp_to_depth: Monodepth2=100, AF-SfMLearner=150 (su options.py)."""</span>
     <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">img_rgb</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">()(</span><span class="n">pil</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">img_rgb</span><span class="p">)</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">w</span><span class="p">,</span><span class="n">h</span><span class="p">),</span><span class="n">pil</span><span class="o">.</span><span class="n">LANCZOS</span><span class="p">))</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">type</span><span class="o">==</span><span class="s2">"cuda"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
@@ -8681,7 +8724,7 @@ Podría ser MonoIIF, el tercer modelo propuesto. <strong>Pendiente de confirmaci
     <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">type</span><span class="o">==</span><span class="s2">"cuda"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
     <span class="n">ms</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span><span class="o">*</span><span class="mi">1000</span>
     <span class="n">disp</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">out</span><span class="p">[(</span><span class="s2">"disp"</span><span class="p">,</span><span class="mi">0</span><span class="p">)],(</span><span class="n">H</span><span class="p">,</span><span class="n">W</span><span class="p">),</span><span class="n">mode</span><span class="o">=</span><span class="s2">"bilinear"</span><span class="p">,</span><span class="n">align_corners</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-    <span class="k">return</span> <span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">100</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">0.1</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">100</span><span class="p">)</span><span class="o">*</span><span class="n">disp</span><span class="p">),</span> <span class="n">ms</span>
+    <span class="k">return</span> <span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">max_depth</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">0.1</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">max_depth</span><span class="p">)</span><span class="o">*</span><span class="n">disp</span><span class="p">),</span> <span class="n">ms</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_predict_monovit_style</span><span class="p">(</span><span class="n">img_rgb</span><span class="p">,</span> <span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""MonoViT/MonoIIT: encoder mpvit_small + DepthDecoder separados.</span>
@@ -8699,13 +8742,15 @@ Podría ser MonoIIF, el tercer modelo propuesto. <strong>Pendiente de confirmaci
 
 <span class="k">def</span><span class="w"> </span><span class="nf">predict_mono2</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>     <span class="k">return</span> <span class="n">_predict_monodepth2_style</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">mono2_encoder</span><span class="p">,</span> <span class="n">mono2_decoder</span><span class="p">,</span> <span class="n">MONO2_H</span><span class="p">,</span> <span class="n">MONO2_W</span><span class="p">,</span> <span class="n">DEVICE</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">predict_monovit</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>   <span class="k">return</span> <span class="n">_predict_monovit_style</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">monovit_enc</span><span class="p">,</span> <span class="n">monovit_dec</span><span class="p">,</span> <span class="n">MONOVIT_H</span><span class="p">,</span> <span class="n">MONOVIT_W</span><span class="p">,</span> <span class="n">DEVICE</span><span class="p">)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">predict_afsfm</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>     <span class="k">return</span> <span class="n">_predict_monodepth2_style</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">afsfm_scared_enc</span><span class="p">,</span> <span class="n">afsfm_scared_dec</span><span class="p">,</span> <span class="n">AFSFM_H</span><span class="p">,</span> <span class="n">AFSFM_W</span><span class="p">,</span> <span class="n">DEVICE</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict_afsfm</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>     <span class="k">return</span> <span class="n">_predict_monodepth2_style</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">afsfm_scared_enc</span><span class="p">,</span> <span class="n">afsfm_scared_dec</span><span class="p">,</span> <span class="n">AFSFM_H</span><span class="p">,</span> <span class="n">AFSFM_W</span><span class="p">,</span> <span class="n">DEVICE</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mf">150.0</span><span class="p">)</span>  <span class="c1"># AF-SfMLearner usa max_depth=150 (su options.py)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">predict_monoIIT</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>   <span class="k">return</span> <span class="n">_predict_monovit_style</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">monoIIT_enc</span><span class="p">,</span> <span class="n">monoIIT_dec</span><span class="p">,</span> <span class="n">MONOIIT_H</span><span class="p">,</span> <span class="n">MONOIIT_W</span><span class="p">,</span> <span class="n">DEVICE</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">predict_w19mono</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>   <span class="k">return</span> <span class="n">_predict_monovit_style</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">w19_enc</span><span class="p">,</span> <span class="n">w19_dec</span><span class="p">,</span> <span class="n">W19_H</span><span class="p">,</span> <span class="n">W19_W</span><span class="p">,</span> <span class="n">DEVICE</span><span class="p">)</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">predict_endosfm</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
     <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">imresize</span><span class="p">(</span><span class="n">img</span><span class="p">,(</span><span class="mi">256</span><span class="p">,</span><span class="mi">832</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="c1"># EndoSfMLearner (DispResNet) se testea a 256x256 (resolucion endoscopica, README EndoSLAM).</span>
+    <span class="c1"># 256x832 (estilo KITTI) era incorrecto para datos endoscopicos.</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">imresize</span><span class="p">(</span><span class="n">img</span><span class="p">,(</span><span class="mi">256</span><span class="p">,</span><span class="mi">256</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(((</span><span class="n">r</span><span class="o">/</span><span class="mi">255</span><span class="o">-</span><span class="mf">0.45</span><span class="p">)</span><span class="o">/</span><span class="mf">0.225</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">DEVICE</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">DEVICE</span><span class="o">.</span><span class="n">type</span><span class="o">==</span><span class="s2">"cuda"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
     <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
