@@ -48,6 +48,7 @@ html,body{font-family:var(--ff-sans);background:var(--m950);color:#e8f4fd;line-h
 .section p{color:var(--m300);margin-bottom:.8rem;}
 .section ul{color:var(--m300);margin:.4rem 0 1rem 1.4rem;font-size:.92rem;}
 .section li{margin-bottom:.35rem;}
+.mono{font-family:var(--ff-mono);font-size:.86em;color:var(--m200);background:rgba(69,153,236,.1);padding:.05em .35em;border-radius:4px;}
 .note{background:rgba(39,102,203,.1);border-left:3px solid var(--m500);
   border-radius:0 6px 6px 0;padding:.8rem 1rem;font-size:.83rem;color:var(--m300);margin:1rem 0;}
 .note.gold{border-left-color:var(--gold);background:rgba(224,168,0,.08);}
@@ -217,6 +218,45 @@ flowchart TD
     <div class="note">El Dr. Espinosa indicó que <strong>MonoIIT corre con el código de testing de MonoViT</strong>.
     Al inspeccionar los checkpoints encontramos que MonoViT usa un decoder Monodepth2 simple mientras
     que MonoIIT y w19-MonoViT usan el decoder <strong>HR-Depth</strong> — el código auto-detecta cuál cargar.</div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── Split oficial y protocolo de testing (New Version) ── -->
+  <div class="section">
+    <div class="section-label">// split y protocolo</div>
+    <h2>Split oficial y protocolo de evaluación</h2>
+    <p>La <strong>New Version</strong> reemplaza los 10 keyframes de los datasets 8–9 por el
+    <strong>split oficial de AF-SfMLearner</strong> (<span class="mono">data/splits/endovis/test_files.txt</span>),
+    el estándar de la literatura SCARED/EndoVis. Esto hace los resultados directamente comparables con los papers.</p>
+
+    <h3>Split — qué frames se evalúan</h3>
+    <table class="result-table">
+      <tr><th>Dataset</th><th>Keyframe</th><th>Frames</th></tr>
+      <tr><td>dataset1</td><td>keyframe3</td><td>78</td></tr>
+      <tr><td>dataset2</td><td>keyframe4</td><td>71</td></tr>
+      <tr><td>dataset3</td><td>keyframe4</td><td>79</td></tr>
+      <tr><td>dataset4</td><td>keyframe4</td><td>76</td></tr>
+      <tr><td>dataset5</td><td>keyframe4</td><td>87</td></tr>
+      <tr><td>dataset6</td><td>keyframe4</td><td>83</td></tr>
+      <tr><td>dataset7</td><td>keyframe4</td><td>76</td></tr>
+      <tr><td><strong>Total</strong></td><td></td><td><strong>550</strong></td></tr>
+    </table>
+    <ul>
+      <li>Datasets <strong>1–7</strong> (todos los de test de SCARED), cámara <strong>izquierda</strong> (<span class="mono">l</span>).</li>
+      <li>Formato por línea: <span class="mono">dataset3/keyframe4 &nbsp;390 &nbsp;l</span> → (dataset, keyframe, frame_id, lado).</li>
+      <li>Correspondencia con el <em>ground-truth</em>: el frame <span class="mono">N</span> usa <span class="mono">scene_points{N-1:06d}.tiff</span>.</li>
+    </ul>
+
+    <h3>Testing — cómo se mide el error</h3>
+    <ul>
+      <li><strong>Ground-truth:</strong> mapa de profundidad estéreo de SCARED (<span class="mono">scene_points*.tiff</span>), en <strong>milímetros</strong>.</li>
+      <li><strong>Cap de profundidad:</strong> <span class="mono">CAP_MM = 150</span> — solo se evalúan píxeles con <span class="mono">0 &lt; gt &lt; 150 mm</span>.</li>
+      <li><strong>Median scaling:</strong> la predicción es relativa; se escala por <span class="mono">median(gt)/median(pred)</span> antes de medir (estándar en depth monocular).</li>
+      <li><strong>Métricas:</strong> AbsRel, SqRel, RMSE, RMSE-log, δ&lt;1.25, δ&lt;1.25², δ&lt;1.25³, más AbsRel separado en zonas especulares vs. no-especulares.</li>
+      <li><strong>Chamfer 3D:</strong> desactivado por defecto (cuello de botella; opcional para publicación).</li>
+    </ul>
+    <p style="font-size:.85rem;"><strong>Diseño factorial (New Version):</strong> 6 modelos × 5 enhancements × 550 frames = <strong>16,500 evaluaciones</strong>. El 5º enhancement es <strong>Endo-STTN</strong>.</p>
   </div>
 
   <hr class="divider">
