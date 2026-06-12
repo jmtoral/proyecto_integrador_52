@@ -257,6 +257,21 @@ flowchart TD
       <li><strong>Chamfer 3D:</strong> desactivado por defecto (cuello de botella; opcional para publicación).</li>
     </ul>
     <p style="font-size:.85rem;"><strong>Diseño factorial (New Version):</strong> 6 modelos × 5 enhancements × 550 frames = <strong>16,500 evaluaciones</strong>. El 5º enhancement es <strong>Endo-STTN</strong>.</p>
+
+    <h3>Nota de consistencia — normalización del encoder de AF-SfMLearner</h3>
+    <p>Al validar los <em>baselines</em>, AF-SfMLearner daba casi el doble de error
+    (AbsRel ≈ 0.118 vs. ≈ 0.060 esperado), mientras que <strong>Monodepth2 sí coincidía</strong>,
+    pese a compartir el mismo <span class="mono">ResnetEncoder</span> y el mismo código de inferencia.</p>
+    <p>La causa: el <span class="mono">ResnetEncoder</span> de Endo-Depth-and-Motion aplica
+    normalización ImageNet dentro de su <span class="mono">forward</span>:
+    <span class="mono">x = (input − 0.45) / 0.225</span>. En el repo oficial de AF-SfMLearner
+    (<span class="mono">networks/resnet_encoder.py</span>) esa línea está <strong>comentada</strong> —
+    sus pesos se entrenaron <strong>sin</strong> esa normalización. Monodepth2 sí la espera, por eso
+    solo AF-SfMLearner salía mal.</p>
+    <div class="note gold"><strong>Corrección:</strong> se usa una subclase
+    <span class="mono">ResnetEncoderNoNorm</span> que sobrescribe <span class="mono">forward</span>
+    sin la normalización, <strong>solo</strong> para AF-SfMLearner. No afecta a los demás modelos.
+    Verificado contra el código oficial de AF-SfMLearner y Endo-Depth-and-Motion.</div>
   </div>
 
   <hr class="divider">
