@@ -130,6 +130,9 @@ html,body{height:100%;font-family:var(--ff-sans);background:var(--m950);color:#e
   <button class="tab" onclick="showPanel('a5nv')" id="tab-a5nv">
     ✨ Avance 5 <span class="tab-badge">New Version</span>
   </button>
+  <button class="tab" onclick="showPanel('a6viz')" id="tab-a6viz">
+    🔍 Avance 6 <span class="tab-badge">Visualización</span>
+  </button>
 </div>
 
 <div class="viewer-wrap">
@@ -193,6 +196,11 @@ html,body{height:100%;font-family:var(--ff-sans);background:var(--m950);color:#e
     <iframe class="html-frame" src="Avance5_52_SCARED_Weights_NewVersion.html" title="Avance 5 — New Version (split oficial + Endo-STTN)"></iframe>
   </div>
 
+  <!-- Avance 6 Visualizacion -->
+  <div class="panel" id="panel-a6viz">
+    <iframe class="html-frame" src="avance6_visualizacion.html" title="Avance 6 — Visualización cualitativa under/over"></iframe>
+  </div>
+
 </div>
 
 <script>
@@ -206,6 +214,7 @@ const panels = {
   a5nb:   { title: 'Avance 5 — Notebook: Modelos entrenados en SCARED (Dr. Ricardo Espinosa Loera)', dl: null },
   a4nv:   { title: 'Avance 4 — New Version: split oficial (550 frames) + Endo-STTN', dl: null },
   a5nv:   { title: 'Avance 5 — New Version: split oficial (550 frames) + Endo-STTN', dl: null },
+  a6viz:  { title: 'Avance 6 — Visualización cualitativa: efecto under/over en MonoIIT vs ground truth', dl: null },
 };
 
 function showPanel(id) {
