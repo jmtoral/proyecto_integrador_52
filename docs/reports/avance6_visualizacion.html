@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avance 6 — Visualización cualitativa · Equipo 52</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --m50:#F0F8FE;--m100:#DDEEFC;--m200:#C3E2FA;--m300:#99D0F7;
+  --m400:#69B7F1;--m500:#4599EC;--m700:#2766CB;--m800:#2654A7;
+  --m900:#244984;--m950:#1A2E51;--gold:#E0A800;
+  --green:#2ecc71;--red:#e74c3c;--purple:#9b59b6;
+  --ff-serif:'Playfair Display',Georgia,serif;
+  --ff-sans:'Inter',system-ui,sans-serif;
+  --ff-mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{font-family:var(--ff-sans);background:var(--m950);color:#e8f4fd;line-height:1.7;}
+.hero{padding:3.5rem 2rem 1.5rem;max-width:1080px;margin:0 auto;text-align:center;}
+.hero h1{font-family:var(--ff-serif);font-size:2rem;color:#fff;margin-bottom:.8rem;}
+.hero p{color:var(--m300);font-size:1rem;max-width:760px;margin:0 auto 1.4rem;}
+.hero-badges{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;}
+.badge{font-family:var(--ff-mono);font-size:.72rem;padding:.3rem .8rem;border-radius:20px;
+  background:rgba(69,153,236,.15);border:1px solid rgba(69,153,236,.3);color:var(--m300);}
+.badge.gold{background:rgba(224,168,0,.12);border-color:rgba(224,168,0,.35);color:var(--gold);}
+.container{max-width:1080px;margin:0 auto;padding:0 2rem 4rem;}
+.section{margin-bottom:2.6rem;}
+.section-label{font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.12em;
+  color:var(--m500);text-transform:uppercase;margin-bottom:.6rem;}
+.section h2{font-family:var(--ff-serif);font-size:1.5rem;color:#fff;margin-bottom:1rem;}
+.section p{color:var(--m300);margin-bottom:.8rem;}
+.section ul{color:var(--m300);margin:.4rem 0 1rem 1.4rem;font-size:.92rem;}
+.section li{margin-bottom:.4rem;}
+.mono{font-family:var(--ff-mono);font-size:.86em;color:var(--m200);background:rgba(69,153,236,.1);padding:.05em .35em;border-radius:4px;}
+.note{background:rgba(39,102,203,.1);border-left:3px solid var(--m500);
+  border-radius:0 6px 6px 0;padding:.8rem 1rem;font-size:.85rem;color:var(--m300);margin:1rem 0;}
+.note.gold{border-left-color:var(--gold);background:rgba(224,168,0,.08);}
+.figwrap{margin:1.6rem 0;background:#fff;border-radius:8px;padding:8px;border:1px solid rgba(69,153,236,.2);}
+.figwrap img{width:100%;display:block;border-radius:4px;}
+.figcap{font-family:var(--ff-mono);font-size:.78rem;color:var(--m400);margin:.6rem 0 0;text-align:center;}
+.divider{border:none;border-top:1px solid rgba(69,153,236,.15);margin:2rem 0;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Avance 6 — Efecto del Image Enhancement bajo Sub/Sobre-exposición</h1>
+  <p>Análisis cualitativo sobre <strong>MonoIIT</strong> (el modelo de menor error del estudio):
+  cómo afecta cada corrección de iluminación a la estimación de profundidad en los fotogramas
+  más oscuros (<em>under</em>) y más brillantes (<em>over</em>) del split oficial, comparado contra el <em>ground truth</em>.</p>
+  <div class="hero-badges">
+    <span class="badge">Equipo 52 · TC5035.10</span>
+    <span class="badge gold">MonoIIT · AbsRel 0.0554</span>
+    <span class="badge">Split oficial · 550 frames</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="section">
+    <div class="section-label">Motivación</div>
+    <h2>Por qué mirar sub/sobre-exposición</h2>
+    <p>Las métricas globales (AbsRel, RMSE) promedian el error sobre los 550 fotogramas y <strong>ocultan dónde</strong>
+    ayuda o estorba cada <em>enhancement</em>. En endoscopía los dos regímenes de iluminación más problemáticos son:</p>
+    <ul>
+      <li><strong>Subexposición (<em>under</em>)</strong> — zonas demasiado <strong>oscuras</strong> (cavidades profundas,
+      regiones alejadas de la fuente de luz). La red pierde textura y la profundidad tiende a aplanarse.</li>
+      <li><strong>Sobreexposición (<em>over</em>)</strong> — zonas <strong>quemadas</strong> por exceso de luz o reflejos
+      especulares sobre tejido húmedo. La señal se satura y la geometría local se distorsiona.</li>
+    </ul>
+    <p>Los métodos <span class="mono">retinex</span>, <span class="mono">endolmspec</span> e <span class="mono">iat</span>
+    buscan precisamente corregir estos extremos. Este avance los inspecciona de forma cualitativa.</p>
+  </div>
+
+  <div class="note gold">
+    <strong>Cómo leer los mapas.</strong> Se muestran en <strong>disparidad</strong> (1/profundidad), la convención de
+    los trabajos de <em>depth</em>: <strong>lo cercano sale claro y lo lejano oscuro</strong>. La primera columna
+    es el <strong>ground truth</strong> del sensor SCARED (que es disperso: los píxeles sin medición aparecen en gris).
+    Los fotogramas se eligen automáticamente por brillo medio (canal L de CIELAB).
+  </div>
+
+  <div class="section">
+    <div class="section-label">Caso 1</div>
+    <h2>Fotograma subexpuesto (<em>under</em>)</h2>
+    <div class="figwrap">
+      <img src="../../outcomes/avance6/avance6_under.png" alt="Caso under: GT + none + retinex + endolmspec + iat con mapas de profundidad">
+    </div>
+    <p class="figcap">GROUND TRUTH · none · retinex · endolmspec · iat — fila superior: imagen; fila inferior: profundidad (disparidad)</p>
+    <p>En las zonas oscuras la imagen <span class="mono">none</span> aporta poca textura, por lo que el mapa de
+    profundidad tiende a aplanarse. Retinex e IAT levantan la luminancia y pueden recuperar estructura; conviene
+    observar si la disparidad predicha se <strong>acerca al ground truth</strong> sin introducir ruido en las sombras.</p>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-label">Caso 2</div>
+    <h2>Fotograma sobreexpuesto (<em>over</em>)</h2>
+    <div class="figwrap">
+      <img src="../../outcomes/avance6/avance6_over.png" alt="Caso over: GT + none + retinex + endolmspec + iat con mapas de profundidad">
+    </div>
+    <p class="figcap">GROUND TRUTH · none · retinex · endolmspec · iat — fila superior: imagen; fila inferior: profundidad (disparidad)</p>
+    <p>En las regiones quemadas la información está saturada. Aquí interesa ver si el <em>enhancement</em> atenúa el
+    brillo y devuelve geometría plausible (coherente con el GT) en las zonas especulares, o si amplifica artefactos.
+    Retinex suele cambiar fuertemente el balance de color (efecto "lavado"), lo que puede o no beneficiar a la red.</p>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-label">Lectura</div>
+    <h2>Qué aporta este análisis</h2>
+    <p>Estas vistas cualitativas complementan la tabla del estudio: un <em>enhancement</em> puede mejorar el AbsRel
+    <strong>global</strong> pero deteriorar un régimen específico (o viceversa). El análisis por exposición, contra el
+    ground truth, ayuda a explicar <em>por qué</em> IAT tiende a ayudar (corrección suave que preserva la estructura)
+    mientras que Retinex puede degradar (transformación agresiva del color/contraste).</p>
+    <div class="note">
+      El <em>enhancement</em> <span class="mono">endosttn</span> (inpainting temporal de especularidades) se documenta
+      por separado: requiere la secuencia completa del <em>keyframe</em>, no un fotograma aislado. Su efecto visual
+      se muestra en el notebook del Avance 5.
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
