@@ -274,6 +274,7 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
     <li><a href="#findings">Hallazgos</a></li>
     <li><a href="#resultados">EDA</a></li>
     <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#depth">Resultados</a></li>
     <li><a href="#equipo">Equipo</a></li>
     <li><a href="#biblio">Referencias</a></li>
   </ul>
@@ -286,6 +287,7 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
   <a href="#findings"  onclick="closeMobile()">Hallazgos</a>
   <a href="#resultados" onclick="closeMobile()">EDA</a>
   <a href="#pipeline"  onclick="closeMobile()">Pipeline</a>
+  <a href="#depth"     onclick="closeMobile()">Resultados</a>
   <a href="#equipo"    onclick="closeMobile()">Equipo</a>
   <a href="#biblio"    onclick="closeMobile()">Referencias</a>
   <a href="https://github.com/jmtoral/proyecto_integrador_52" target="_blank">GitHub →</a>
@@ -601,6 +603,59 @@ footer .copy{font-size:.78rem;color:var(--m700);width:100%;text-align:center;mar
         <div class="card-icon">🔒</div>
         <h3>Control experimental</h3>
         <p>Modelo, hiperparámetros y ground truth constantes. Solo varía el preprocesamiento. Tres datasets para validar generalización: SCARED, Hamlyn y C3VD.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Resultados de profundidad (Avance 5) ── -->
+<section id="depth" style="background:var(--m50);color:var(--m950);">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label reveal">// resultados · avance 5</div>
+    <h2 class="section-title reveal">¿El realce de imagen mejora la profundidad?</h2>
+    <p class="section-body reveal" style="color:var(--m800);">Evaluación de <strong>5 modelos × 4 enhancements</strong> sobre el <em>split</em> oficial de AF-SfMLearner (550 fotogramas, datasets 1–7 de SCARED), con pesos re-entrenados en SCARED por el Dr. Ricardo Espinosa Loera. La métrica es <strong>AbsRel</strong> (menor es mejor); ΔAR% negativo (←) indica que el realce mejoró respecto a la imagen sin tocar (<code>none</code>).</p>
+
+    <table class="data-table reveal" style="margin-top:2rem;">
+      <thead>
+        <tr><th>Modelo</th><th>none</th><th>endolmspec</th><th>iat</th><th>endosttn</th><th>Mejor</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Monodepth2</strong></td><td>0.0708</td><td>0.0743</td><td><strong>0.0696</strong> ←</td><td>0.0720</td><td>iat (−1.7%)</td></tr>
+        <tr><td><strong>MonoViT</strong></td><td>0.0727</td><td>0.0730</td><td><strong>0.0713</strong> ←</td><td>0.0728</td><td>iat (−1.9%)</td></tr>
+        <tr><td><strong>EndoSfMLearner</strong></td><td><strong>0.0845</strong></td><td>0.0877</td><td>0.0879</td><td>0.0904</td><td>none</td></tr>
+        <tr><td><strong>AF-SfMLearner</strong></td><td>0.0592</td><td><strong>0.0564</strong> ←</td><td>0.0582 ←</td><td>0.0608</td><td>endolmspec (−4.7%)</td></tr>
+        <tr><td><strong>MonoIIT</strong></td><td>0.0554</td><td>0.0562</td><td><strong>0.0537</strong> ←</td><td>0.0558</td><td>iat (−3.1%)</td></tr>
+      </tbody>
+    </table>
+    <p class="section-body reveal" style="color:var(--m700);font-size:.82rem;margin-top:.8rem;">
+      En <strong>negrita</strong>, la mejor configuración de cada modelo. El mejor resultado absoluto del estudio es <strong>MonoIIT + IAT (AbsRel = 0.0537)</strong>.
+    </p>
+
+    <div class="findings-grid" style="margin-top:3rem;">
+      <div class="finding-card reveal">
+        <span class="num">1°</span>
+        <h3>IAT es el único realce robusto</h3>
+        <p>Mejora el AbsRel en <strong>4 de 5 modelos</strong> (todos menos EndoSfMLearner). Es el único <em>enhancement</em> que ayuda de forma consistente entre arquitecturas, lo que sugiere que normalizar la exposición preservando bordes beneficia a la estimación de profundidad de forma generalizable.</p>
+      </div>
+      <div class="finding-card reveal">
+        <span class="num">2°</span>
+        <h3>Endo-STTN: neutro e inviable en tiempo real</h3>
+        <p>El <em>inpainting</em> temporal apenas mueve el AbsRel (+0.1% a +7%), pero su tiempo de inferencia es <strong>~19.7 s/frame</strong> (~300× más lento que los realces clásicos, ~180–400 ms) por procesar frames vecinos. No justifica su costo clínico.</p>
+      </div>
+      <div class="finding-card reveal">
+        <span class="num">3°</span>
+        <h3>El beneficio es condicional al modelo</h3>
+        <p>No hay un realce universalmente óptimo: AF-SfMLearner mejora más con <code>endolmspec</code> (−4.7%), mientras que <strong>EndoSfMLearner no se beneficia de ningún realce</strong> (su mejor resultado es la imagen cruda). El efecto del enhancement depende de la arquitectura.</p>
+      </div>
+      <div class="finding-card reveal">
+        <span class="num">4°</span>
+        <h3>EndoSfMLearner es el más frágil</h3>
+        <p>Mayor error base (0.0845) y el más sensible a la entrada: <strong>ningún realce lo mejora</strong>, su mejor resultado es la imagen sin tocar. Su <em>brightness-aware loss</em> ya absorbe variaciones de iluminación, así que cualquier corrección externa lo saca de su distribución.</p>
+      </div>
+      <div class="finding-card reveal">
+        <span class="num">5°</span>
+        <h3>Conclusión: sí mejora, pero con matices</h3>
+        <p>El <em>image enhancement</em> <strong>sí puede mejorar</strong> la profundidad monocular en endoscopía, pero el beneficio es <strong>modesto y condicional al método</strong>. Solo IAT lo logra de manera generalizable. Combinación recomendada: <strong>MonoIIT + IAT</strong>.</p>
       </div>
     </div>
   </div>

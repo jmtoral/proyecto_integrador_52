@@ -61,10 +61,16 @@ predice el modelo respecto a la geometria real del sensor.</p>
 </div>
 
 <h3>Como leer cada figura</h3>
-<p>Cada figura tiene <b>dos filas</b> y <b>seis columnas</b>. La fila superior (<i>entrada</i>) es la imagen RGB;
+<p>Cada figura tiene <b>dos filas</b>. La fila superior (<i>entrada</i>) es la imagen RGB;
 la inferior (<i>profundidad</i>) es el mapa que MonoIIT predice de esa entrada. La columna izquierda muestra el
 <b>ground truth</b>: la profundidad real del sensor estereo de SCARED (en gris las zonas sin dato del sensor).
-Las cinco columnas restantes son la imagen sin tocar (<code>none</code>) y los cuatro enhancements.</p>
+Las columnas restantes son la imagen sin tocar (<code>none</code>) y los enhancements
+(<code>endolmspec</code>, <code>iat</code>, <code>endosttn</code>).</p>
+
+<div class="note" style="border-left-color:#d65a4a;background:#fdf0ee;"><b>Nota.</b> Por indicacion del profesor, <b>Retinex se
+excluyo del estudio</b>. El codigo del notebook ya no lo evalua. <b>Las figuras de abajo aun incluyen una columna
+<code>retinex</code></b> porque se generaron antes del cambio; se actualizaran (sin esa columna) al re-ejecutar el
+notebook del Avance 6.</div>
 
 <div class="note"><b>Codigo de color de la profundidad.</b> Se usa el colormap <b>magma</b>:
 <b>amarillo = cerca</b>, <b>morado/negro = lejos</b>. El ground truth se reescala de forma robusta (percentiles)
@@ -75,7 +81,6 @@ para que sea comparable con las predicciones; las zonas grises del GT son pixele
  <tr><th>Columna</th><th>Que hace al RGB</th><th>Que buscamos en la profundidad</th></tr>
  <tr><td>ground truth</td><td>profundidad real del sensor (referencia)</td><td>la geometria que la prediccion deberia reproducir</td></tr>
  <tr><td>none</td><td>imagen original, sin realce</td><td>linea base del modelo para ese fotograma</td></tr>
- <tr><td>retinex</td><td>aplana la iluminacion global, sube luminancia</td><td>si recupera estructura en zonas oscuras o quemadas, o si lava el contraste</td></tr>
  <tr><td>endolmspec</td><td>realce especifico de endoscopia (corrige tinte/especulares)</td><td>si preserva la geometria sin introducir tinte que confunda al modelo</td></tr>
  <tr><td>iat</td><td>ajuste de exposicion/tono aprendido (low-light)</td><td>si normaliza el brillo manteniendo bordes y profundidad estable</td></tr>
  <tr><td>endosttn</td><td>inpainting temporal: borra reflejos especulares con frames vecinos</td><td>si quitar los especulares limpia el mapa donde antes habia saturacion</td></tr>
@@ -92,9 +97,6 @@ para que sea comparable con las predicciones; las zonas grises del GT son pixele
  <ul>
   <li><b>none</b> &mdash; pese a la oscuridad, MonoIIT entrega una profundidad coherente: cupula clara (cerca)
       al centro y caida hacia el fondo morado arriba a la derecha. Es una base solida, dificil de superar.</li>
-  <li><b>retinex</b> &mdash; sobre-corrige: lava por completo el color (la imagen queda casi blanca) y eso
-      desestabiliza la prediccion, que abre una mancha morada (falso "lejos") en la parte superior que no
-      existe en el GT. Aqui el realce <b>perjudica</b>.</li>
   <li><b>endolmspec</b> &mdash; recupera luminancia conservando textura vascular; el mapa es muy parecido al de
       <code>none</code>, con la transicion cerca/lejos casi intacta. Realce <b>neutro a positivo</b>.</li>
   <li><b>iat</b> &mdash; el resultado mas limpio: sube exposicion sin quemar, y la profundidad es practicamente
@@ -103,8 +105,8 @@ para que sea comparable con las predicciones; las zonas grises del GT son pixele
       mantiene estable, lo que confirma que quitar especulares no daña la geometria global.</li>
  </ul>
  <div class="verdict"><b>Veredicto under:</b> en penumbra el modelo ya es robusto, asi que el margen de mejora es
- estrecho. <code>iat</code> y <code>endolmspec</code> realzan sin efectos secundarios; <code>retinex</code> es el
- unico que introduce artefactos de profundidad por exceso de correccion.</div>
+ estrecho. <code>iat</code> y <code>endolmspec</code> realzan sin efectos secundarios y mantienen la
+ geometria coherente con el ground truth.</div>
 </div>
 
 <div class="card over">
@@ -118,8 +120,6 @@ para que sea comparable con las predicciones; las zonas grises del GT son pixele
  <ul>
   <li><b>none</b> &mdash; MonoIIT predice bien la geometria dominante: pliegue cercano (amarillo) abajo y fondo
       lejano (morado) en el resto, consistente con el poco GT disponible.</li>
-  <li><b>retinex</b> &mdash; desatura agresivamente la imagen; la profundidad apenas cambia respecto a la base,
-      lo que sugiere que el modelo se apoya mas en la estructura que en el color absoluto. Efecto <b>casi nulo</b>.</li>
   <li><b>endolmspec</b> &mdash; introduce un tinte verdoso al corregir; la profundidad sigue la misma forma pero
       con leve perdida de definicion en el pliegue inferior. Realce <b>neutro</b>, con riesgo de tinte.</li>
   <li><b>iat</b> &mdash; aplica un calido global y mantiene el mapa estable; util para uniformar exposicion sin
@@ -138,7 +138,7 @@ para que sea comparable con las predicciones; las zonas grises del GT son pixele
 aun asi, arreglar la profundidad justo en los pixeles mas dificiles (o romperla). Estas dos figuras muestran los
 dos extremos:</p>
 <ul>
- <li><b>En penumbra</b> el modelo ya es robusto; el realce rara vez mejora y a veces (Retinex) introduce artefactos.</li>
+ <li><b>En penumbra</b> el modelo ya es robusto; el realce rara vez mejora, y un realce agresivo puede introducir artefactos.</li>
  <li><b>En saturacion</b> el realce generico apenas mueve la prediccion, pero el inpainting temporal
      (<code>endosttn</code>) si recupera geometria donde la imagen estaba quemada.</li>
 </ul>

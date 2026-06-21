@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proyecto Integrador - Equipo 52</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.css">
+<style>
+ :root{--azul:#0036a3;--azul2:#2766CB;--oro:#E0A800;--tinta:#1a2230;--gris:#5b6573;}
+ .reveal{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--tinta);}
+ .reveal h1,.reveal h2,.reveal h3{color:var(--azul);text-transform:none;font-weight:700;letter-spacing:0;}
+ .reveal h1{font-size:1.7em;} .reveal h2{font-size:1.15em;margin-bottom:.35em;} .reveal h3{font-size:.8em;color:var(--azul2);}
+ .reveal section{text-align:left;}
+ .reveal .center{text-align:center;}
+ .reveal p,.reveal li{font-size:.62em;line-height:1.45;}
+ .reveal .tag{display:inline-block;background:var(--azul);color:#fff;padding:4px 14px;border-radius:20px;font-size:.4em;letter-spacing:.04em;text-transform:uppercase;}
+ .reveal .oro{color:var(--oro);} .reveal .azulb{color:var(--azul);font-weight:700;}
+ .reveal small,.reveal .small{font-size:.52em;color:var(--gris);}
+ .reveal table{font-size:.46em;margin:6px auto;border-collapse:collapse;width:100%;}
+ .reveal table th{background:var(--azul);color:#fff;padding:5px 8px;}
+ .reveal table td{padding:4px 8px;border-bottom:1px solid #e4e8ef;}
+ .reveal .best{color:#1a8a3a;font-weight:700;} .reveal .bad{color:#c0392b;}
+ .reveal .arrow{color:#1a8a3a;font-weight:700;}
+ .reveal .two{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center;}
+ .reveal .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+ .reveal .card{background:#f4f7fc;border:1px solid #dfe6f1;border-left:4px solid var(--azul);border-radius:8px;padding:10px 13px;font-size:.92em;}
+ .reveal .card.oro{border-left-color:var(--oro);} .reveal .card.verde{border-left-color:#1a8a3a;}
+ .reveal .card h4{margin:0 0 5px;color:var(--azul);font-size:1.05em;}
+ .reveal .card p,.reveal .card li{font-size:.92em;margin:.2em 0;}
+ .reveal figure{margin:0;text-align:center;}
+ .reveal figure img{border-radius:8px;border:1px solid #dde3ec;box-shadow:0 3px 12px rgba(20,40,80,.1);max-height:62vh;}
+ .reveal figcaption{font-size:.5em;color:var(--gris);margin-top:5px;}
+ .reveal .kbig{font-size:2.2em;color:var(--azul);font-weight:800;line-height:1;}
+ .reveal .note{background:#fff8e6;border-left:4px solid var(--oro);padding:8px 13px;border-radius:6px;font-size:.56em;margin-top:10px;}
+ .reveal .qbox{background:#eef4ff;border:2px solid var(--azul);border-radius:12px;padding:18px 26px;font-size:.8em;}
+ .reveal .ref{font-size:.4em;color:var(--gris);line-height:1.55;}
+ .reveal .footer{position:absolute;bottom:6px;right:14px;font-size:.28em;color:#aab2bf;}
+ .reveal .pill{display:inline-block;background:#eef1f6;color:#1f3a8a;border-radius:14px;padding:2px 9px;font-size:.5em;margin:2px;font-family:ui-monospace,Consolas,monospace;}
+ .reveal .mermaid{background:#f7f9fc;border-radius:10px;padding:8px;font-size:.46em;}
+ .reveal .team img{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.5);}
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- 1. PORTADA -->
+<section class="center" data-background-color="#0036a3">
+  <span class="tag" style="background:rgba(255,255,255,.18);">Proyecto Integrador &middot; TC5035.10</span>
+  <h1 style="color:#fff;margin-top:24px;">El realce de imagen en la estimación<br>de profundidad monocular endoscópica</h1>
+  <p style="color:#cdd9f2;font-size:.72em;margin-top:14px;">Un estudio factorial sobre SCARED: ¿qué método de mejora ayuda a cada modelo?</p>
+  <div class="team" style="display:flex;gap:40px;justify-content:center;margin-top:26px;">
+    <div><img src="../img/elda.jpg"><br><span style="color:#fff;font-size:.5em;">Elda Morales<br><span style="color:#9fb6e6;">A00449074</span></span></div>
+    <div><img src="../img/mpgc.jpg"><br><span style="color:#fff;font-size:.5em;">M. Paula Gutiérrez<br><span style="color:#9fb6e6;">A01747706</span></span></div>
+    <div><img src="../img/jmtc.jpg"><br><span style="color:#fff;font-size:.5em;">J. Manuel Toral<br><span style="color:#9fb6e6;">A01122243</span></span></div>
+  </div>
+  <p style="color:#9fb6e6;font-size:.46em;margin-top:18px;">Equipo 52 &middot; Maestría en Inteligencia Artificial Aplicada &middot; Tecnológico de Monterrey</p>
+</section>
+
+<!-- 2. CONTEXTO: que es depth monocular -->
+<section>
+  <h2>Contexto: profundidad monocular en endoscopía</h2>
+  <div class="two">
+    <div>
+      <p>La <b>estimación de profundidad monocular</b> consiste en predecir, a partir de <b>una sola imagen RGB</b>, la distancia de cada píxel a la cámara — sin sensor de profundidad ni par estéreo.</p>
+      <p>En endoscopía habilita <b>reconstrucción 3D</b>, navegación y medición de lesiones durante la cirugía, usando solo el vídeo del endoscopio.</p>
+      <div class="note"><b>SCARED</b> = dataset de endoscopía abdominal con <i>ground truth</i> de profundidad real (sensor de luz estructurada, en milímetros). Es nuestro banco de pruebas.</div>
+    </div>
+    <figure>
+      <img src="../img/02_depth_maps.png">
+      <figcaption>Imagen RGB y su mapa de profundidad de referencia (SCARED).</figcaption>
+    </figure>
+  </div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 3. PROBLEMA -->
+<section>
+  <h2>El problema: la iluminación degrada la predicción</h2>
+  <div class="two">
+    <figure>
+      <img src="../img/01_rgb_keyframes.png">
+      <figcaption>Frames de SCARED: nótese la fuerte variación de brillo entre regiones.</figcaption>
+    </figure>
+    <div>
+      <p>La luz del endoscopio va <b>montada en la cámara</b>: el centro se ilumina mucho y los bordes/cavidades quedan oscuros. Aparecen tres artefactos:</p>
+      <div class="card"><b>Sub-exposición</b> — zonas oscuras sin textura → la profundidad se aplana.</div>
+      <div class="card" style="margin-top:7px;"><b>Sobre-exposición</b> — zonas quemadas → geometría distorsionada.</div>
+      <div class="card" style="margin-top:7px;"><b>Reflejos especulares</b> — brillos sobre tejido húmedo que ocultan estructura.</div>
+    </div>
+  </div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 4. EVIDENCIA CUANTITATIVA (EDA) -->
+<section>
+  <h2>Evidencia: la luz se correlaciona con el error</h2>
+  <div class="two">
+    <div>
+      <p>En nuestro <b>análisis exploratorio</b> sobre SCARED encontramos que las zonas <b>más brillantes</b> son justamente donde <b>menos datos de profundidad válidos</b> hay (correlación de Pearson negativa, hasta −0.86).</p>
+      <p>Es decir: el artefacto de iluminación <b>no es cosmético</b> — coincide con la pérdida de información geométrica. Esto motiva intentar <b>corregir la imagen antes</b> de estimar la profundidad.</p>
+      <div class="note">El gradiente de iluminación es <b>sistemático y asimétrico</b> (centrado en el eje óptico, no en el centro geométrico): un sesgo estructural que el modelo hereda.</div>
+    </div>
+    <figure>
+      <img src="../img/19_correlacion_lum_gt.png">
+      <figcaption>Correlación luminancia ↔ cobertura de ground-truth por anillo radial.</figcaption>
+    </figure>
+  </div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 5. PREGUNTA + APORTACION -->
+<section data-background-color="#f4f7fc">
+  <h2 class="center">Pregunta de investigación y aportación</h2>
+  <div class="center" style="margin:14px 0;">
+    <p class="qbox"><i>¿Los métodos de <b>image enhancement</b> mejoran la estimación de profundidad monocular en endoscopía?</i></p>
+  </div>
+  <div class="two">
+    <div class="card verde"><h4>Nuestra aportación</h4>
+      <p>Un <b>estudio factorial</b> del efecto del realce de imagen sobre la profundidad monocular en SCARED: <b>5 arquitecturas × varios métodos de mejora × 550 frames</b>.</p>
+      <p>Identificamos <b>qué realce conviene a cada modelo</b> y cuál mejora de forma generalizable — algo no reportado así en la literatura SCARED.</p>
+    </div>
+    <div class="card"><h4>Alcance</h4>
+      <p>Cada modelo se evalúa <b>con y sin</b> cada realce, contra su propio baseline. Aislamos el efecto del enhancement manteniendo todo lo demás fijo.</p>
+      <p class="small">Estructura de presentación inspirada en el pipeline de Espinosa et al. (CBMS 2024) [1]; nuestro foco —el efecto del enhancement sobre depth— es propio.</p>
+    </div>
+  </div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 6. METODOS DE MEJORA (el corazon) -->
+<section>
+  <h2>Los métodos de mejora evaluados</h2>
+  <div class="three">
+    <div class="card"><h4>none</h4><p>Imagen original, sin tocar. Es la <b>línea base</b> de cada modelo.</p></div>
+    <div class="card"><h4>Endo-LMSPEC</h4><p>Corrección de exposición <b>multi-escala</b> (pirámide Laplaciana + U-Nets). Realza detalle local. <span class="small">[2]</span></p></div>
+    <div class="card"><h4>IAT</h4><p><i>Illumination-Adaptive Transformer</i>: ajusta exposición con mapeo <b>local + global</b> aprendido.</p></div>
+  </div>
+  <div class="two" style="margin-top:12px;">
+    <div class="card oro"><h4>Endo-STTN <span class="small">[3]</span></h4><p><i>Spatio-Temporal Transformer Network</i>: no procesa una imagen aislada, sino la <b>secuencia</b>; rellena (<i>inpainting</i>) los reflejos especulares usando los <b>frames vecinos</b>.</p></div>
+    <figure><img src="../img/21_correccion_demo.png" style="max-height:30vh;"><figcaption>Ejemplo de corrección de iluminación sobre un frame de SCARED.</figcaption></figure>
+  </div>
+  <div class="note">Idea común: si la imagen entra "más limpia", el modelo de profundidad debería predecir mejor. <b>Lo medimos, no lo asumimos.</b></div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 7. MODELOS -->
+<section>
+  <h2>Los 5 modelos de profundidad (pesos SCARED)</h2>
+  <p>Arquitecturas auto-supervisadas de depth monocular, <b>re-entrenadas en SCARED</b> por el Dr. Ricardo Espinosa Loera para evaluar en el dominio real:</p>
+  <table>
+    <tr><th>Modelo</th><th>Encoder</th><th>Decoder</th><th>Qué lo distingue</th></tr>
+    <tr><td>Monodepth2</td><td>ResNet-18 (CNN)</td><td>Monodepth2</td><td>baseline clásico de la literatura</td></tr>
+    <tr><td>MonoViT</td><td>MPViT (transformer)</td><td>HR-Depth</td><td>atención visual + módulo de iluminación</td></tr>
+    <tr><td>EndoSfMLearner</td><td>DispResNet-18</td><td>DispNet</td><td>pérdida fotométrica <i>brightness-aware</i></td></tr>
+    <tr><td>AF-SfMLearner</td><td>ResNet-18</td><td>Monodepth2</td><td>módulo de <i>appearance flow</i> (endoscopía)</td></tr>
+    <tr><td><b>MonoIIT</b></td><td>MPViT (transformer)</td><td>HR-Depth</td><td><b>+ módulo explícito de iluminación</b></td></tr>
+  </table>
+  <div class="note">Se cubre un espectro: <b>CNN clásicas, transformers y modelos específicos de endoscopía</b>. Así el hallazgo no depende de una sola arquitectura.</div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 8. METRICAS -->
+<section>
+  <h2>¿Cómo medimos el error? Métricas</h2>
+  <div class="two">
+    <div>
+      <table>
+        <tr><th>Métrica</th><th>Qué mide</th><th>Mejor</th></tr>
+        <tr><td><b>AbsRel</b></td><td>error relativo medio (la principal)</td><td>↓</td></tr>
+        <tr><td>RMSE</td><td>error cuadrático en mm</td><td>↓</td></tr>
+        <tr><td>RMSE-log</td><td>RMSE en escala log</td><td>↓</td></tr>
+        <tr><td>δ&lt;1.25ᵏ</td><td>% píxeles "casi correctos"</td><td>↑</td></tr>
+      </table>
+      <p style="margin-top:8px;"><b>AbsRel</b> = promedio de |pred − gt| / gt. Si vale 0.05, el error típico es ~5% de la profundidad real.</p>
+    </div>
+    <div>
+      <div class="card"><h4>Median scaling</h4><p>La predicción monocular es <b>relativa</b> (sin escala absoluta). Antes de medir, se multiplica por <code>median(gt)/median(pred)</code> para llevarla a milímetros. Es el estándar en depth monocular.</p></div>
+      <div class="card oro" style="margin-top:8px;"><h4>ΔAR%</h4><p>Cambio de AbsRel respecto a <code>none</code>. <b>Negativo = el realce mejoró</b>; positivo = empeoró.</p></div>
+    </div>
+  </div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 9. PIPELINE mermaid -->
+<section>
+  <h2>Diseño experimental (pipeline)</h2>
+  <div class="mermaid">
+flowchart LR
+    A["SCARED<br/>split oficial<br/>550 frames"] --> ENH
+    subgraph ENH ["Image Enhancement (variable independiente)"]
+        E0["none"]
+        E1["Endo-LMSPEC"]
+        E2["IAT"]
+        E3["Endo-STTN"]
+    end
+    ENH --> M["5 modelos de depth<br/>(pesos SCARED)"]
+    M --> D["Median scaling -> mm"]
+    GT["Ground truth<br/>sensor estereo"] --> CMP["Comparacion"]
+    D --> CMP
+    CMP --> R["AbsRel · RMSE · delta<br/>(variable dependiente)"]
+    style ENH fill:#cfe8ff,stroke:#2766CB
+    style M fill:#cfe8ff,stroke:#2766CB
+    style GT fill:#fff3cd,stroke:#E0A800
+    style R fill:#1a2e51,stroke:#E0A800,color:#fff
+  </div>
+  <div class="note center"><b>Diseño factorial controlado:</b> solo varía el enhancement; modelo, GT y protocolo se mantienen fijos → <b>5 × 4 × 550 = 11,000 evaluaciones</b>.</div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 10. INFRAESTRUCTURA -->
+<section>
+  <h2>Infraestructura y reproducibilidad</h2>
+  <div class="three">
+    <div class="card"><h4>Cómputo</h4><p>Google Colab (GPU A100/T4) para inferencia; repo en GitHub; entorno local para validación.</p></div>
+    <div class="card"><h4>Datos</h4><p><b>Split oficial</b> de AF-SfMLearner (550 frames, ds 1–7), el estándar de la literatura SCARED → resultados comparables.</p></div>
+    <div class="card"><h4>Reproducibilidad</h4><p>Caché de frames (.npz), <b>checkpointing</b> del loop, split fijo. Reanudable sin perder avance.</p></div>
+  </div>
+  <p style="margin-top:12px;"><b>Stack:</b> <span class="pill">PyTorch</span> <span class="pill">OpenCV</span> <span class="pill">NumPy</span> <span class="pill">Plotly</span> <span class="pill">matplotlib</span> &nbsp;|&nbsp; <b>Entregables:</b> notebooks por avance → reportes HTML, tablas LaTeX, sitio web y reconstrucción 3D interactiva.</p>
+  <div class="note"><b>Hallazgo técnico:</b> el encoder de AF-SfMLearner requería <b>desactivar la normalización ImageNet</b> (sus pesos se entrenaron sin ella) para reproducir su baseline correcto — depurar el pipeline fue parte del trabajo.</div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 11. BASELINES -->
+<section>
+  <h2>Punto de partida: baselines sin realce</h2>
+  <div class="two">
+    <div>
+      <table>
+        <tr><th>Modelo</th><th>AbsRel ↓</th><th>RMSE ↓</th><th>δ&lt;1.25 ↑</th></tr>
+        <tr><td><b>MonoIIT</b></td><td class="best">0.0554</td><td class="best">4.700</td><td>0.9714</td></tr>
+        <tr><td>AF-SfMLearner</td><td>0.0592</td><td>5.056</td><td>0.9674</td></tr>
+        <tr><td>Monodepth2</td><td>0.0708</td><td>5.746</td><td>0.9459</td></tr>
+        <tr><td>MonoViT</td><td>0.0727</td><td>5.689</td><td>0.9516</td></tr>
+        <tr><td>EndoSfMLearner</td><td>0.0845</td><td>7.029</td><td>0.9216</td></tr>
+      </table>
+      <p style="margin-top:8px;"><b>MonoIIT</b> (transformer + módulo de iluminación) es el más preciso ya de base. Esta tabla es la <b>referencia</b> contra la que medimos cada realce.</p>
+    </div>
+    <figure>
+      <img src="../img/02_depth_maps.png" style="max-height:42vh;">
+      <figcaption>Mapa de profundidad predicho vs. ground truth (caso base).</figcaption>
+    </figure>
+  </div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 12. RESULTADOS tabla -->
+<section>
+  <h2>Resultado central: efecto del realce (ΔAbsRel %)</h2>
+  <table>
+    <tr><th>Modelo</th><th>none (AbsRel)</th><th>endolmspec</th><th>iat</th><th>endosttn</th><th>Mejor</th></tr>
+    <tr><td>Monodepth2</td><td>0.0708</td><td class="bad">+4.9%</td><td class="best">−1.7% ←</td><td>+1.7%</td><td>iat</td></tr>
+    <tr><td>MonoViT</td><td>0.0727</td><td>+0.4%</td><td class="best">−1.9% ←</td><td>+0.1%</td><td>iat</td></tr>
+    <tr><td>EndoSfMLearner</td><td>0.0845</td><td class="bad">+3.8%</td><td class="bad">+4.0%</td><td class="bad">+7.0%</td><td>none</td></tr>
+    <tr><td>AF-SfMLearner</td><td>0.0592</td><td class="best">−4.7% ←</td><td class="best">−1.7% ←</td><td>+2.7%</td><td>endolmspec</td></tr>
+    <tr><td><b>MonoIIT</b></td><td>0.0554</td><td>+1.4%</td><td class="best">−3.1% ←</td><td>+0.7%</td><td>iat</td></tr>
+  </table>
+  <div class="two" style="margin-top:6px;">
+    <figure><img src="../../outcomes/avance5_newversion/avance5_metricas.png" style="max-height:34vh;"><figcaption>Métricas por modelo × enhancement (barras).</figcaption></figure>
+    <div class="card oro"><h4>Mejor configuración del estudio</h4><p class="center" style="font-size:1.3em;"><b>MonoIIT + IAT → AbsRel 0.0537</b></p><p>Por debajo de su ya bajo baseline (0.0554). ← marca mejora vs. <code>none</code>.</p></div>
+  </div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 13. HALLAZGO clave -->
+<section data-background-color="#f4f7fc">
+  <h2 class="center">Hallazgo principal</h2>
+  <p class="center"><span class="kbig">IAT</span> &nbsp;es el único realce robusto: mejora <b>4 de 5 modelos</b></p>
+  <div class="three" style="margin-top:14px;">
+    <div class="card verde"><h4>✔ IAT</h4><p>Normaliza exposición <b>preservando bordes</b> → ayuda de forma generalizable, sin sacar al modelo de su distribución.</p></div>
+    <div class="card"><h4>~ Endo-LMSPEC</h4><p>Solo ayuda en AF-SfMLearner (<b>−4.7%</b>, su mejor); neutro en el resto.</p></div>
+    <div class="card"><h4>~ Endo-STTN</h4><p>Efecto casi nulo y <b>~300× más lento</b> (~19.7 s/frame): inviable en tiempo real.</p></div>
+  </div>
+  <div class="note"><b>El beneficio del realce es real pero modesto y condicional</b> al método y a la arquitectura. <b>EndoSfMLearner</b> no se beneficia de ninguno: su pérdida <i>brightness-aware</i> ya absorbe la iluminación, y el realce externo lo perturba.</div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 14. CUALITATIVO under/over -->
+<section>
+  <h2>Inspección cualitativa por régimen</h2>
+  <figure class="center"><img src="../../outcomes/avance6/avance6_under.png" style="max-height:34vh;"><figcaption>Caso <b>sub-expuesto</b>: imagen + mapa de profundidad por enhancement vs. ground truth (MonoIIT).</figcaption></figure>
+  <p style="margin-top:6px;">En penumbra el modelo ya es robusto; el realce <b>mejora poco</b>. Retinex (descartado) llegaba a introducir artefactos por sobre-corrección. <b>IAT y Endo-LMSPEC</b> realzan sin deformar la geometría.</p>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 15. CUALITATIVO over / especulares -->
+<section>
+  <h2>Dónde sí brilla cada método</h2>
+  <figure class="center"><img src="../../outcomes/avance6/avance6_over.png" style="max-height:34vh;"><figcaption>Caso <b>sobre-expuesto</b> con reflejo especular fuerte.</figcaption></figure>
+  <p style="margin-top:6px;">En la zona <b>quemada por el especular</b>, <b>Endo-STTN</b> reconstruye tejido plausible (inpainting temporal) y limpia el mapa de profundidad justo donde la saturación lo rompía. Su valor es <b>local</b>, no global — coherente con que apenas mueve la métrica promedio.</p>
+  <div class="note center">Conclusión visual: el beneficio del realce <b>depende del régimen de iluminación</b>, no es uniforme.</div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 16. RECONSTRUCCION 3D -->
+<section>
+  <h2>Cierre del pipeline: reconstrucción 3D</h2>
+  <div class="two">
+    <div>
+      <p>El mapa de profundidad de MonoIIT se <b>retroproyecta</b> a una <b>nube de puntos 3D</b> con los intrínsecos de la cámara:</p>
+      <div class="mermaid">
+flowchart TB
+    F["frame"] --> E["enhancement"]
+    E --> D["MonoIIT depth"]
+    D --> P["back-projection<br/>(fx,fy,cx,cy)"]
+    P --> S["nube de puntos 3D"]
+    style S fill:#1a2e51,stroke:#E0A800,color:#fff
+      </div>
+      <p>Comparamos 3 nubes: <b>ground truth</b>, MonoIIT (none) y MonoIIT (IAT), en un visor <b>interactivo Plotly</b> con color RGB por punto.</p>
+    </div>
+    <div class="card"><h4>Por qué importa</h4><p>La profundidad por sí sola es un mapa 2D; la nube 3D muestra la <b>forma real del tejido</b> reconstruida desde una sola cámara. Es el insumo para navegación quirúrgica y medición de lesiones.</p>
+    <p class="small">Reconstrucción por-frame; la fusión multi-frame (estilo SLAM) es trabajo futuro.</p></div>
+  </div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 17. CONCLUSIONES -->
+<section data-background-color="#0036a3">
+  <h2 style="color:#fff;">Conclusiones</h2>
+  <ul style="color:#eaf1ff;">
+    <li>El <b>image enhancement sí mejora</b> la profundidad monocular endoscópica, pero de forma <b>modesta y condicional</b> — no es un "siempre conviene".</li>
+    <li><b>IAT es el único realce generalizable</b> (mejora 4/5 modelos); la mejor combinación es <b class="oro">MonoIIT + IAT (AbsRel 0.0537)</b>.</li>
+    <li><b>Endo-STTN</b> es neutro en promedio e inviable en tiempo real, pero <b>útil localmente</b> en reflejos especulares.</li>
+    <li>El efecto <b>depende de la arquitectura</b>: lo que ayuda a uno puede perjudicar a otro (EndoSfMLearner no se beneficia de ninguno).</li>
+  </ul>
+  <div class="note" style="background:rgba(255,255,255,.12);border-left-color:var(--oro);color:#fff;">Respuesta a la pregunta: <b>el realce ayuda, pero elegir el método correcto importa más que aplicarlo por defecto.</b> Esa es la aportación práctica del estudio factorial.</div>
+  <div class="footer" style="color:#9fb6e6;">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 18. LIMITACIONES / FUTURO -->
+<section>
+  <h2>Limitaciones y trabajo futuro</h2>
+  <div class="two">
+    <div class="card"><h4>Limitaciones</h4>
+      <li>Reconstrucción 3D <b>por-frame</b> (sin fusión global).</li>
+      <li>Chamfer 3D desactivado por costo computacional.</li>
+      <li>Realce entrenado para <b>apariencia</b>, no específicamente para depth.</li>
+    </div>
+    <div class="card oro"><h4>Trabajo futuro</h4>
+      <li>Fusión multi-frame con pose (estilo RNN-SLAM) para mapa 3D global.</li>
+      <li>Evaluar Chamfer Distance a escala completa.</li>
+      <li>Validar en otros datasets (Hamlyn, C3VD).</li>
+      <li>Re-entrenar el realce optimizando la métrica de profundidad.</li>
+    </div>
+  </div>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 19. REFERENCIAS -->
+<section>
+  <h2>Referencias</h2>
+  <p class="ref">
+    [1] R. Espinosa, J. Cerriteño, S. Gonzalez-Dominguez, G. Ochoa-Ruiz y C. Daul, "A deep learning-based image pre-processing pipeline for enhanced 3D colon surface reconstruction robust to endoscopic illumination artifacts," <i>2024 IEEE 37th International Symposium on Computer-Based Medical Systems (CBMS)</i>, Guadalajara, Mexico, 2024, pp. 81-88, doi: 10.1109/CBMS61543.2024.00022. <span class="azulb">(referencia de estructura)</span><br><br>
+    [2] A. Garcia-Vega et al., "Multi-scale structural-aware exposure correction for endoscopic imaging," <i>IEEE ISBI</i>, 2023. <small>(Endo-LMSPEC)</small><br>
+    [3] R. Daher, F. Vasconcelos y D. Stoyanov, "A temporal learning approach to inpainting endoscopic specularities," <i>Medical Image Analysis</i>, vol. 90, 2023. <small>(Endo-STTN)</small><br>
+    [4] C. Godard et al., "Digging into self-supervised monocular depth estimation," <i>ICCV</i>, 2019. <small>(Monodepth2)</small><br>
+    [5] S. Shao et al., "Self-supervised monocular depth and ego-motion estimation in endoscopy," <i>Medical Image Analysis</i>, 2022. <small>(AF-SfMLearner)</small><br>
+    [6] C. Zhao et al., "MonoViT: self-supervised monocular depth estimation with a vision transformer," <i>3DV</i>, 2022.<br>
+    [7] D. Recasens et al., "Endo-Depth-and-Motion," <i>IEEE RA-L</i>, 2021. <small>(SCARED depth)</small>
+  </p>
+  <p class="center" style="margin-top:18px;font-size:.8em;"><b>¡Gracias!</b> &middot; Equipo 52 &middot; Preguntas</p>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+ mermaid.initialize({startOnLoad:false, theme:'default', securityLevel:'loose'});
+ Reveal.initialize({hash:true, slideNumber:'c/t', transition:'slide', width:1280, height:720, margin:0.04});
+ function renderMermaid(){
+   document.querySelectorAll('.mermaid:not([data-processed])').forEach(function(el){
+     try{ mermaid.run({nodes:[el]}); }catch(e){}
+   });
+ }
+ Reveal.on('ready', renderMermaid);
+ Reveal.on('slidechanged', renderMermaid);
+</script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage{booktabs}
+\usepackage{multirow}
 \usepackage{amsmath}
 \usepackage{microtype}
 \usepackage[table]{xcolor}
@@ -11,6 +12,7 @@
 
 % ======================================================================
 % AVANCE 5 — NEW VERSION (split oficial 550 frames + Endo-STTN)
+% Resultados definitivos: 5 modelos, baselines corregidos.
 % ======================================================================
 \begin{table}[htbp]
 \centering
@@ -18,61 +20,49 @@
 \setlength{\tabcolsep}{5pt}
 \renewcommand{\arraystretch}{1.15}
 
-\caption{\textbf{Avance 5 — New Version.} Resultados con \textbf{pesos re-entrenados en SCARED} (Dr.\ Ricardo Espinosa Loera), evaluados sobre el \textbf{\textit{split} oficial de AF-SfMLearner} (550 fotogramas, \textit{datasets} 1--7). Se incluye \textbf{Endo-STTN} como quinto método de mejora. La flecha $\leftarrow$ marca las configuraciones que mejoran respecto al \textit{baseline} (\textit{none}).}
+\caption{\textbf{Avance 5 — New Version.} Resultados con \textbf{pesos re-entrenados en SCARED} (Dr.\ Ricardo Espinosa Loera), evaluados sobre el \textbf{\textit{split} oficial de AF-SfMLearner} (550 fotogramas, \textit{datasets} 1--7). Se evalúan cuatro métodos de realce (\textit{none}, \textit{endolmspec}, \textit{iat}, \textit{endosttn}); Retinex se excluyó por indicación del profesor. La flecha $\leftarrow$ marca las configuraciones que mejoran respecto al \textit{baseline} (\textit{none}); en \textbf{negrita}, la mejor configuración de cada modelo.}
 \label{tab:avance5_newversion}
 
-\begin{tabular}{llccccccccc@{\hspace{10pt}}l}
+\begin{tabular}{llccccccccc}
 \toprule
-\textbf{Modelo} & \textbf{Enhancement} & \textbf{AbsRel} & \textbf{SqRel} & \textbf{RMSE} & \textbf{RMSELog} & $\mathbf{\delta < 1.25}$ & $\mathbf{\delta < 1.25^2}$ & $\mathbf{\delta < 1.25^3}$ & \textbf{IT (ms)} & \textbf{$\mathbf{\Delta\text{AR}\%}$} & \\
+\textbf{Modelo} & \textbf{Enhancement} & \textbf{AbsRel} & \textbf{SqRel} & \textbf{RMSE} & \textbf{RMSELog} & $\delta < 1.25$ & $\delta < 1.25^2$ & $\delta < 1.25^3$ & \textbf{IT (ms)} & $\Delta\text{AR}\%$ \\
 \midrule
-
-Monodepth2 & none       & 0.0708 & 0.6219 & 5.746 & 0.0988 & 0.9459 & 0.9931 & 0.9995 &   29.0 & baseline & \\
-           & retinex    & 0.1095 & 1.4737 & 9.174 & 0.1556 & 0.8767 & 0.9744 & 0.9922 &  359.0 & +54.7\% & \\
-           & endolmspec & 0.0743 & 0.6658 & 5.997 & 0.1038 & 0.9411 & 0.9926 & 0.9991 &  122.8 &  +4.9\% & \\
-           & iat        & 0.0696 & 0.6105 & 5.745 & 0.0977 & 0.9468 & 0.9944 & 0.9993 &  228.7 &  -1.7\% & $\leftarrow$ \\
-           & endosttn   & 0.0720 & 0.6345 & 5.827 & 0.1006 & 0.9449 & 0.9930 & 0.9994 & 7682.3 &  +1.7\% & \\
-\addlinespace[0.7em]
-
-MonoViT & none       & 0.0994 & 1.2450 & 8.537 & 0.1428 & 0.8908 & 0.9843 & 0.9941 &   50.4 & baseline & \\
-        & retinex    & 0.0986 & 1.3027 & 8.596 & 0.1407 & 0.8975 & 0.9785 & 0.9936 &  381.4 &  -0.8\% & $\leftarrow$ \\
-        & endolmspec & 0.1035 & 1.2924 & 8.694 & 0.1455 & 0.8838 & 0.9824 & 0.9952 &  145.2 &  +4.1\% & \\
-        & iat        & 0.0953 & 1.1757 & 8.271 & 0.1373 & 0.9020 & 0.9845 & 0.9948 &  251.2 &  -4.1\% & $\leftarrow$ \\
-        & endosttn   & 0.0971 & 1.2238 & 8.415 & 0.1405 & 0.8959 & 0.9846 & 0.9939 & 7704.7 &  -2.3\% & $\leftarrow$ \\
-\addlinespace[0.7em]
-
-EndoSfMLearner & none       & 0.1123 & 1.5182 & 8.994 & 0.1455 & 0.8686 & 0.9813 & 0.9965 &    6.3 & baseline & \\
-               & retinex    & 0.1126 & 1.5240 & 9.010 & 0.1457 & 0.8680 & 0.9812 & 0.9965 &  337.9 &  +0.3\% & \\
-               & endolmspec & 0.1124 & 1.5199 & 8.999 & 0.1455 & 0.8684 & 0.9813 & 0.9965 &  101.7 &  +0.1\% & \\
-               & iat        & 0.1124 & 1.5199 & 8.998 & 0.1455 & 0.8684 & 0.9813 & 0.9965 &  207.7 &  +0.1\% & \\
-               & endosttn   & 0.1123 & 1.5184 & 8.995 & 0.1455 & 0.8686 & 0.9813 & 0.9965 & 7661.1 &  +0.0\% & \\
-\addlinespace[0.7em]
-
-AF-SfMLearner & none       & 0.1177 & 1.4548 & 9.093 & 0.1527 & 0.8476 & 0.9902 & 0.9970 &   27.3 & baseline & \\
-              & retinex    & 0.1025 & 1.4512 & 8.944 & 0.1496 & 0.8919 & 0.9732 & 0.9889 &  359.0 & -12.9\% & $\leftarrow$ \\
-              & endolmspec & 0.1069 & 1.2332 & 8.475 & 0.1417 & 0.8773 & 0.9914 & 0.9969 &  122.8 &  -9.2\% & $\leftarrow$ \\
-              & iat        & 0.1013 & 1.1653 & 8.178 & 0.1368 & 0.8848 & 0.9902 & 0.9968 &  228.8 & -13.9\% & $\leftarrow$ \\
-              & endosttn   & 0.1167 & 1.4188 & 9.026 & 0.1525 & 0.8475 & 0.9895 & 0.9969 & 7682.2 &  -0.8\% & $\leftarrow$ \\
-\addlinespace[0.7em]
-
-MonoIIT & none       & 0.0554 & 0.4146 & 4.700 & 0.0777 & 0.9713 & 0.9976 & 0.9996 &   71.3 & baseline & \\
-        & retinex    & 0.0851 & 1.0591 & 7.705 & 0.1254 & 0.9233 & 0.9824 & 0.9936 &  402.9 & +53.6\% & \\
-        & endolmspec & 0.0562 & 0.4214 & 4.869 & 0.0792 & 0.9735 & 0.9977 & 0.9996 &  166.7 &  +1.4\% & \\
-        & iat        & 0.0537 & 0.3857 & 4.559 & 0.0755 & 0.9738 & 0.9981 & 0.9998 &  272.8 &  -3.1\% & $\leftarrow$ \\
-        & endosttn   & 0.0558 & 0.4160 & 4.688 & 0.0776 & 0.9765 & 0.9975 & 0.9996 & 7726.1 &  +0.7\% & \\
-\addlinespace[0.7em]
-
-w19-MonoViT & none       & 0.0727 & 0.6084 & 5.690 & 0.0969 & 0.9516 & 0.9954 & 0.9995 &   71.1 & baseline & \\
-            & retinex    & 0.0858 & 1.0065 & 7.534 & 0.1236 & 0.9259 & 0.9850 & 0.9950 &  402.9 & +18.0\% & \\
-            & endolmspec & 0.0731 & 0.6204 & 5.849 & 0.0984 & 0.9526 & 0.9950 & 0.9992 &  166.7 &  +0.6\% & \\
-            & iat        & 0.0713 & 0.5971 & 5.716 & 0.0960 & 0.9565 & 0.9955 & 0.9994 &  272.6 &  -1.9\% & $\leftarrow$ \\
-            & endosttn   & 0.0728 & 0.6195 & 5.762 & 0.0974 & 0.9549 & 0.9953 & 0.9994 & 7726.1 &  +0.1\% & \\
+\multirow{4}{*}{Monodepth2}
+ & none & 0.0708 & 0.6218 & 5.746 & 0.0988 & 0.9459 & 0.9931 & 0.9995 & 6.0 & base \\
+ & endolmspec & 0.0743 & 0.6658 & 5.997 & 0.1038 & 0.9411 & 0.9926 & 0.9991 & 181.4 & +4.9\% \\
+ & iat & \textbf{0.0696} & 0.6105 & 5.745 & 0.0977 & 0.9468 & 0.9944 & 0.9993 & 287.3 & -1.7\% $\leftarrow$ \\
+ & endosttn & 0.0720 & 0.6344 & 5.827 & 0.1006 & 0.9449 & 0.9930 & 0.9994 & 19673.0 & +1.7\% \\
+\midrule
+\multirow{4}{*}{MonoViT}
+ & none & 0.0727 & 0.6081 & 5.689 & 0.0969 & 0.9516 & 0.9954 & 0.9995 & 55.0 & base \\
+ & endolmspec & 0.0730 & 0.6200 & 5.845 & 0.0983 & 0.9526 & 0.9950 & 0.9992 & 228.5 & +0.4\% \\
+ & iat & \textbf{0.0713} & 0.5969 & 5.715 & 0.0960 & 0.9565 & 0.9955 & 0.9994 & 335.3 & -1.9\% $\leftarrow$ \\
+ & endosttn & 0.0728 & 0.6194 & 5.762 & 0.0974 & 0.9549 & 0.9953 & 0.9994 & 19721.6 & +0.1\% \\
+\midrule
+\multirow{4}{*}{EndoSfMLearner}
+ & none & \textbf{0.0845} & 0.8706 & 7.029 & 0.1211 & 0.9216 & 0.9867 & 0.9972 & 12.8 & base \\
+ & endolmspec & 0.0877 & 0.9353 & 7.323 & 0.1264 & 0.9160 & 0.9855 & 0.9968 & 187.1 & +3.8\% \\
+ & iat & 0.0879 & 0.9377 & 7.284 & 0.1267 & 0.9130 & 0.9853 & 0.9967 & 289.8 & +4.0\% \\
+ & endosttn & 0.0904 & 0.9608 & 7.378 & 0.1303 & 0.9077 & 0.9831 & 0.9969 & 19676.4 & +7.0\% \\
+\midrule
+\multirow{4}{*}{AF-SfMLearner}
+ & none & 0.0592 & 0.4686 & 5.056 & 0.0825 & 0.9674 & 0.9971 & 0.9996 & 8.4 & base \\
+ & endolmspec & \textbf{0.0564} & 0.4335 & 4.898 & 0.0795 & 0.9719 & 0.9968 & 0.9995 & 180.7 & -4.7\% $\leftarrow$ \\
+ & iat & 0.0582 & 0.4483 & 4.963 & 0.0812 & 0.9685 & 0.9972 & 0.9996 & 286.6 & -1.7\% $\leftarrow$ \\
+ & endosttn & 0.0608 & 0.4806 & 5.125 & 0.0840 & 0.9675 & 0.9969 & 0.9996 & 19672.9 & +2.7\% \\
+\midrule
+\multirow{4}{*}{MonoIIT}
+ & none & 0.0554 & 0.4144 & 4.700 & 0.0777 & 0.9714 & 0.9976 & 0.9996 & 57.3 & base \\
+ & endolmspec & 0.0562 & 0.4215 & 4.870 & 0.0792 & 0.9735 & 0.9976 & 0.9996 & 228.9 & +1.4\% \\
+ & iat & \textbf{0.0537} & 0.3857 & 4.560 & 0.0755 & 0.9738 & 0.9981 & 0.9998 & 335.4 & -3.1\% $\leftarrow$ \\
+ & endosttn & 0.0558 & 0.4160 & 4.688 & 0.0775 & 0.9765 & 0.9975 & 0.9996 & 19722.0 & +0.7\% \\
 \bottomrule
 \end{tabular}
 
 \vspace{0.6em}
 \begin{minipage}{\linewidth}
     \footnotesize
-    \textbf{Nota.} \textit{Split} oficial de AF-SfMLearner (\texttt{splits/endovis/test\_files.txt}): 550 fotogramas de los \textit{datasets} 1--7 de SCARED, comparables con la literatura. $\delta < 1.25^k$ = fracción de píxeles con $\max(\text{pred}/\text{gt},\,\text{gt}/\text{pred}) < 1.25^k$ (mayor es mejor). $\Delta\text{AR}\%$ = variación de AbsRel respecto a \textit{none}; negativo (con $\leftarrow$) indica mejora. \textbf{IAT} es el método más consistente (mejora en 5 de 6 modelos). \textbf{Endo-STTN} es $\sim$30$\times$ más lento ($\sim$7.7\,s/frame) por su naturaleza temporal, con mejoras marginales. El \textit{enhancement} es especialmente beneficioso en \textbf{AF-SfMLearner} (IAT: $-13.9\%$).
+    \textbf{Nota.} \textit{Split} oficial de AF-SfMLearner (\texttt{splits/endovis/test\_files.txt}): 550 fotogramas de los \textit{datasets} 1--7 de SCARED, comparables con la literatura. $\delta < 1.25^k$ = fracción de píxeles con $\max(\text{pred}/\text{gt},\,\text{gt}/\text{pred}) < 1.25^k$ (mayor es mejor). $\Delta\text{AR}\%$ = variación de AbsRel respecto a \textit{none}; negativo (con $\leftarrow$) indica mejora. \textbf{IAT} es el único realce robusto: mejora en 4 de 5 modelos. \textbf{Endo-STTN} es $\sim$300$\times$ más lento ($\sim$19.7\,s/frame), inviable en tiempo real, con efecto casi nulo. El mejor resultado absoluto del estudio es \textbf{MonoIIT + IAT} (AbsRel $=0.0537$).
 \end{minipage}
 
 \end{table}
