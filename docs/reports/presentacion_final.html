@@ -275,19 +275,27 @@ flowchart LR
   <div class="footer">Equipo 52 &middot; TC5035.10</div>
 </section>
 
-<!-- 14. CUALITATIVO under/over -->
+<!-- 14. CUALITATIVO under -->
 <section>
-  <h2>Inspección cualitativa por régimen</h2>
-  <figure class="center"><img src="../../outcomes/avance6/avance6_under.png" style="max-height:34vh;"><figcaption>Caso <b>sub-expuesto</b>: imagen + mapa de profundidad por enhancement vs. ground truth (MonoIIT).</figcaption></figure>
-  <p style="margin-top:6px;">En penumbra el modelo ya es robusto; el realce <b>mejora poco</b>. Retinex (descartado) llegaba a introducir artefactos por sobre-corrección. <b>IAT y Endo-LMSPEC</b> realzan sin deformar la geometría.</p>
+  <h2>Inspección cualitativa: sub-exposición</h2>
+  <figure class="center"><img src="../../outcomes/avance6/avance6_under_1.png" style="max-height:40vh;"><figcaption>Caso <b>sub-expuesto</b> (dataset 3): imagen + mapa de profundidad por enhancement vs. ground truth (MonoIIT).</figcaption></figure>
+  <p style="margin-top:6px;">En penumbra el modelo <b>ya es robusto</b>; el realce mejora poco. <b>IAT</b> y <b>Endo-LMSPEC</b> levantan luminancia sin deformar la geometría — la profundidad predicha sigue coherente con el ground truth.</p>
   <div class="footer">Equipo 52 &middot; TC5035.10</div>
 </section>
 
-<!-- 15. CUALITATIVO over / especulares -->
+<!-- 15. CUALITATIVO over -->
 <section>
-  <h2>Dónde sí brilla cada método</h2>
-  <figure class="center"><img src="../../outcomes/avance6/avance6_over.png" style="max-height:34vh;"><figcaption>Caso <b>sobre-expuesto</b> con reflejo especular fuerte.</figcaption></figure>
-  <p style="margin-top:6px;">En la zona <b>quemada por el especular</b>, <b>Endo-STTN</b> reconstruye tejido plausible (inpainting temporal) y limpia el mapa de profundidad justo donde la saturación lo rompía. Su valor es <b>local</b>, no global — coherente con que apenas mueve la métrica promedio.</p>
+  <h2>Inspección cualitativa: sobre-exposición</h2>
+  <figure class="center"><img src="../../outcomes/avance6/avance6_over_1.png" style="max-height:40vh;"><figcaption>Caso <b>sobre-expuesto</b> (dataset 2): zonas quemadas por exceso de luz.</figcaption></figure>
+  <p style="margin-top:6px;">Con saturación, el realce genérico apenas mueve la predicción. El interés está en si el enhancement <b>recupera geometría</b> donde la imagen perdió textura — efecto que varía según el método.</p>
+  <div class="footer">Equipo 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 15b. CUALITATIVO especulares -->
+<section>
+  <h2>Dónde sí brilla Endo-STTN: especulares</h2>
+  <figure class="center"><img src="../../outcomes/avance6/avance6_specular_1.png" style="max-height:40vh;"><figcaption>Caso con <b>reflejos especulares marcados</b> (dataset 2): 13% de píxeles saturados.</figcaption></figure>
+  <p style="margin-top:6px;">En la zona <b>quemada por el especular</b>, <b>Endo-STTN</b> reconstruye tejido plausible (inpainting temporal con frames vecinos) y limpia el mapa de profundidad justo donde la saturación lo rompía. Su valor es <b>local</b>, no global — por eso apenas mueve la métrica promedio.</p>
   <div class="note center">Conclusión visual: el beneficio del realce <b>depende del régimen de iluminación</b>, no es uniforme.</div>
   <div class="footer">Equipo 52 &middot; TC5035.10</div>
 </section>
