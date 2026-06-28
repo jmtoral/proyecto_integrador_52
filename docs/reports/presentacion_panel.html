@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image Enhancement for Endoscopic Depth - Team 52</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/white.css">
+<style>
+ :root{--azul:#0036a3;--azul2:#2766CB;--oro:#E0A800;--tinta:#1a2230;--gris:#5b6573;}
+ .reveal{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--tinta);}
+ .reveal h1,.reveal h2,.reveal h3{color:var(--azul);text-transform:none;font-weight:700;letter-spacing:0;}
+ .reveal h1{font-size:1.65em;} .reveal h2{font-size:1.12em;margin-bottom:.35em;} .reveal h3{font-size:.8em;color:var(--azul2);}
+ .reveal section{text-align:left;}
+ .reveal .center{text-align:center;}
+ .reveal p,.reveal li{font-size:.6em;line-height:1.45;}
+ .reveal .tag{display:inline-block;background:var(--azul);color:#fff;padding:4px 14px;border-radius:20px;font-size:.4em;letter-spacing:.04em;text-transform:uppercase;}
+ .reveal .oro{color:var(--oro);} .reveal .azulb{color:var(--azul);font-weight:700;}
+ .reveal small,.reveal .small{font-size:.52em;color:var(--gris);}
+ .reveal table{font-size:.44em;margin:6px auto;border-collapse:collapse;width:100%;}
+ .reveal table th{background:var(--azul);color:#fff;padding:5px 8px;}
+ .reveal table td{padding:4px 8px;border-bottom:1px solid #e4e8ef;}
+ .reveal .best{color:#1a8a3a;font-weight:700;} .reveal .bad{color:#c0392b;}
+ .reveal .arrow{color:#1a8a3a;font-weight:700;}
+ .reveal .two{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center;}
+ .reveal .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+ .reveal .card{background:#f4f7fc;border:1px solid #dfe6f1;border-left:4px solid var(--azul);border-radius:8px;padding:10px 13px;font-size:.92em;}
+ .reveal .card.oro{border-left-color:var(--oro);} .reveal .card.verde{border-left-color:#1a8a3a;} .reveal .card.rojo{border-left-color:#c0392b;}
+ .reveal .card h4{margin:0 0 5px;color:var(--azul);font-size:1.05em;}
+ .reveal .card p,.reveal .card li{font-size:.92em;margin:.2em 0;}
+ .reveal figure{margin:0;text-align:center;}
+ .reveal figure img{border-radius:8px;border:1px solid #dde3ec;box-shadow:0 3px 12px rgba(20,40,80,.1);max-height:60vh;}
+ .reveal figcaption{font-size:.5em;color:var(--gris);margin-top:5px;}
+ .reveal .kbig{font-size:2.1em;color:var(--azul);font-weight:800;line-height:1;}
+ .reveal .note{background:#fff8e6;border-left:4px solid var(--oro);padding:8px 13px;border-radius:6px;font-size:.55em;margin-top:10px;}
+ .reveal .qbox{background:#eef4ff;border:2px solid var(--azul);border-radius:12px;padding:16px 24px;font-size:.78em;}
+ .reveal .ref{font-size:.38em;color:var(--gris);line-height:1.5;}
+ .reveal .footer{position:absolute;bottom:6px;right:14px;font-size:.28em;color:#aab2bf;}
+ .reveal .pill{display:inline-block;background:#eef1f6;color:#1f3a8a;border-radius:14px;padding:2px 9px;font-size:.5em;margin:2px;font-family:ui-monospace,Consolas,monospace;}
+ .reveal .mermaid{background:#f7f9fc;border-radius:10px;padding:8px;font-size:.46em;}
+ .reveal .team img{width:82px;height:82px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.5);}
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- 1. TITLE -->
+<section class="center" data-background-color="#0036a3">
+  <span class="tag" style="background:rgba(255,255,255,.18);">Integrative Project &middot; TC5035.10 &middot; MICAI 2026</span>
+  <h1 style="color:#fff;margin-top:20px;">Assessing the Impact of Endoscopic Image Enhancement<br>on Monocular Depth Estimation in SCARED</h1>
+  <div class="team" style="display:flex;gap:34px;justify-content:center;margin-top:22px;">
+    <div><img src="../img/jmtc.jpg"><br><span style="color:#fff;font-size:.46em;">J. M. Toral</span></div>
+    <div><img src="../img/elda.jpg"><br><span style="color:#fff;font-size:.46em;">E. C. Morales</span></div>
+    <div><img src="../img/mpgc.jpg"><br><span style="color:#fff;font-size:.46em;">M. P. Gutiérrez</span></div>
+  </div>
+  <p style="color:#cdd9f2;font-size:.5em;margin-top:14px;">J. M. Toral, E. C. Morales, M. P. Gutiérrez, G. Camacho-Gonzalez, R. Espinosa, G. Ochoa-Ruíz</p>
+  <p style="color:#9fb6e6;font-size:.44em;margin-top:6px;">School of Engineering and Sciences &middot; Tecnológico de Monterrey &middot; Team 52</p>
+</section>
+
+<!-- 2. PROBLEM -->
+<section>
+  <h2>The Problem</h2>
+  <div class="two">
+    <div>
+      <p><b>Monocular depth estimation</b> — predicting per-pixel distance from a <b>single RGB frame</b> — underpins surgical navigation, 3D reconstruction and robotic assistance in minimally invasive surgery.</p>
+      <p>But endoscopic images are severely degraded by <b>illumination artifacts</b>: the light source is coaxial with the camera, causing radial fall-off, vignetting, <b>under/over-exposure</b> and <b>specular highlights</b>.</p>
+      <div class="card rojo"><b>Why it matters:</b> these artifacts are <b>not cosmetic</b> — models can misread them as geometry, and depth errors concentrate exactly where the ground truth is least reliable.</div>
+    </div>
+    <figure>
+      <img src="../img/01_rgb_keyframes.png">
+      <figcaption>SCARED frames: strong, uneven illumination across the field of view.</figcaption>
+    </figure>
+  </div>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 3. RESEARCH QUESTION -->
+<section data-background-color="#f4f7fc">
+  <h2 class="center">Research Question</h2>
+  <div class="center" style="margin:16px 0;">
+    <p class="qbox"><i>Does improving the endoscopic image <b>before inference</b> actually improve monocular depth estimation?</i></p>
+  </div>
+  <div class="two">
+    <div class="card"><h4>The intuitive hypothesis</h4><p>Enhancement should reduce depth error by suppressing illumination artifacts and recovering texture in poorly exposed regions.</p></div>
+    <div class="card oro"><h4>The catch</h4><p>A <b>visually improved image is not necessarily a geometrically better input</b>. Contrast amplification, color shifts or over-smoothing can introduce artificial cues that corrupt depth inference.</p></div>
+  </div>
+  <div class="note">Our key stance: enhancement is evaluated <b>not by perceptual quality</b>, but by its <b>downstream geometric impact</b> on depth.</div>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 4. EVIDENCE / KEY INSIGHT -->
+<section>
+  <h2>Key Insight: illumination correlates with error</h2>
+  <div class="two">
+    <div>
+      <p>Our exploratory analysis on SCARED shows the <b>brightest regions</b> coincide with where <b>least valid ground-truth depth</b> exists (Pearson correlation down to <b>−0.86</b>).</p>
+      <p>The illumination gradient is <b>systematic and asymmetric</b> (centered on the optical axis). The problem is <b>fundamentally geometric</b>, not just visual — uneven light constrains where depth can be reliably estimated.</p>
+      <div class="card"><b>Implication:</b> targeting <b>local</b> exposure (under/over) is more promising than global illumination correction.</div>
+    </div>
+    <figure>
+      <img src="../img/19_correlacion_lum_gt.png">
+      <figcaption>Luminance vs. GT-coverage correlation by radial ring.</figcaption>
+    </figure>
+  </div>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 5. PROPOSED SOLUTION - pipeline -->
+<section>
+  <h2>Proposed Solution: a controlled evaluation pipeline</h2>
+  <div class="mermaid">
+flowchart LR
+    A["SCARED<br/>official split<br/>550 frames"] --> ENH
+    subgraph ENH ["Image Enhancement E_i (independent variable)"]
+        E0["none"]
+        E1["Endo-LMSPEC"]
+        E2["IAT"]
+        E3["Endo-STTN"]
+    end
+    ENH --> M["5 depth models D_j<br/>(SCARED weights)"]
+    M --> D["median scaling -> mm"]
+    GT["Ground truth<br/>(structured-light)"] --> CMP["compare on valid mask"]
+    D --> CMP
+    CMP --> R["AbsRel · RMSE · delta · IT"]
+    style ENH fill:#cfe8ff,stroke:#2766CB
+    style M fill:#cfe8ff,stroke:#2766CB
+    style GT fill:#fff3cd,stroke:#E0A800
+    style R fill:#1a2e51,stroke:#E0A800,color:#fff
+  </div>
+  <p class="center" style="font-size:.56em;"><b>X<sub>raw</sub> → E<sub>i</sub>(X<sub>raw</sub>) → D<sub>j</sub>(E<sub>i</sub>(X<sub>raw</sub>)) → Ẑ<sub>ij</sub></b> &nbsp; — only the preprocessing changes; split, mask, models, scaling and metrics stay fixed.</p>
+  <div class="note center"><b>4 enhancements × 5 depth models × 550 frames = 11,000 controlled evaluations.</b></div>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 6. methods + models -->
+<section>
+  <h2>Enhancement methods & depth models</h2>
+  <div class="two">
+    <div>
+      <h3>Enhancement (4 input conditions)</h3>
+      <table>
+        <tr><th>Method</th><th>Role</th></tr>
+        <tr><td>none</td><td>raw baseline</td></tr>
+        <tr><td>Endo-LMSPEC</td><td>multi-scale exposure correction (Endo4IE-trained)</td></tr>
+        <tr><td>IAT</td><td>lightweight transformer illumination (Endo4IE-trained)</td></tr>
+        <tr><td>Endo-STTN</td><td>temporal specular inpainting</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>Depth models (5 architectures)</h3>
+      <table>
+        <tr><th>Model</th><th>Family</th></tr>
+        <tr><td>Monodepth2</td><td>ResNet18 — CNN baseline</td></tr>
+        <tr><td>EndoSfMLearner</td><td>DispResNet18 — endoscopic</td></tr>
+        <tr><td>AF-SfMLearner</td><td>ResNet18 + appearance flow</td></tr>
+        <tr><td>MonoViT</td><td>MPViT — transformer</td></tr>
+        <tr><td><b>MonoIIT</b></td><td>MPViT + HR-Depth — domain-adapted</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="note">Span chosen on purpose: CNN baselines, endoscopy-specific models and vision transformers → findings don't depend on one architecture.</div>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 7. metrics -->
+<section>
+  <h2>How we measure: metrics</h2>
+  <div class="two">
+    <div>
+      <p><b>AbsRel</b> (primary) = mean per-pixel relative error:</p>
+      <p class="center" style="font-size:.9em;">AbsRel = (1/N) Σ |Z<sub>p</sub> − Ẑ<sub>p</sub>| / Z<sub>p</sub></p>
+      <p>Also report <b>SqRel, RMSE (mm), RMSE-log</b> and <b>δ&lt;1.25ᵏ</b> (% of "almost-correct" pixels), plus <b>inference time (IT)</b> — real-time is a clinical prerequisite.</p>
+    </div>
+    <div>
+      <div class="card"><h4>Median scaling</h4><p>Monocular depth is <b>scale-ambiguous</b>; each prediction is scaled by <code>median(GT)/median(pred)</code> to mm, only over valid GT pixels (mask Ω).</p></div>
+      <div class="card oro" style="margin-top:8px;"><h4>ΔAR%</h4><p>Change in AbsRel vs. <code>none</code>. <b>Negative = enhancement helped.</b></p></div>
+    </div>
+  </div>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 8. RESULTS TABLE -->
+<section>
+  <h2>Findings: the full result (ΔAbsRel %)</h2>
+  <table>
+    <tr><th>Model</th><th>none</th><th>endolmspec</th><th>iat</th><th>endosttn</th><th>Best</th></tr>
+    <tr><td>Monodepth2</td><td>0.0708</td><td class="bad">+4.9%</td><td class="best">−1.7% ←</td><td>+1.7%</td><td>iat</td></tr>
+    <tr><td>MonoViT</td><td>0.0727</td><td>+0.4%</td><td class="best">−1.9% ←</td><td>+0.1%</td><td>iat</td></tr>
+    <tr><td>EndoSfMLearner</td><td>0.0845</td><td class="bad">+3.8%</td><td class="bad">+4.0%</td><td class="bad">+7.0%</td><td>none</td></tr>
+    <tr><td>AF-SfMLearner</td><td>0.0592</td><td class="best">−4.7% ←</td><td class="best">−1.7% ←</td><td>+2.7%</td><td>endolmspec</td></tr>
+    <tr><td><b>MonoIIT</b></td><td>0.0554</td><td>+1.4%</td><td class="best">−3.1% ←</td><td>+0.7%</td><td>iat</td></tr>
+  </table>
+  <div class="two" style="margin-top:6px;">
+    <figure><img src="../../outcomes/avance5_newversion/avance5_metricas.png" style="max-height:32vh;"><figcaption>Metrics per model × enhancement.</figcaption></figure>
+    <div class="card oro"><h4>Best configuration of the study</h4><p class="center" style="font-size:1.25em;"><b>MonoIIT + IAT → AbsRel 0.0537</b></p><p>δ&lt;1.25 = 0.9738. Below its already-low baseline (0.0554).</p></div>
+  </div>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 9. KEY FINDINGS -->
+<section data-background-color="#f4f7fc">
+  <h2 class="center">Key findings</h2>
+  <div class="three">
+    <div class="card verde"><h4>IAT is the most versatile</h4><p>Improves <b>3 of 5</b> models (Monodepth2, MonoViT, MonoIIT). Smooth, attention-driven correction that <b>preserves micro-textures</b>.</p></div>
+    <div class="card"><h4>Model-dependent</h4><p>AF-SfMLearner peaks with <b>Endo-LMSPEC (−4.7%)</b>; EndoSfMLearner is hurt by <b>every</b> method.</p></div>
+    <div class="card rojo"><h4>Endo-STTN: visual ≠ geometric</h4><p>Removes specular glare but <b>smooths over micro-textures</b> depth needs → negligible gain, ~300× slower.</p></div>
+  </div>
+  <div class="note"><b>Central conclusion:</b> a perceptually superior image is <b>not necessarily a geometrically superior input</b>. Enhancement must be judged by its downstream geometric impact.</div>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 10. QUALITATIVE under -->
+<section>
+  <h2>Qualitative: severe underexposure</h2>
+  <figure class="center"><img src="../../outcomes/avance6/avance6_under_1.png" style="max-height:40vh;"><figcaption>MonoIIT, underexposed frame — input(none) · output(IAT) · depth maps · ground truth.</figcaption></figure>
+  <p style="margin-top:6px;">IAT <b>elevates local illumination while preserving shading gradients</b> crucial for inferring curvature → smoother, more coherent depth. Endo-LMSPEC adds color shifts; Endo-STTN barely changes low-light geometry.</p>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 11. QUALITATIVE over -->
+<section>
+  <h2>Qualitative: severe overexposure</h2>
+  <figure class="center"><img src="../../outcomes/avance6/avance6_over_1.png" style="max-height:40vh;"><figcaption>MonoIIT, overexposed frame with strong specular glare.</figcaption></figure>
+  <p style="margin-top:6px;">Endo-LMSPEC introduces <b>greenish chromatic aberration</b> (a domain shift); Endo-STTN inpaints glare but <b>strips capillary micro-textures</b>. IAT mitigates intensity <b>without removing topological detail</b> — reinforcing it as the most versatile method.</p>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 12. QUALITATIVE specular -->
+<section>
+  <h2>Qualitative: specular highlights</h2>
+  <figure class="center"><img src="../../outcomes/avance6/avance6_specular_1.png" style="max-height:40vh;"><figcaption>High-specular regime — where Endo-STTN's inpainting is most relevant.</figcaption></figure>
+  <p style="margin-top:6px;">Even where specular inpainting visually "cleans" the frame, the geometric gain is marginal: the depth network relies on the very high-frequency detail the inpainting removes. <b>Visual cleanup ≠ better geometry.</b></p>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 13. BUSINESS RECOMMENDATIONS -->
+<section>
+  <h2>Core recommendations</h2>
+  <div class="three">
+    <div class="card verde"><h4>Deploy MonoIIT + IAT</h4><p>Best accuracy (AbsRel 0.0537). For surgical depth on SCARED-like data, this is the recommended configuration.</p></div>
+    <div class="card"><h4>Match enhancement to model</h4><p>No universal winner. Validate the pair, don't apply a method by default — the wrong one <b>degrades</b> accuracy.</p></div>
+    <div class="card rojo"><h4>Avoid Endo-STTN in real time</h4><p>~19.7 s/frame is incompatible with intra-operative use; its visual gain doesn't translate to geometry.</p></div>
+  </div>
+  <div class="note"><b>Practical rule:</b> evaluate any preprocessing by its effect on the <b>downstream task</b> (depth) and on <b>latency</b>, not by image-quality scores.</div>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 14. BENEFITS / EXPECTED RESULTS -->
+<section>
+  <h2>Benefits & expected results</h2>
+  <div class="two">
+    <div class="card oro"><h4>Clinical value</h4>
+      <li>More accurate depth → better <b>3D reconstruction, navigation and AR overlay</b> in MIS.</li>
+      <li>Lightweight IAT keeps latency low enough for <b>near real-time</b> pipelines.</li>
+    </div>
+    <div class="card"><h4>Methodological value</h4>
+      <li>A <b>reproducible, controlled protocol</b> (fixed split/mask/scaling) others can reuse.</li>
+      <li>A clear, evidence-based <b>selection guide</b> for enhancement × model.</li>
+    </div>
+  </div>
+  <div class="note center">Up to <b>−4.7% AbsRel</b> from preprocessing alone, at no training cost — a cheap, model-specific accuracy gain.</div>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 15. FUTURE WORK -->
+<section>
+  <h2>Future work</h2>
+  <ul>
+    <li><b>Unified runtime environment</b> for all model × enhancement permutations → exact latency profiling and numerical consistency.</li>
+    <li><b>Paired statistical testing & confidence intervals</b> to confirm improvements are significant across photometric regimes.</li>
+    <li><b>Cross-dataset generalization</b>: scale the protocol to <b>Hamlyn</b> and <b>C3VD</b> (different cameras, light sources, anatomy).</li>
+    <li>Train enhancement <b>optimizing the depth metric</b> directly, not perceptual quality; extend to full <b>3D reconstruction</b> (multi-frame fusion).</li>
+  </ul>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 16. CLOSING / CONCLUSION -->
+<section data-background-color="#0036a3">
+  <h2 style="color:#fff;">Takeaways</h2>
+  <ul style="color:#eaf1ff;">
+    <li>Image enhancement <b>can</b> reduce depth error — but the effect is <b>modest and architecture-dependent</b>.</li>
+    <li><b>IAT</b> is the only generalizable method; <b>MonoIIT + IAT (0.0537)</b> is the best configuration.</li>
+    <li><b>Endo-STTN</b> shows the core lesson: <b>visually better ≠ geometrically better</b>, and real-time cost matters.</li>
+  </ul>
+  <div class="note" style="background:rgba(255,255,255,.12);border-left-color:var(--oro);color:#fff;">In surgical computer vision, preprocessing must be validated by its <b>downstream geometric impact</b>, not perceptual quality.</div>
+  <p class="center" style="color:#fff;font-size:.7em;margin-top:14px;"><b>Thank you</b> &middot; Questions</p>
+  <div class="footer" style="color:#9fb6e6;">Team 52 &middot; TC5035.10</div>
+</section>
+
+<!-- 17. REFERENCES -->
+<section>
+  <h2>References (selected)</h2>
+  <p class="ref">
+    [2] R. Espinosa, J. Cerriteño, S. Gonzalez-Dominguez, G. Ochoa-Ruiz, C. Daul. A deep learning-based image pre-processing pipeline for enhanced 3D colon surface reconstruction robust to endoscopic illumination artifacts. <i>IEEE CBMS</i>, 2024, pp. 81–88. doi:10.1109/CBMS61543.2024.00022 <span class="azulb">(reference structure)</span><br>
+    [4] M. Allan et al. Stereo Correspondence and Reconstruction of Endoscopic Data Challenge (SCARED). arXiv:2101.01133, 2021.<br>
+    [5] C. Godard et al. Digging into self-supervised monocular depth estimation. <i>ICCV</i>, 2019. (Monodepth2)<br>
+    [6] C. Zhao et al. MonoViT: self-supervised monocular depth with a vision transformer. <i>3DV</i>, 2022.<br>
+    [7] S. Shao et al. Self-supervised monocular depth and ego-motion estimation in endoscopy (AF-SfMLearner). <i>Med. Image Anal.</i> 77, 2022.<br>
+    [8] K. B. Ozyoruk et al. EndoSLAM / Endo-SfMLearner. <i>Med. Image Anal.</i> 71, 2021.<br>
+    [9] D. Recasens et al. Endo-Depth-and-Motion. <i>IEEE RA-L</i> 6(4), 2021.<br>
+    [10] X. Lyu et al. HR-Depth. <i>AAAI</i> 35(3), 2021. &nbsp; [11] Y. Lee et al. MPViT. <i>CVPR</i>, 2022.<br>
+    [12] A. Garcia-Vega et al. Endo-LMSPEC. <i>IEEE ISBI</i>, 2023. &nbsp; [13] Z. Cui et al. IAT. <i>BMVC</i>, 2022.<br>
+    [14] R. Daher et al. Endo-STTN. <i>Med. Image Anal.</i> 90, 2023. &nbsp; [15] A. Garcia-Vega et al. Endo4IE dataset. Mendeley Data, 2022.
+  </p>
+  <div class="footer">Team 52 &middot; TC5035.10</div>
+</section>
+
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+ mermaid.initialize({startOnLoad:false, theme:'default', securityLevel:'loose'});
+ Reveal.initialize({hash:true, slideNumber:'c/t', transition:'slide', width:1280, height:720, margin:0.04});
+ function renderMermaid(){
+   document.querySelectorAll('.mermaid:not([data-processed])').forEach(function(el){
+     try{ mermaid.run({nodes:[el]}); }catch(e){}
+   });
+ }
+ Reveal.on('ready', renderMermaid);
+ Reveal.on('slidechanged', renderMermaid);
+</script>
+</body>
+</html>
