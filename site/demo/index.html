@@ -309,8 +309,15 @@ lensSizeRange.addEventListener("input", e => setLensSize(+e.target.value));
 
 /* Optional metrics.json (written by the Avance9 notebook): {scene: {method: {absrel, rmse}}}.
    If it's missing (e.g. running the page before the notebook exported it), the panel
-   just shows "—" instead of breaking. */
-fetch("assets/metrics.json").then(r => r.ok ? r.json() : {}).then(j => { METRICS = j || {}; render(); }).catch(()=>{});
+   just shows "—" instead of breaking. NOTE: fetch() of a local file is blocked by
+   the browser when this page is opened via double-click (file:// has no CORS) —
+   metrics will only load when served over http(s) (GitHub Pages, or a local
+   `python -m http.server` in this folder). This is a browser security limit, not
+   a bug in the data. */
+fetch("assets/metrics.json")
+  .then(r => r.ok ? r.json() : {})
+  .then(j => { METRICS = j || {}; render(); })
+  .catch(err => console.warn("metrics.json not loaded (normal if opened via file://):", err));
 
 /* populate dropdowns */
 SCENES.forEach((s,i)=>{
