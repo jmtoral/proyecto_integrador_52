@@ -2,7 +2,7 @@
 <!--
   ============================================================================
   Interactive demo — Endoscopic Image Enhancement + Monocular Depth Estimation
-  Team 52 · Tecnologico de Monterrey · MICAI 2026
+  Team 52 · Tecnologico de Monterrey
   ============================================================================
 
   HOW TO SWAP IN YOUR OWN IMAGES
@@ -10,14 +10,18 @@
   This page is 100% static. It does NOT run any ML model in the browser.
   Every image is precomputed and stored under ./assets/ .
 
-  For each scene you need THREE images of the SAME frame, SAME resolution:
-      assets/<scene>_raw.png       original endoscopic RGB frame
-      assets/<scene>_enhanced.png  same frame after IAT enhancement
-      assets/<scene>_depth.png     predicted depth map (MonoIIT), magma colormap
+  Each scene shares ONE raw frame, plus one enhanced+depth pair PER
+  enhancement method (depth is predicted FROM the enhanced image, so it
+  differs per method):
+      assets/<scene>_raw.png                        original RGB frame (shared)
+      assets/<scene>_enhanced.png                    IAT-enhanced frame
+      assets/<scene>_depth.png                       depth (MonoIIT) over IAT output
+      assets/<scene>_endolmspec_enhanced.png         Endo-LMSPEC-enhanced frame
+      assets/<scene>_endolmspec_depth.png            depth (MonoIIT) over Endo-LMSPEC output
 
-  Then register the scene in the SCENES array in the <script> block below.
-  The companion notebook (Avance9_App_Lupa.ipynb) generates these assets and
-  writes them straight into this folder.
+  Then register the scene/method in the SCENES / ENHANCEMENTS arrays in the
+  <script> block below. The companion notebook (Avance9_App_Lupa.ipynb)
+  generates these assets and writes them straight into this folder.
   ============================================================================
 -->
 <html lang="en">
@@ -37,7 +41,7 @@
 body{font-family:var(--ff);color:var(--ink);background:
   radial-gradient(1200px 600px at 50% -10%, #f2f6ff 0%, #ffffff 55%);
   min-height:100vh;padding:2rem 1rem 3rem;}
-.wrap{max-width:1000px;margin:0 auto;}
+.wrap{max-width:1200px;margin:0 auto;}
 
 /* Header */
 header{text-align:center;margin-bottom:1.6rem;}
@@ -71,13 +75,16 @@ button.active{background:var(--gold);color:#3a2c00;border-color:var(--gold);}
 .toggle{display:inline-flex;align-items:center;gap:.5rem;font-size:.82rem;
   color:var(--muted);font-weight:500;user-select:none;cursor:pointer;}
 .toggle input{width:16px;height:16px;accent-color:var(--blue);cursor:pointer;}
+.lens-size-group button{width:34px;height:34px;padding:0;border-radius:50%;
+  font-size:1.1rem;font-weight:700;line-height:1;}
 
 /* Stage */
 .stage-shell{display:flex;justify-content:center;}
 .stage{position:relative;display:inline-block;border-radius:14px;overflow:hidden;
   box-shadow:0 12px 40px rgba(15,35,80,.18);border:1px solid rgba(20,40,90,.08);
   cursor:none;background:#000;line-height:0;max-width:100%;}
-.stage img{display:block;max-width:100%;width:640px;height:auto;user-select:none;-webkit-user-drag:none;}
+.stage img{display:block;max-width:100%;width:920px;height:auto;user-select:none;-webkit-user-drag:none;}
+@media(max-width:960px){.stage img{width:100vw;}}
 /* rawLayer stays in normal flow so it gives the .stage its size;
    depthLayer stacks on top of it absolutely. */
 #depthLayer{position:absolute;inset:0;width:100%;height:100%;opacity:0;
@@ -85,12 +92,14 @@ button.active{background:var(--gold);color:#3a2c00;border-color:var(--gold);}
 .stage.depth #depthLayer{opacity:1;}
 
 /* The lens */
-.lens{position:absolute;top:0;left:0;width:150px;height:150px;border-radius:50%;
+.lens{--lens-size:150px;position:absolute;top:0;left:0;
+  width:var(--lens-size);height:var(--lens-size);border-radius:50%;
   pointer-events:none;opacity:0;transform:translate(-50%,-50%);
   border:3px solid rgba(255,255,255,.9);
   box-shadow:0 0 0 1px rgba(0,0,0,.35), 0 8px 26px rgba(0,0,0,.4),
              inset 0 0 22px rgba(0,0,0,.25);
-  background-repeat:no-repeat;transition:opacity .18s;z-index:5;}
+  background-repeat:no-repeat;
+  transition:opacity .18s,width .15s,height .15s;z-index:5;}
 .stage.show-lens .lens{opacity:1;}
 .lens-tag{position:absolute;left:50%;bottom:-1.55rem;transform:translateX(-50%);
   font-family:var(--ff-mono);font-size:.62rem;font-weight:600;white-space:nowrap;
@@ -141,11 +150,19 @@ footer a{color:var(--blue);text-decoration:none;}
       <label for="sceneSel">Scene</label>
       <select id="sceneSel"></select>
     </div>
-    <span class="chip" id="enhChip">enhancement: IAT</span>
+    <div class="group">
+      <label for="enhSel">Enhancement</label>
+      <select id="enhSel"></select>
+    </div>
     <button id="depthBtn" class="primary">
       <span id="depthIcon">◨</span><span id="depthTxt">Show depth map</span>
     </button>
     <label class="toggle"><input type="checkbox" id="zoomChk" checked>Lens zoom 1.5×</label>
+    <div class="group lens-size-group">
+      <label>Lens size</label>
+      <button type="button" id="lensSmaller" aria-label="Smaller lens">−</button>
+      <button type="button" id="lensBigger" aria-label="Bigger lens">+</button>
+    </div>
   </div>
 
   <div class="stage-shell">
@@ -163,7 +180,7 @@ footer a{color:var(--blue);text-decoration:none;}
 
   <p class="caption">
     <b>Outside the lens</b> you see the raw frame; <b>inside the lens</b>, the same
-    region after IAT illumination correction. The <b>depth map</b> uses the
+    region after <b id="enhName">IAT</b> illumination correction. The <b>depth map</b> uses the
     <b>magma</b> colormap — <b>bright/yellow = near</b>, <b>dark/purple = far</b>.
     <br>
     <span class="hint" id="hint">Hover the image to use the lens ✦</span>
@@ -178,46 +195,80 @@ footer a{color:var(--blue);text-decoration:none;}
 
 <script>
 /* ---------------------------------------------------------------------------
-   SCENES — register one entry per scene. Each points to three PNGs in ./assets
-   (raw, enhanced, depth). To add your own: drop the three files in assets/ and
-   add an object here. label = text shown in the dropdown.
+   SCENES — register one entry per scene. For each enhancement method you have
+   assets for, add a key under `variants` pointing to the three PNGs in
+   ./assets (raw is shared across variants; enhanced/depth are per-method,
+   since depth is predicted FROM the enhanced image). To add a new method:
+   generate <scene>_<method>_enhanced.png and <scene>_<method>_depth.png,
+   then add a `variants.<method>` entry here (and to ENHANCEMENTS below).
 --------------------------------------------------------------------------- */
-const SCENES = [
-  { id:"under",    label:"Underexposed",  raw:"assets/under_raw.png",    enhanced:"assets/under_enhanced.png",    depth:"assets/under_depth.png"    },
-  { id:"over",     label:"Overexposed",   raw:"assets/over_raw.png",     enhanced:"assets/over_enhanced.png",     depth:"assets/over_depth.png"     },
-  { id:"specular", label:"Specular",      raw:"assets/specular_raw.png", enhanced:"assets/specular_enhanced.png", depth:"assets/specular_depth.png" },
+const ENHANCEMENTS = [
+  { id:"iat",        label:"IAT" },
+  { id:"endolmspec", label:"Endo-LMSPEC" },
 ];
 
-const LENS_SIZE = 150;          // px, matches .lens css
+const SCENES = [
+  { id:"under", label:"Underexposed", raw:"assets/under_raw.png",
+    variants:{ iat:{ enhanced:"assets/under_enhanced.png",           depth:"assets/under_depth.png" },
+               endolmspec:{ enhanced:"assets/under_endolmspec_enhanced.png", depth:"assets/under_endolmspec_depth.png" } } },
+  { id:"over", label:"Overexposed", raw:"assets/over_raw.png",
+    variants:{ iat:{ enhanced:"assets/over_enhanced.png",            depth:"assets/over_depth.png" },
+               endolmspec:{ enhanced:"assets/over_endolmspec_enhanced.png",  depth:"assets/over_endolmspec_depth.png" } } },
+  { id:"specular", label:"Specular", raw:"assets/specular_raw.png",
+    variants:{ iat:{ enhanced:"assets/specular_enhanced.png",        depth:"assets/specular_depth.png" },
+               endolmspec:{ enhanced:"assets/specular_endolmspec_enhanced.png", depth:"assets/specular_endolmspec_depth.png" } } },
+];
+
+const LENS_MIN = 90, LENS_MAX = 320, LENS_STEP = 30;
 const stage   = document.getElementById("stage");
 const rawImg  = document.getElementById("rawLayer");
 const depthImg= document.getElementById("depthLayer");
 const lens    = document.getElementById("lens");
+const lensTag = document.getElementById("lensTag");
+const enhName = document.getElementById("enhName");
 const sceneSel= document.getElementById("sceneSel");
+const enhSel  = document.getElementById("enhSel");
 const depthBtn= document.getElementById("depthBtn");
 const depthTxt= document.getElementById("depthTxt");
 const depthIcon=document.getElementById("depthIcon");
 const zoomChk = document.getElementById("zoomChk");
 const hint    = document.getElementById("hint");
+const lensBiggerBtn  = document.getElementById("lensBigger");
+const lensSmallerBtn = document.getElementById("lensSmaller");
 
-let current = SCENES[0];
+let currentScene = SCENES[0];
+let currentEnh   = ENHANCEMENTS[0];
 let depthOn = false;
+let lensSize = 150;             // px, mirrors --lens-size in CSS
 
-/* populate dropdown */
+function setLensSize(px){
+  lensSize = Math.max(LENS_MIN, Math.min(LENS_MAX, px));
+  lens.style.setProperty("--lens-size", lensSize + "px");
+}
+lensBiggerBtn.addEventListener("click", ()=> setLensSize(lensSize + LENS_STEP));
+lensSmallerBtn.addEventListener("click", ()=> setLensSize(lensSize - LENS_STEP));
+
+/* populate dropdowns */
 SCENES.forEach((s,i)=>{
   const o=document.createElement("option");
   o.value=i; o.textContent=s.label; sceneSel.appendChild(o);
 });
+ENHANCEMENTS.forEach((e,i)=>{
+  const o=document.createElement("option");
+  o.value=i; o.textContent=e.label; enhSel.appendChild(o);
+});
 
-/* load a scene (raw + depth as <img>, enhanced as lens background) */
-function loadScene(scene){
-  current = scene;
-  rawImg.src   = scene.raw;
-  depthImg.src = scene.depth;
-  // enhanced version lives only in the lens background
-  lens.style.backgroundImage = `url("${scene.enhanced}")`;
+/* render current scene + enhancement: raw stays fixed, enhanced/depth swap */
+function render(){
+  const v = currentScene.variants[currentEnh.id];
+  rawImg.src   = currentScene.raw;
+  depthImg.src = v.depth;
+  lens.style.backgroundImage = `url("${v.enhanced}")`;   // enhanced lives in the lens
+  lensTag.textContent = `enhanced (${currentEnh.label})`;
+  enhName.textContent = currentEnh.label;
 }
-sceneSel.addEventListener("change", e => loadScene(SCENES[+e.target.value]));
+sceneSel.addEventListener("change", e => { currentScene = SCENES[+e.target.value]; render(); });
+enhSel.addEventListener("change",   e => { currentEnh   = ENHANCEMENTS[+e.target.value]; render(); });
 
 /* keep the lens background sized to the displayed image (so it lines up) */
 function syncLensBackground(x, y){
@@ -226,8 +277,8 @@ function syncLensBackground(x, y){
   const h = rawImg.clientHeight * zoom;
   lens.style.backgroundSize = `${w}px ${h}px`;
   // position the background so the point under the cursor is centered in the lens
-  const bgX = LENS_SIZE/2 - x*zoom;
-  const bgY = LENS_SIZE/2 - y*zoom;
+  const bgX = lensSize/2 - x*zoom;
+  const bgY = lensSize/2 - y*zoom;
   lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
 }
 
@@ -265,7 +316,8 @@ depthBtn.addEventListener("click", ()=>{
   depthIcon.textContent = depthOn ? "◧" : "◨";
 });
 
-loadScene(SCENES[0]);
+setLensSize(lensSize);
+render();
 </script>
 </body>
 </html>
