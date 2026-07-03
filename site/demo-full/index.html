@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  Interactive demo — full-screen variant
+  Team 52 · Tecnologico de Monterrey
+
+  Same data/logic as ../demo/index.html, but the image fills the viewport and
+  the controls collapse into one discreet bar instead of large boxed panels.
+  Reuses the SAME assets (../demo/assets/) — no image duplication. If you add
+  a scene/enhancement/asset, update BOTH this file and ../demo/index.html (or
+  factor SCENES/ENHANCEMENTS out to a shared .js if they diverge further).
+  ============================================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enhancement × Depth — Full-screen demo · Team 52</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#0036a3; --gold:#E0A800;
+  --ink:#1a2233; --muted:#c7cedd;
+  --ff:'Inter',system-ui,sans-serif; --ff-mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:var(--ff);background:#000;color:#fff;}
+
+/* Full-bleed stage */
+.stage{position:fixed;inset:0;background:#000;cursor:none;}
+.stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  user-select:none;-webkit-user-drag:none;}
+.stage.fill-mode img{object-fit:cover;}
+#depthLayer,#gtLayer{opacity:0;transition:opacity .45s ease;}
+.stage.view-depth #depthLayer{opacity:1;}
+.stage.view-gt #gtLayer{opacity:1;}
+
+/* The lens */
+.lens{--lens-size:180px;position:absolute;top:0;left:0;
+  width:var(--lens-size);height:var(--lens-size);border-radius:50%;
+  pointer-events:none;opacity:0;transform:translate(-50%,-50%);
+  border:3px solid rgba(255,255,255,.9);
+  box-shadow:0 0 0 1px rgba(0,0,0,.35), 0 8px 26px rgba(0,0,0,.4),
+             inset 0 0 22px rgba(0,0,0,.25);
+  background-repeat:no-repeat;background-color:#000;
+  transition:opacity .18s,width .15s,height .15s;z-index:5;}
+.stage.show-lens .lens{opacity:1;}
+.lens-tag{position:absolute;left:50%;bottom:-1.55rem;transform:translateX(-50%);
+  font-family:var(--ff-mono);font-size:.62rem;font-weight:600;white-space:nowrap;
+  color:#fff;background:rgba(0,54,163,.92);padding:.18rem .5rem;border-radius:6px;
+  letter-spacing:.04em;}
+
+/* Discreet control bar — always visible, minimal, corner-docked */
+.bar{position:fixed;top:14px;left:14px;z-index:10;
+  background:rgba(10,14,26,.55);backdrop-filter:blur(8px) saturate(1.3);
+  border:1px solid rgba(255,255,255,.12);border-radius:12px;
+  padding:.5rem .65rem;display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;
+  max-width:calc(100vw - 28px);
+  box-shadow:0 8px 24px rgba(0,0,0,.35);}
+.bar .grp{display:flex;align-items:center;gap:.35rem;}
+.bar label{font-family:var(--ff-mono);font-size:.62rem;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.04em;}
+.bar select{font-family:var(--ff);font-size:.76rem;font-weight:500;color:#fff;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  border-radius:6px;padding:.2rem .4rem;cursor:pointer;outline:none;}
+.bar select option{color:#000;}
+.bar button{font-family:var(--ff);font-size:.74rem;font-weight:600;cursor:pointer;
+  border-radius:6px;padding:.32rem .55rem;border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.08);color:#fff;transition:background .15s;
+  display:inline-flex;align-items:center;gap:.3rem;white-space:nowrap;}
+.bar button:hover{background:rgba(255,255,255,.18);}
+.bar button.active{background:var(--gold);color:#3a2c00;border-color:var(--gold);}
+.bar .divider{width:1px;align-self:stretch;background:rgba(255,255,255,.15);}
+.bar .metrics{font-family:var(--ff-mono);font-size:.68rem;color:var(--muted);
+  display:flex;gap:.55rem;white-space:nowrap;}
+.bar .metrics b{color:#fff;}
+.bar .toggle{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;
+  color:var(--muted);cursor:pointer;user-select:none;}
+.bar .toggle input{width:13px;height:13px;accent-color:var(--gold);cursor:pointer;}
+.bar input[type=range]{width:70px;accent-color:var(--gold);cursor:pointer;}
+
+.collapse-btn{position:fixed;top:14px;left:14px;z-index:11;
+  width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.15);
+  background:rgba(10,14,26,.55);backdrop-filter:blur(8px);color:#fff;
+  font-size:.85rem;cursor:pointer;display:none;align-items:center;justify-content:center;}
+body.collapsed .bar{display:none;}
+body.collapsed .collapse-btn{display:flex;}
+
+/* Depth colorbar legend — small, corner-docked opposite the control bar */
+.legend{position:fixed;right:14px;top:14px;z-index:6;
+  background:rgba(10,14,26,.55);backdrop-filter:blur(8px);border-radius:10px;
+  padding:.4rem .55rem .5rem;opacity:0;transition:opacity .3s;
+  pointer-events:none;font-size:.6rem;color:#fff;
+  display:flex;flex-direction:column;align-items:center;}
+.stage.view-depth ~ .legend,.stage.view-gt ~ .legend{opacity:1;}
+.legend .row{display:flex;align-items:stretch;gap:.4rem;}
+.legend .bar-grad{width:10px;height:70px;border-radius:4px;flex:none;
+  background:linear-gradient(to top,#000004,#3b0f70,#8c2981,#de4968,#fe9f6d,#fcfdbf);}
+.legend .lab{display:flex;flex-direction:column;justify-content:space-between;
+  font-family:var(--ff-mono);font-weight:600;font-size:.58rem;}
+.legend .title{text-align:center;font-weight:600;margin-bottom:.3rem;
+  font-family:var(--ff-mono);letter-spacing:.02em;font-size:.56rem;}
+
+/* Back link + hint — bottom corners, discreet */
+.back-link{position:fixed;bottom:12px;left:14px;z-index:10;
+  font-family:var(--ff-mono);font-size:.68rem;color:var(--muted);
+  text-decoration:none;background:rgba(10,14,26,.5);backdrop-filter:blur(6px);
+  padding:.3rem .6rem;border-radius:999px;border:1px solid rgba(255,255,255,.1);}
+.back-link:hover{color:#fff;}
+.hint{position:fixed;bottom:12px;right:14px;z-index:10;
+  font-family:var(--ff-mono);font-size:.66rem;color:var(--muted);
+  background:rgba(10,14,26,.5);backdrop-filter:blur(6px);
+  padding:.3rem .6rem;border-radius:999px;border:1px solid rgba(255,255,255,.1);
+  transition:opacity .3s;}
+
+@media(max-width:640px){
+  .bar{max-width:calc(100vw - 20px);gap:.4rem;padding:.4rem .5rem;}
+  .bar .metrics,.bar label{display:none;}
+  .legend{transform:scale(.85);transform-origin:top right;}
+}
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <img id="rawLayer" alt="raw endoscopic frame">
+  <img id="depthLayer" alt="predicted depth map">
+  <img id="gtLayer" alt="sparse ground-truth depth">
+  <div class="lens" id="lens"><span class="lens-tag" id="lensTag">enhanced (IAT)</span></div>
+</div>
+
+<div class="legend" id="legend">
+  <div class="title" id="legendTitle">depth</div>
+  <div class="row">
+    <div class="bar-grad"></div>
+    <div class="lab"><span>near</span><span>far</span></div>
+  </div>
+</div>
+
+<button class="collapse-btn" id="expandBtn" title="Show controls">☰</button>
+
+<div class="bar" id="bar">
+  <button id="hideBtn" title="Hide controls">×</button>
+  <div class="divider"></div>
+  <div class="grp">
+    <label for="sceneSel">Scene</label>
+    <select id="sceneSel"></select>
+  </div>
+  <div class="grp">
+    <label for="enhSel">Enh.</label>
+    <select id="enhSel"></select>
+  </div>
+  <button id="depthBtn">Depth</button>
+  <button id="gtBtn">GT</button>
+  <button id="fillBtn" title="Fill screen edge-to-edge (may crop image)">Fill screen</button>
+  <div class="divider"></div>
+  <label class="toggle"><input type="checkbox" id="zoomChk" checked>1.5×</label>
+  <input type="range" id="lensSizeRange" min="90" max="416" step="10" value="180" title="Lens size">
+  <div class="divider"></div>
+  <div class="metrics" id="metricsPanel">
+    <span>AbsRel <b id="mAbsRel">—</b></span>
+    <span>RMSE <b id="mRmse">—</b></span>
+  </div>
+</div>
+
+<a class="back-link" href="../demo/index.html">← boxed demo</a>
+<div class="hint" id="hint">Hover to use the lens ✦</div>
+
+<script>
+/* Same data model as ../demo/index.html — assets are shared, not duplicated. */
+const ASSETS = "../demo/assets/";
+
+const ENHANCEMENTS = [
+  { id:"iat",        label:"IAT" },
+  { id:"endolmspec", label:"Endo-LMSPEC" },
+];
+
+function makeScene(id, label){
+  return { id, label, raw:`${ASSETS}${id}_raw.png`, gt:`${ASSETS}${id}_gt.png`,
+    variants:{ iat:{ enhanced:`${ASSETS}${id}_enhanced.png`, depth:`${ASSETS}${id}_depth.png` },
+               endolmspec:{ enhanced:`${ASSETS}${id}_endolmspec_enhanced.png`, depth:`${ASSETS}${id}_endolmspec_depth.png` } } };
+}
+
+const SCENES = [
+  makeScene("under1",    "Underexposed #1"),
+  makeScene("under2",    "Underexposed #2"),
+  makeScene("over1",     "Overexposed #1"),
+  makeScene("over2",     "Overexposed #2"),
+  makeScene("specular1", "Specular #1"),
+  makeScene("specular2", "Specular #2"),
+  makeScene("medium1",   "Well-lit #1"),
+];
+
+const stage   = document.getElementById("stage");
+const rawImg  = document.getElementById("rawLayer");
+const depthImg= document.getElementById("depthLayer");
+const gtImg   = document.getElementById("gtLayer");
+const lens    = document.getElementById("lens");
+const lensTag = document.getElementById("lensTag");
+const sceneSel= document.getElementById("sceneSel");
+const enhSel  = document.getElementById("enhSel");
+const depthBtn= document.getElementById("depthBtn");
+const gtBtn   = document.getElementById("gtBtn");
+const fillBtn = document.getElementById("fillBtn");
+const legendTitle = document.getElementById("legendTitle");
+const zoomChk = document.getElementById("zoomChk");
+const hint    = document.getElementById("hint");
+const lensSizeRange = document.getElementById("lensSizeRange");
+const mAbsRel = document.getElementById("mAbsRel");
+const mRmse   = document.getElementById("mRmse");
+const bar     = document.getElementById("bar");
+const hideBtn = document.getElementById("hideBtn");
+const expandBtn = document.getElementById("expandBtn");
+
+let currentScene = SCENES[0];
+let currentEnh   = ENHANCEMENTS[0];
+let view = "raw";
+let lensSize = +lensSizeRange.value;
+let METRICS = {};
+
+function setLensSize(px){
+  lensSize = px;
+  lens.style.setProperty("--lens-size", lensSize + "px");
+}
+lensSizeRange.addEventListener("input", e => setLensSize(+e.target.value));
+
+fetch(ASSETS + "metrics.json")
+  .then(r => r.ok ? r.json() : {})
+  .then(j => { METRICS = j || {}; render(); })
+  .catch(err => console.warn("metrics.json not loaded (normal if opened via file://):", err));
+
+SCENES.forEach((s,i)=>{
+  const o=document.createElement("option");
+  o.value=i; o.textContent=s.label; sceneSel.appendChild(o);
+});
+ENHANCEMENTS.forEach((e,i)=>{
+  const o=document.createElement("option");
+  o.value=i; o.textContent=e.label; enhSel.appendChild(o);
+});
+
+function render(){
+  const v = currentScene.variants[currentEnh.id];
+  rawImg.src   = currentScene.raw;
+  depthImg.src = v.depth;
+  lens.style.backgroundImage = `url("${v.enhanced}")`;
+  lensTag.textContent = `enhanced (${currentEnh.label})`;
+
+  if (currentScene.gt) {
+    const probe = new Image();
+    probe.onload  = () => { gtImg.src = currentScene.gt; gtBtn.style.display = ""; };
+    probe.onerror = () => { gtBtn.style.display = "none"; if (view === "gt") setView("raw"); };
+    probe.src = currentScene.gt;
+  } else {
+    gtBtn.style.display = "none";
+    if (view === "gt") setView("raw");
+  }
+
+  const m = METRICS[currentScene.id] && METRICS[currentScene.id][currentEnh.id];
+  mAbsRel.textContent = m ? m.absrel.toFixed(3) : "—";
+  mRmse.textContent   = m ? m.rmse.toFixed(1)   : "—";
+}
+sceneSel.addEventListener("change", e => { currentScene = SCENES[+e.target.value]; render(); });
+enhSel.addEventListener("change",   e => { currentEnh   = ENHANCEMENTS[+e.target.value]; render(); });
+
+/* lens background must be sized/positioned against the *rendered* image area,
+   not the raw stage: object-fit:contain letterboxes (bars), object-fit:cover
+   crops (overflows past the stage on one axis). Mirror whichever is active. */
+function renderedImageRect(){
+  const sw = stage.clientWidth, sh = stage.clientHeight;
+  const iw = rawImg.naturalWidth, ih = rawImg.naturalHeight;
+  if (!iw || !ih) return { x:0, y:0, w:sw, h:sh };
+  const scale = stage.classList.contains("fill-mode")
+    ? Math.max(sw/iw, sh/ih)
+    : Math.min(sw/iw, sh/ih);
+  const w = iw*scale, h = ih*scale;
+  return { x:(sw-w)/2, y:(sh-h)/2, w, h };
+}
+
+function syncLensBackground(x, y){
+  const zoom = zoomChk.checked ? 1.5 : 1.0;
+  const rect = renderedImageRect();
+  const w = rect.w * zoom, h = rect.h * zoom;
+  lens.style.backgroundSize = `${w}px ${h}px`;
+  const relX = x - rect.x, relY = y - rect.y;
+  const bgX = lensSize/2 - relX*zoom;
+  const bgY = lensSize/2 - relY*zoom;
+  lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
+}
+
+stage.addEventListener("mousemove", e=>{
+  const r = stage.getBoundingClientRect();
+  const x = e.clientX - r.left;
+  const y = e.clientY - r.top;
+  lens.style.left = x + "px";
+  lens.style.top  = y + "px";
+  syncLensBackground(x, y);
+  stage.classList.add("show-lens");
+  hint.style.opacity = ".35";
+});
+stage.addEventListener("mouseleave", ()=> stage.classList.remove("show-lens"));
+
+stage.addEventListener("touchmove", e=>{
+  const t = e.touches[0]; if(!t) return;
+  const r = stage.getBoundingClientRect();
+  const x = t.clientX - r.left, y = t.clientY - r.top;
+  lens.style.left=x+"px"; lens.style.top=y+"px";
+  syncLensBackground(x,y);
+  stage.classList.add("show-lens");
+  e.preventDefault();
+},{passive:false});
+stage.addEventListener("touchend", ()=> stage.classList.remove("show-lens"));
+
+function setView(next){
+  view = (view === next) ? "raw" : next;
+  stage.classList.toggle("view-depth", view === "depth");
+  stage.classList.toggle("view-gt",    view === "gt");
+  depthBtn.classList.toggle("active", view === "depth");
+  gtBtn.classList.toggle("active", view === "gt");
+  legendTitle.textContent = view === "gt" ? "ground truth" : "depth";
+}
+depthBtn.addEventListener("click", () => setView("depth"));
+gtBtn.addEventListener("click",    () => setView("gt"));
+
+fillBtn.addEventListener("click", () => {
+  stage.classList.toggle("fill-mode");
+  fillBtn.classList.toggle("active", stage.classList.contains("fill-mode"));
+  fillBtn.textContent = stage.classList.contains("fill-mode") ? "Fit screen" : "Fill screen";
+});
+
+hideBtn.addEventListener("click", () => document.body.classList.add("collapsed"));
+expandBtn.addEventListener("click", () => document.body.classList.remove("collapsed"));
+
+window.addEventListener("resize", () => { if (stage.classList.contains("show-lens")) syncLensBackground(parseFloat(lens.style.left)||0, parseFloat(lens.style.top)||0); });
+
+setLensSize(lensSize);
+render();
+</script>
+</body>
+</html>
