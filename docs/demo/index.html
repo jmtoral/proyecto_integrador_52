@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  Interactive demo — Endoscopic Image Enhancement + Monocular Depth Estimation
+  Team 52 · Tecnologico de Monterrey · MICAI 2026
+  ============================================================================
+
+  HOW TO SWAP IN YOUR OWN IMAGES
+  ------------------------------
+  This page is 100% static. It does NOT run any ML model in the browser.
+  Every image is precomputed and stored under ./assets/ .
+
+  For each scene you need THREE images of the SAME frame, SAME resolution:
+      assets/<scene>_raw.png       original endoscopic RGB frame
+      assets/<scene>_enhanced.png  same frame after IAT enhancement
+      assets/<scene>_depth.png     predicted depth map (MonoIIT), magma colormap
+
+  Then register the scene in the SCENES array in the <script> block below.
+  The companion notebook (Avance9_App_Lupa.ipynb) generates these assets and
+  writes them straight into this folder.
+  ============================================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enhancement × Depth — Interactive demo · Team 52</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#0036a3; --blue-d:#002c86; --gold:#E0A800;
+  --ink:#1a2233; --muted:#5a6577; --line:#e2e7ef; --bg:#ffffff;
+  --ff:'Inter',system-ui,sans-serif; --ff-mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--ff);color:var(--ink);background:
+  radial-gradient(1200px 600px at 50% -10%, #f2f6ff 0%, #ffffff 55%);
+  min-height:100vh;padding:2rem 1rem 3rem;}
+.wrap{max-width:1000px;margin:0 auto;}
+
+/* Header */
+header{text-align:center;margin-bottom:1.6rem;}
+.eyebrow{font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:.5rem;}
+h1{font-size:clamp(1.35rem,3.2vw,2rem);font-weight:700;color:var(--blue);
+  line-height:1.2;letter-spacing:-.01em;}
+.subtitle{color:var(--muted);font-size:.95rem;margin-top:.5rem;max-width:640px;
+  margin-left:auto;margin-right:auto;}
+
+/* Controls */
+.controls{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center;
+  justify-content:center;margin:1.4rem 0;}
+.controls .group{display:flex;align-items:center;gap:.5rem;
+  background:#fff;border:1px solid var(--line);border-radius:10px;
+  padding:.5rem .8rem;box-shadow:0 1px 2px rgba(20,40,90,.04);}
+.controls label{font-size:.8rem;color:var(--muted);font-weight:500;}
+select{font-family:var(--ff);font-size:.88rem;font-weight:600;color:var(--ink);
+  border:none;background:transparent;cursor:pointer;outline:none;}
+.chip{font-family:var(--ff-mono);font-size:.74rem;font-weight:600;
+  color:var(--blue);background:#eaf0ff;border:1px solid #d3e0ff;
+  border-radius:999px;padding:.35rem .7rem;letter-spacing:.03em;}
+button{font-family:var(--ff);font-size:.85rem;font-weight:600;cursor:pointer;
+  border-radius:10px;padding:.6rem 1rem;border:1px solid var(--line);
+  background:#fff;color:var(--ink);transition:transform .12s,box-shadow .2s,background .2s;
+  box-shadow:0 1px 2px rgba(20,40,90,.04);display:inline-flex;align-items:center;gap:.45rem;}
+button:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(20,40,90,.1);}
+button.primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+button.primary:hover{background:#002c86;}
+button.active{background:var(--gold);color:#3a2c00;border-color:var(--gold);}
+.toggle{display:inline-flex;align-items:center;gap:.5rem;font-size:.82rem;
+  color:var(--muted);font-weight:500;user-select:none;cursor:pointer;}
+.toggle input{width:16px;height:16px;accent-color:var(--blue);cursor:pointer;}
+
+/* Stage */
+.stage-shell{display:flex;justify-content:center;}
+.stage{position:relative;display:inline-block;border-radius:14px;overflow:hidden;
+  box-shadow:0 12px 40px rgba(15,35,80,.18);border:1px solid rgba(20,40,90,.08);
+  cursor:none;background:#000;line-height:0;}
+.stage img{display:block;max-width:100%;height:auto;user-select:none;-webkit-user-drag:none;}
+/* stacked layers */
+.layer{position:absolute;inset:0;width:100%;height:100%;transition:opacity .45s ease;}
+#depthLayer{opacity:0;}
+.stage.depth #depthLayer{opacity:1;}
+
+/* The lens */
+.lens{position:absolute;top:0;left:0;width:150px;height:150px;border-radius:50%;
+  pointer-events:none;opacity:0;transform:translate(-50%,-50%);
+  border:3px solid rgba(255,255,255,.9);
+  box-shadow:0 0 0 1px rgba(0,0,0,.35), 0 8px 26px rgba(0,0,0,.4),
+             inset 0 0 22px rgba(0,0,0,.25);
+  background-repeat:no-repeat;transition:opacity .18s;z-index:5;}
+.stage.show-lens .lens{opacity:1;}
+.lens-tag{position:absolute;left:50%;bottom:-1.55rem;transform:translateX(-50%);
+  font-family:var(--ff-mono);font-size:.62rem;font-weight:600;white-space:nowrap;
+  color:#fff;background:rgba(0,54,163,.92);padding:.18rem .5rem;border-radius:6px;
+  letter-spacing:.04em;}
+
+/* Depth colorbar legend */
+.legend{position:absolute;right:12px;top:12px;z-index:6;
+  background:rgba(255,255,255,.92);border-radius:8px;padding:.5rem .6rem;
+  box-shadow:0 4px 14px rgba(0,0,0,.18);opacity:0;transition:opacity .45s;
+  pointer-events:none;font-size:.66rem;color:var(--ink);}
+.stage.depth .legend{opacity:1;}
+.legend .bar{width:14px;height:96px;border-radius:4px;margin:0 auto .3rem;
+  /* magma: far (dark) -> near (bright) */
+  background:linear-gradient(to top,#000004,#3b0f70,#8c2981,#de4968,#fe9f6d,#fcfdbf);}
+.legend .lab{display:flex;flex-direction:column;height:96px;justify-content:space-between;
+  position:absolute;left:34px;top:.5rem;font-family:var(--ff-mono);font-weight:600;}
+.legend .title{text-align:center;font-weight:600;margin-bottom:.35rem;
+  font-family:var(--ff-mono);letter-spacing:.02em;}
+
+/* Caption */
+.caption{max-width:760px;margin:1.6rem auto 0;text-align:center;
+  color:var(--muted);font-size:.85rem;line-height:1.6;}
+.caption b{color:var(--ink);font-weight:600;}
+.hint{display:inline-block;margin-top:.6rem;font-family:var(--ff-mono);
+  font-size:.72rem;color:var(--blue);background:#eaf0ff;border-radius:999px;
+  padding:.3rem .8rem;}
+footer{text-align:center;margin-top:2.2rem;font-size:.72rem;color:#98a2b3;
+  font-family:var(--ff-mono);}
+footer a{color:var(--blue);text-decoration:none;}
+@media(max-width:560px){.lens{width:110px;height:110px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Team 52 · Tec de Monterrey · MICAI 2026</div>
+    <h1>Assessing Endoscopic Image Enhancement<br>on Monocular Depth Estimation</h1>
+    <p class="subtitle">
+      Move your mouse over the frame: the lens reveals the <b>IAT-enhanced</b>
+      version. Toggle the button to see <b>MonoIIT</b>'s predicted depth map.
+    </p>
+  </header>
+
+  <div class="controls">
+    <div class="group">
+      <label for="sceneSel">Scene</label>
+      <select id="sceneSel"></select>
+    </div>
+    <span class="chip" id="enhChip">enhancement: IAT</span>
+    <button id="depthBtn" class="primary">
+      <span id="depthIcon">◨</span><span id="depthTxt">Show depth map</span>
+    </button>
+    <label class="toggle"><input type="checkbox" id="zoomChk" checked>Lens zoom 1.5×</label>
+  </div>
+
+  <div class="stage-shell">
+    <div class="stage" id="stage">
+      <img id="rawLayer"   class="layer" alt="raw endoscopic frame">
+      <img id="depthLayer" class="layer" alt="predicted depth map">
+      <div class="lens" id="lens"><span class="lens-tag" id="lensTag">enhanced (IAT)</span></div>
+      <div class="legend">
+        <div class="title">depth</div>
+        <div class="bar"></div>
+        <div class="lab"><span>near</span><span>far</span></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="caption">
+    <b>Outside the lens</b> you see the raw frame; <b>inside the lens</b>, the same
+    region after IAT illumination correction. The <b>depth map</b> uses the
+    <b>magma</b> colormap — <b>bright/yellow = near</b>, <b>dark/purple = far</b>.
+    <br>
+    <span class="hint" id="hint">Hover the image to use the lens ✦</span>
+  </p>
+
+  <footer>
+    Static demo — all images precomputed (no model runs in-browser). ·
+    <a href="../index.html">← back to project site</a>
+  </footer>
+
+</div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   SCENES — register one entry per scene. Each points to three PNGs in ./assets
+   (raw, enhanced, depth). To add your own: drop the three files in assets/ and
+   add an object here. label = text shown in the dropdown.
+--------------------------------------------------------------------------- */
+const SCENES = [
+  { id:"under",    label:"Underexposed",  raw:"assets/under_raw.png",    enhanced:"assets/under_enhanced.png",    depth:"assets/under_depth.png"    },
+  { id:"over",     label:"Overexposed",   raw:"assets/over_raw.png",     enhanced:"assets/over_enhanced.png",     depth:"assets/over_depth.png"     },
+  { id:"specular", label:"Specular",      raw:"assets/specular_raw.png", enhanced:"assets/specular_enhanced.png", depth:"assets/specular_depth.png" },
+];
+
+const LENS_SIZE = 150;          // px, matches .lens css
+const stage   = document.getElementById("stage");
+const rawImg  = document.getElementById("rawLayer");
+const depthImg= document.getElementById("depthLayer");
+const lens    = document.getElementById("lens");
+const sceneSel= document.getElementById("sceneSel");
+const depthBtn= document.getElementById("depthBtn");
+const depthTxt= document.getElementById("depthTxt");
+const depthIcon=document.getElementById("depthIcon");
+const zoomChk = document.getElementById("zoomChk");
+const hint    = document.getElementById("hint");
+
+let current = SCENES[0];
+let depthOn = false;
+
+/* populate dropdown */
+SCENES.forEach((s,i)=>{
+  const o=document.createElement("option");
+  o.value=i; o.textContent=s.label; sceneSel.appendChild(o);
+});
+
+/* load a scene (raw + depth as <img>, enhanced as lens background) */
+function loadScene(scene){
+  current = scene;
+  rawImg.src   = scene.raw;
+  depthImg.src = scene.depth;
+  // enhanced version lives only in the lens background
+  lens.style.backgroundImage = `url("${scene.enhanced}")`;
+}
+sceneSel.addEventListener("change", e => loadScene(SCENES[+e.target.value]));
+
+/* keep the lens background sized to the displayed image (so it lines up) */
+function syncLensBackground(x, y){
+  const zoom = zoomChk.checked ? 1.5 : 1.0;
+  const w = rawImg.clientWidth  * zoom;
+  const h = rawImg.clientHeight * zoom;
+  lens.style.backgroundSize = `${w}px ${h}px`;
+  // position the background so the point under the cursor is centered in the lens
+  const bgX = LENS_SIZE/2 - x*zoom;
+  const bgY = LENS_SIZE/2 - y*zoom;
+  lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
+}
+
+/* mouse tracking */
+stage.addEventListener("mousemove", e=>{
+  const r = stage.getBoundingClientRect();
+  const x = e.clientX - r.left;
+  const y = e.clientY - r.top;
+  lens.style.left = x + "px";
+  lens.style.top  = y + "px";
+  syncLensBackground(x, y);
+  stage.classList.add("show-lens");
+  hint.style.opacity = ".35";
+});
+stage.addEventListener("mouseleave", ()=> stage.classList.remove("show-lens"));
+
+/* touch support (nice-to-have) */
+stage.addEventListener("touchmove", e=>{
+  const t = e.touches[0]; if(!t) return;
+  const r = stage.getBoundingClientRect();
+  const x = t.clientX - r.left, y = t.clientY - r.top;
+  lens.style.left=x+"px"; lens.style.top=y+"px";
+  syncLensBackground(x,y);
+  stage.classList.add("show-lens");
+  e.preventDefault();
+},{passive:false});
+stage.addEventListener("touchend", ()=> stage.classList.remove("show-lens"));
+
+/* depth toggle */
+depthBtn.addEventListener("click", ()=>{
+  depthOn = !depthOn;
+  stage.classList.toggle("depth", depthOn);
+  depthBtn.classList.toggle("active", depthOn);
+  depthTxt.textContent = depthOn ? "Hide depth map" : "Show depth map";
+  depthIcon.textContent = depthOn ? "◧" : "◨";
+});
+
+loadScene(SCENES[0]);
+</script>
+</body>
+</html>
