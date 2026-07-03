@@ -1,5 +1,5 @@
 {
- "under": {
+ "under1": {
   "iat": {
    "absrel": 0.0775,
    "rmse": 9.59
@@ -9,7 +9,17 @@
    "rmse": 9.96
   }
  },
- "over": {
+ "under2": {
+  "iat": {
+   "absrel": 0.0482,
+   "rmse": 3.91
+  },
+  "endolmspec": {
+   "absrel": 0.0521,
+   "rmse": 4.26
+  }
+ },
+ "over1": {
   "iat": {
    "absrel": 0.0832,
    "rmse": 5.02
@@ -19,14 +29,44 @@
    "rmse": 4.99
   }
  },
- "specular": {
+ "over2": {
   "iat": {
-   "absrel": 0.0973,
-   "rmse": 5.89
+   "absrel": 0.038,
+   "rmse": 2.01
   },
   "endolmspec": {
-   "absrel": 0.0868,
-   "rmse": 5.37
+   "absrel": 0.0377,
+   "rmse": 2.02
+  }
+ },
+ "specular1": {
+  "iat": {
+   "absrel": 0.0273,
+   "rmse": 3.16
+  },
+  "endolmspec": {
+   "absrel": 0.0359,
+   "rmse": 4.14
+  }
+ },
+ "specular2": {
+  "iat": {
+   "absrel": 0.0747,
+   "rmse": 5.02
+  },
+  "endolmspec": {
+   "absrel": 0.0475,
+   "rmse": 3.18
+  }
+ },
+ "medium1": {
+  "iat": {
+   "absrel": 0.0592,
+   "rmse": 8.87
+  },
+  "endolmspec": {
+   "absrel": 0.0547,
+   "rmse": 7.88
   }
  }
 }
