@@ -19,9 +19,14 @@
       assets/<scene>_endolmspec_enhanced.png         Endo-LMSPEC-enhanced frame
       assets/<scene>_endolmspec_depth.png            depth (MonoIIT) over Endo-LMSPEC output
 
+  Optionally also drop assets/metrics.json with per-scene/per-method depth
+  accuracy vs ground truth, shape: { "<scene>": { "<method>": { "absrel": 0.07,
+  "rmse": 4.2 } } }. It's read via fetch() and shown in the on-image metrics
+  panel; if the file is missing the panel just shows "—" (no crash).
+
   Then register the scene/method in the SCENES / ENHANCEMENTS arrays in the
   <script> block below. The companion notebook (Avance9_App_Lupa.ipynb)
-  generates these assets and writes them straight into this folder.
+  generates these assets + metrics.json and writes them straight into this folder.
   ============================================================================
 -->
 <html lang="en">
@@ -75,8 +80,23 @@ button.active{background:var(--gold);color:#3a2c00;border-color:var(--gold);}
 .toggle{display:inline-flex;align-items:center;gap:.5rem;font-size:.82rem;
   color:var(--muted);font-weight:500;user-select:none;cursor:pointer;}
 .toggle input{width:16px;height:16px;accent-color:var(--blue);cursor:pointer;}
-.lens-size-group button{width:34px;height:34px;padding:0;border-radius:50%;
-  font-size:1.1rem;font-weight:700;line-height:1;}
+.lens-size-group{gap:.6rem;}
+.lens-size-group input[type=range]{width:110px;accent-color:var(--blue);cursor:pointer;}
+.lens-size-group .val{font-family:var(--ff-mono);font-size:.76rem;color:var(--muted);
+  min-width:2.4em;text-align:right;}
+
+/* Metrics panel (inside the stage, near the lens) */
+.metrics-panel{position:absolute;left:12px;top:12px;z-index:6;
+  background:rgba(255,255,255,.94);border-radius:8px;padding:.55rem .7rem;
+  box-shadow:0 4px 14px rgba(0,0,0,.18);font-size:.7rem;color:var(--ink);
+  min-width:132px;}
+.metrics-panel .title{font-family:var(--ff-mono);font-weight:700;letter-spacing:.03em;
+  color:var(--blue);margin-bottom:.3rem;text-transform:uppercase;font-size:.64rem;}
+.metrics-panel .row{display:flex;justify-content:space-between;gap:.6rem;
+  padding:.12rem 0;border-top:1px dashed var(--line);}
+.metrics-panel .row:first-of-type{border-top:none;}
+.metrics-panel .row b{font-family:var(--ff-mono);color:var(--ink);}
+.metrics-panel .muted{color:#9aa4b5;font-size:.64rem;margin-top:.25rem;}
 
 /* Stage */
 .stage-shell{display:flex;justify-content:center;}
@@ -159,9 +179,9 @@ footer a{color:var(--blue);text-decoration:none;}
     </button>
     <label class="toggle"><input type="checkbox" id="zoomChk" checked>Lens zoom 1.5×</label>
     <div class="group lens-size-group">
-      <label>Lens size</label>
-      <button type="button" id="lensSmaller" aria-label="Smaller lens">−</button>
-      <button type="button" id="lensBigger" aria-label="Bigger lens">+</button>
+      <label for="lensSizeRange">Lens size</label>
+      <input type="range" id="lensSizeRange" min="90" max="320" step="10" value="150">
+      <span class="val" id="lensSizeVal">150px</span>
     </div>
   </div>
 
@@ -174,6 +194,12 @@ footer a{color:var(--blue);text-decoration:none;}
         <div class="title">depth</div>
         <div class="bar"></div>
         <div class="lab"><span>near</span><span>far</span></div>
+      </div>
+      <div class="metrics-panel" id="metricsPanel">
+        <div class="title">Depth accuracy vs GT</div>
+        <div class="row"><span>AbsRel</span><b id="mAbsRel">—</b></div>
+        <div class="row"><span>RMSE (mm)</span><b id="mRmse">—</b></div>
+        <div class="muted" id="mNote">MonoIIT, this frame</div>
       </div>
     </div>
   </div>
@@ -219,7 +245,6 @@ const SCENES = [
                endolmspec:{ enhanced:"assets/specular_endolmspec_enhanced.png", depth:"assets/specular_endolmspec_depth.png" } } },
 ];
 
-const LENS_MIN = 90, LENS_MAX = 320, LENS_STEP = 30;
 const stage   = document.getElementById("stage");
 const rawImg  = document.getElementById("rawLayer");
 const depthImg= document.getElementById("depthLayer");
@@ -233,20 +258,28 @@ const depthTxt= document.getElementById("depthTxt");
 const depthIcon=document.getElementById("depthIcon");
 const zoomChk = document.getElementById("zoomChk");
 const hint    = document.getElementById("hint");
-const lensBiggerBtn  = document.getElementById("lensBigger");
-const lensSmallerBtn = document.getElementById("lensSmaller");
+const lensSizeRange = document.getElementById("lensSizeRange");
+const lensSizeVal   = document.getElementById("lensSizeVal");
+const mAbsRel = document.getElementById("mAbsRel");
+const mRmse   = document.getElementById("mRmse");
 
 let currentScene = SCENES[0];
 let currentEnh   = ENHANCEMENTS[0];
 let depthOn = false;
-let lensSize = 150;             // px, mirrors --lens-size in CSS
+let lensSize = +lensSizeRange.value;   // px, mirrors --lens-size in CSS
+let METRICS = {};                      // filled by fetch("assets/metrics.json"), optional
 
 function setLensSize(px){
-  lensSize = Math.max(LENS_MIN, Math.min(LENS_MAX, px));
+  lensSize = px;
   lens.style.setProperty("--lens-size", lensSize + "px");
+  lensSizeVal.textContent = lensSize + "px";
 }
-lensBiggerBtn.addEventListener("click", ()=> setLensSize(lensSize + LENS_STEP));
-lensSmallerBtn.addEventListener("click", ()=> setLensSize(lensSize - LENS_STEP));
+lensSizeRange.addEventListener("input", e => setLensSize(+e.target.value));
+
+/* Optional metrics.json (written by the Avance9 notebook): {scene: {method: {absrel, rmse}}}.
+   If it's missing (e.g. running the page before the notebook exported it), the panel
+   just shows "—" instead of breaking. */
+fetch("assets/metrics.json").then(r => r.ok ? r.json() : {}).then(j => { METRICS = j || {}; render(); }).catch(()=>{});
 
 /* populate dropdowns */
 SCENES.forEach((s,i)=>{
@@ -266,6 +299,10 @@ function render(){
   lens.style.backgroundImage = `url("${v.enhanced}")`;   // enhanced lives in the lens
   lensTag.textContent = `enhanced (${currentEnh.label})`;
   enhName.textContent = currentEnh.label;
+
+  const m = METRICS[currentScene.id] && METRICS[currentScene.id][currentEnh.id];
+  mAbsRel.textContent = m ? m.absrel.toFixed(3) : "—";
+  mRmse.textContent   = m ? m.rmse.toFixed(1)   : "—";
 }
 sceneSel.addEventListener("change", e => { currentScene = SCENES[+e.target.value]; render(); });
 enhSel.addEventListener("change",   e => { currentEnh   = ENHANCEMENTS[+e.target.value]; render(); });
