@@ -18,11 +18,13 @@
       assets/<scene>_depth.png                       depth (MonoIIT) over IAT output
       assets/<scene>_endolmspec_enhanced.png         Endo-LMSPEC-enhanced frame
       assets/<scene>_endolmspec_depth.png            depth (MonoIIT) over Endo-LMSPEC output
+      assets/<scene>_gt.png                          sparse ground-truth depth (magma), optional
 
   Optionally also drop assets/metrics.json with per-scene/per-method depth
   accuracy vs ground truth, shape: { "<scene>": { "<method>": { "absrel": 0.07,
-  "rmse": 4.2 } } }. It's read via fetch() and shown in the on-image metrics
-  panel; if the file is missing the panel just shows "—" (no crash).
+  "rmse": 4.2 } } }. It's read via fetch() and shown in the metrics panel below
+  the image; if the file is missing the panel just shows "—" (no crash). If a
+  scene has no <scene>_gt.png, the "Show ground truth" button is hidden for it.
 
   Then register the scene/method in the SCENES / ENHANCEMENTS arrays in the
   <script> block below. The companion notebook (Avance9_App_Lupa.ipynb)
@@ -85,18 +87,18 @@ button.active{background:var(--gold);color:#3a2c00;border-color:var(--gold);}
 .lens-size-group .val{font-family:var(--ff-mono);font-size:.76rem;color:var(--muted);
   min-width:2.4em;text-align:right;}
 
-/* Metrics panel (inside the stage, near the lens) */
-.metrics-panel{position:absolute;left:12px;top:12px;z-index:6;
-  background:rgba(255,255,255,.94);border-radius:8px;padding:.55rem .7rem;
-  box-shadow:0 4px 14px rgba(0,0,0,.18);font-size:.7rem;color:var(--ink);
-  min-width:132px;}
-.metrics-panel .title{font-family:var(--ff-mono);font-weight:700;letter-spacing:.03em;
-  color:var(--blue);margin-bottom:.3rem;text-transform:uppercase;font-size:.64rem;}
-.metrics-panel .row{display:flex;justify-content:space-between;gap:.6rem;
-  padding:.12rem 0;border-top:1px dashed var(--line);}
-.metrics-panel .row:first-of-type{border-top:none;}
-.metrics-panel .row b{font-family:var(--ff-mono);color:var(--ink);}
-.metrics-panel .muted{color:#9aa4b5;font-size:.64rem;margin-top:.25rem;}
+/* Metrics panel — lives BELOW the stage, not on top of the image */
+.metrics-panel{max-width:920px;margin:1rem auto 0;display:flex;flex-wrap:wrap;
+  justify-content:center;gap:.7rem;}
+.metrics-panel .card{background:#fff;border:1px solid var(--line);border-radius:10px;
+  padding:.55rem 1rem;box-shadow:0 1px 2px rgba(20,40,90,.04);
+  display:flex;align-items:baseline;gap:.5rem;min-width:150px;}
+.metrics-panel .card .lbl{font-family:var(--ff-mono);font-size:.68rem;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.03em;}
+.metrics-panel .card .num{font-family:var(--ff-mono);font-size:1.05rem;font-weight:700;
+  color:var(--blue);}
+.metrics-panel .note{width:100%;text-align:center;font-size:.72rem;color:#9aa4b5;
+  font-family:var(--ff-mono);margin-top:-.2rem;}
 
 /* Stage */
 .stage-shell{display:flex;justify-content:center;}
@@ -107,9 +109,10 @@ button.active{background:var(--gold);color:#3a2c00;border-color:var(--gold);}
 @media(max-width:960px){.stage img{width:100vw;}}
 /* rawLayer stays in normal flow so it gives the .stage its size;
    depthLayer stacks on top of it absolutely. */
-#depthLayer{position:absolute;inset:0;width:100%;height:100%;opacity:0;
+#depthLayer,#gtLayer{position:absolute;inset:0;width:100%;height:100%;opacity:0;
   transition:opacity .45s ease;object-fit:cover;}
-.stage.depth #depthLayer{opacity:1;}
+.stage.view-depth #depthLayer{opacity:1;}
+.stage.view-gt #gtLayer{opacity:1;}
 
 /* The lens */
 .lens{--lens-size:150px;position:absolute;top:0;left:0;
@@ -131,7 +134,7 @@ button.active{background:var(--gold);color:#3a2c00;border-color:var(--gold);}
   background:rgba(255,255,255,.92);border-radius:8px;padding:.5rem .6rem;
   box-shadow:0 4px 14px rgba(0,0,0,.18);opacity:0;transition:opacity .45s;
   pointer-events:none;font-size:.66rem;color:var(--ink);}
-.stage.depth .legend{opacity:1;}
+.stage.view-depth .legend,.stage.view-gt .legend{opacity:1;}
 .legend .bar{width:14px;height:96px;border-radius:4px;margin:0 auto .3rem;
   /* magma: far (dark) -> near (bright) */
   background:linear-gradient(to top,#000004,#3b0f70,#8c2981,#de4968,#fe9f6d,#fcfdbf);}
@@ -160,8 +163,9 @@ footer a{color:var(--blue);text-decoration:none;}
     <div class="eyebrow">Team 52 · Tec de Monterrey</div>
     <h1>Assessing Endoscopic Image Enhancement<br>on Monocular Depth Estimation</h1>
     <p class="subtitle">
-      Move your mouse over the frame: the lens reveals the <b>IAT-enhanced</b>
-      version. Toggle the button to see <b>MonoIIT</b>'s predicted depth map.
+      Move your mouse over the frame: the lens reveals the enhanced version.
+      Toggle the buttons to see <b>MonoIIT</b>'s predicted depth map or the
+      sparse <b>ground truth</b>.
     </p>
   </header>
 
@@ -177,6 +181,9 @@ footer a{color:var(--blue);text-decoration:none;}
     <button id="depthBtn" class="primary">
       <span id="depthIcon">◨</span><span id="depthTxt">Show depth map</span>
     </button>
+    <button id="gtBtn">
+      <span id="gtIcon">◫</span><span id="gtTxt">Show ground truth</span>
+    </button>
     <label class="toggle"><input type="checkbox" id="zoomChk" checked>Lens zoom 1.5×</label>
     <div class="group lens-size-group">
       <label for="lensSizeRange">Lens size</label>
@@ -189,25 +196,27 @@ footer a{color:var(--blue);text-decoration:none;}
     <div class="stage" id="stage">
       <img id="rawLayer" alt="raw endoscopic frame">
       <img id="depthLayer" alt="predicted depth map">
+      <img id="gtLayer" alt="sparse ground-truth depth">
       <div class="lens" id="lens"><span class="lens-tag" id="lensTag">enhanced (IAT)</span></div>
       <div class="legend">
-        <div class="title">depth</div>
+        <div class="title" id="legendTitle">depth</div>
         <div class="bar"></div>
         <div class="lab"><span>near</span><span>far</span></div>
-      </div>
-      <div class="metrics-panel" id="metricsPanel">
-        <div class="title">Depth accuracy vs GT</div>
-        <div class="row"><span>AbsRel</span><b id="mAbsRel">—</b></div>
-        <div class="row"><span>RMSE (mm)</span><b id="mRmse">—</b></div>
-        <div class="muted" id="mNote">MonoIIT, this frame</div>
       </div>
     </div>
   </div>
 
+  <div class="metrics-panel" id="metricsPanel">
+    <div class="card"><span class="lbl">AbsRel</span><span class="num" id="mAbsRel">—</span></div>
+    <div class="card"><span class="lbl">RMSE (mm)</span><span class="num" id="mRmse">—</span></div>
+    <div class="note">MonoIIT depth accuracy vs ground truth, this frame</div>
+  </div>
+
   <p class="caption">
     <b>Outside the lens</b> you see the raw frame; <b>inside the lens</b>, the same
-    region after <b id="enhName">IAT</b> illumination correction. The <b>depth map</b> uses the
-    <b>magma</b> colormap — <b>bright/yellow = near</b>, <b>dark/purple = far</b>.
+    region after <b id="enhName">IAT</b> illumination correction. The <b>depth map</b> and
+    <b>ground truth</b> use the <b>magma</b> colormap — <b>bright/yellow = near</b>,
+    <b>dark/purple = far</b>.
     <br>
     <span class="hint" id="hint">Hover the image to use the lens ✦</span>
   </p>
@@ -234,13 +243,13 @@ const ENHANCEMENTS = [
 ];
 
 const SCENES = [
-  { id:"under", label:"Underexposed", raw:"assets/under_raw.png",
+  { id:"under", label:"Underexposed", raw:"assets/under_raw.png", gt:"assets/under_gt.png",
     variants:{ iat:{ enhanced:"assets/under_enhanced.png",           depth:"assets/under_depth.png" },
                endolmspec:{ enhanced:"assets/under_endolmspec_enhanced.png", depth:"assets/under_endolmspec_depth.png" } } },
-  { id:"over", label:"Overexposed", raw:"assets/over_raw.png",
+  { id:"over", label:"Overexposed", raw:"assets/over_raw.png", gt:"assets/over_gt.png",
     variants:{ iat:{ enhanced:"assets/over_enhanced.png",            depth:"assets/over_depth.png" },
                endolmspec:{ enhanced:"assets/over_endolmspec_enhanced.png",  depth:"assets/over_endolmspec_depth.png" } } },
-  { id:"specular", label:"Specular", raw:"assets/specular_raw.png",
+  { id:"specular", label:"Specular", raw:"assets/specular_raw.png", gt:"assets/specular_gt.png",
     variants:{ iat:{ enhanced:"assets/specular_enhanced.png",        depth:"assets/specular_depth.png" },
                endolmspec:{ enhanced:"assets/specular_endolmspec_enhanced.png", depth:"assets/specular_endolmspec_depth.png" } } },
 ];
@@ -248,6 +257,7 @@ const SCENES = [
 const stage   = document.getElementById("stage");
 const rawImg  = document.getElementById("rawLayer");
 const depthImg= document.getElementById("depthLayer");
+const gtImg   = document.getElementById("gtLayer");
 const lens    = document.getElementById("lens");
 const lensTag = document.getElementById("lensTag");
 const enhName = document.getElementById("enhName");
@@ -256,6 +266,10 @@ const enhSel  = document.getElementById("enhSel");
 const depthBtn= document.getElementById("depthBtn");
 const depthTxt= document.getElementById("depthTxt");
 const depthIcon=document.getElementById("depthIcon");
+const gtBtn   = document.getElementById("gtBtn");
+const gtTxt   = document.getElementById("gtTxt");
+const gtIcon  = document.getElementById("gtIcon");
+const legendTitle = document.getElementById("legendTitle");
 const zoomChk = document.getElementById("zoomChk");
 const hint    = document.getElementById("hint");
 const lensSizeRange = document.getElementById("lensSizeRange");
@@ -265,7 +279,7 @@ const mRmse   = document.getElementById("mRmse");
 
 let currentScene = SCENES[0];
 let currentEnh   = ENHANCEMENTS[0];
-let depthOn = false;
+let view = "raw";               // "raw" | "depth" | "gt" — mutually exclusive
 let lensSize = +lensSizeRange.value;   // px, mirrors --lens-size in CSS
 let METRICS = {};                      // filled by fetch("assets/metrics.json"), optional
 
@@ -291,7 +305,7 @@ ENHANCEMENTS.forEach((e,i)=>{
   o.value=i; o.textContent=e.label; enhSel.appendChild(o);
 });
 
-/* render current scene + enhancement: raw stays fixed, enhanced/depth swap */
+/* render current scene + enhancement: raw stays fixed, enhanced/depth/gt swap */
 function render(){
   const v = currentScene.variants[currentEnh.id];
   rawImg.src   = currentScene.raw;
@@ -299,6 +313,17 @@ function render(){
   lens.style.backgroundImage = `url("${v.enhanced}")`;   // enhanced lives in the lens
   lensTag.textContent = `enhanced (${currentEnh.label})`;
   enhName.textContent = currentEnh.label;
+
+  // ground truth is optional per scene: probe it, hide the button if missing
+  if (currentScene.gt) {
+    const probe = new Image();
+    probe.onload  = () => { gtImg.src = currentScene.gt; gtBtn.style.display = ""; };
+    probe.onerror = () => { gtBtn.style.display = "none"; if (view === "gt") setView("raw"); };
+    probe.src = currentScene.gt;
+  } else {
+    gtBtn.style.display = "none";
+    if (view === "gt") setView("raw");
+  }
 
   const m = METRICS[currentScene.id] && METRICS[currentScene.id][currentEnh.id];
   mAbsRel.textContent = m ? m.absrel.toFixed(3) : "—";
@@ -344,14 +369,24 @@ stage.addEventListener("touchmove", e=>{
 },{passive:false});
 stage.addEventListener("touchend", ()=> stage.classList.remove("show-lens"));
 
-/* depth toggle */
-depthBtn.addEventListener("click", ()=>{
-  depthOn = !depthOn;
-  stage.classList.toggle("depth", depthOn);
-  depthBtn.classList.toggle("active", depthOn);
-  depthTxt.textContent = depthOn ? "Hide depth map" : "Show depth map";
-  depthIcon.textContent = depthOn ? "◧" : "◨";
-});
+/* depth / ground-truth toggle — mutually exclusive views over the same stage */
+function setView(next){
+  view = (view === next) ? "raw" : next;   // click again to go back to raw
+  stage.classList.toggle("view-depth", view === "depth");
+  stage.classList.toggle("view-gt",    view === "gt");
+
+  depthBtn.classList.toggle("active", view === "depth");
+  depthTxt.textContent = view === "depth" ? "Hide depth map" : "Show depth map";
+  depthIcon.textContent = view === "depth" ? "◧" : "◨";
+
+  gtBtn.classList.toggle("active", view === "gt");
+  gtTxt.textContent = view === "gt" ? "Hide ground truth" : "Show ground truth";
+  gtIcon.textContent = view === "gt" ? "◪" : "◫";
+
+  legendTitle.textContent = view === "gt" ? "ground truth" : "depth";
+}
+depthBtn.addEventListener("click", () => setView("depth"));
+gtBtn.addEventListener("click",    () => setView("gt"));
 
 setLensSize(lensSize);
 render();
