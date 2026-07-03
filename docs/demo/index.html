@@ -265,7 +265,10 @@ const SCENES = [
   makeScene("specular1", "Specular #1"),
   makeScene("specular2", "Specular #2"),
   makeScene("medium1",   "Well-lit #1"),
-  makeScene("medium2",   "Well-lit #2"),
+  // medium2 was requested by _pick_diverse in the notebook but no second
+  // distinct well-lit keyframe existed in the split without overlapping
+  // under/over/specular picks, so only medium1 was generated. Add it back
+  // here once/if a medium2_*.png set exists in assets/.
 ];
 
 const stage   = document.getElementById("stage");
