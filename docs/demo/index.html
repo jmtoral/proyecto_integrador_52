@@ -26,9 +26,11 @@
   the image; if the file is missing the panel just shows "—" (no crash). If a
   scene has no <scene>_gt.png, the "Show ground truth" button is hidden for it.
 
-  Then register the scene/method in the SCENES / ENHANCEMENTS arrays in the
-  <script> block below. The companion notebook (Avance9_App_Lupa.ipynb)
-  generates these assets + metrics.json and writes them straight into this folder.
+  Then register the scene with makeScene("<scene>", "<label>") in the SCENES
+  array in the <script> block below (or add a raw ENHANCEMENTS/SCENES entry
+  if it doesn't follow the "<scene>_..." convention). The companion notebook
+  (Avance9_App_Lupa.ipynb) generates these assets + metrics.json for 8 scenes
+  (under1/2, over1/2, specular1/2, medium1/2) and writes them straight here.
   ============================================================================
 -->
 <html lang="en">
@@ -131,17 +133,20 @@ button.active{background:var(--gold);color:#3a2c00;border-color:var(--gold);}
 
 /* Depth colorbar legend */
 .legend{position:absolute;right:12px;top:12px;z-index:6;
-  background:rgba(255,255,255,.92);border-radius:8px;padding:.5rem .6rem;
+  background:rgba(255,255,255,.92);border-radius:8px;padding:.5rem .65rem .6rem;
   box-shadow:0 4px 14px rgba(0,0,0,.18);opacity:0;transition:opacity .45s;
-  pointer-events:none;font-size:.66rem;color:var(--ink);}
+  pointer-events:none;font-size:.66rem;color:var(--ink);
+  display:flex;flex-direction:column;align-items:center;}
 .stage.view-depth .legend,.stage.view-gt .legend{opacity:1;}
-.legend .bar{width:14px;height:96px;border-radius:4px;margin:0 auto .3rem;
+.legend .row{display:flex;align-items:stretch;gap:.5rem;}
+.legend .bar{width:14px;height:96px;border-radius:4px;flex:none;
   /* magma: far (dark) -> near (bright) */
   background:linear-gradient(to top,#000004,#3b0f70,#8c2981,#de4968,#fe9f6d,#fcfdbf);}
-.legend .lab{display:flex;flex-direction:column;height:96px;justify-content:space-between;
-  position:absolute;left:34px;top:.5rem;font-family:var(--ff-mono);font-weight:600;}
+.legend .lab{display:flex;flex-direction:column;justify-content:space-between;
+  font-family:var(--ff-mono);font-weight:600;}
 .legend .title{text-align:center;font-weight:600;margin-bottom:.35rem;
-  font-family:var(--ff-mono);letter-spacing:.02em;}
+  font-family:var(--ff-mono);letter-spacing:.02em;white-space:nowrap;
+  font-size:.6rem;}
 
 /* Caption */
 .caption{max-width:760px;margin:1.6rem auto 0;text-align:center;
@@ -200,8 +205,10 @@ footer a{color:var(--blue);text-decoration:none;}
       <div class="lens" id="lens"><span class="lens-tag" id="lensTag">enhanced (IAT)</span></div>
       <div class="legend">
         <div class="title" id="legendTitle">depth</div>
-        <div class="bar"></div>
-        <div class="lab"><span>near</span><span>far</span></div>
+        <div class="row">
+          <div class="bar"></div>
+          <div class="lab"><span>near</span><span>far</span></div>
+        </div>
       </div>
     </div>
   </div>
@@ -242,16 +249,23 @@ const ENHANCEMENTS = [
   { id:"endolmspec", label:"Endo-LMSPEC" },
 ];
 
+/* makeScene(id, label) builds the standard variants block for a scene whose
+   assets follow the "<id>_..." naming convention written by the notebook. */
+function makeScene(id, label){
+  return { id, label, raw:`assets/${id}_raw.png`, gt:`assets/${id}_gt.png`,
+    variants:{ iat:{ enhanced:`assets/${id}_enhanced.png`, depth:`assets/${id}_depth.png` },
+               endolmspec:{ enhanced:`assets/${id}_endolmspec_enhanced.png`, depth:`assets/${id}_endolmspec_depth.png` } } };
+}
+
 const SCENES = [
-  { id:"under", label:"Underexposed", raw:"assets/under_raw.png", gt:"assets/under_gt.png",
-    variants:{ iat:{ enhanced:"assets/under_enhanced.png",           depth:"assets/under_depth.png" },
-               endolmspec:{ enhanced:"assets/under_endolmspec_enhanced.png", depth:"assets/under_endolmspec_depth.png" } } },
-  { id:"over", label:"Overexposed", raw:"assets/over_raw.png", gt:"assets/over_gt.png",
-    variants:{ iat:{ enhanced:"assets/over_enhanced.png",            depth:"assets/over_depth.png" },
-               endolmspec:{ enhanced:"assets/over_endolmspec_enhanced.png",  depth:"assets/over_endolmspec_depth.png" } } },
-  { id:"specular", label:"Specular", raw:"assets/specular_raw.png", gt:"assets/specular_gt.png",
-    variants:{ iat:{ enhanced:"assets/specular_enhanced.png",        depth:"assets/specular_depth.png" },
-               endolmspec:{ enhanced:"assets/specular_endolmspec_enhanced.png", depth:"assets/specular_endolmspec_depth.png" } } },
+  makeScene("under1",    "Underexposed #1"),
+  makeScene("under2",    "Underexposed #2"),
+  makeScene("over1",     "Overexposed #1"),
+  makeScene("over2",     "Overexposed #2"),
+  makeScene("specular1", "Specular #1"),
+  makeScene("specular2", "Specular #2"),
+  makeScene("medium1",   "Well-lit #1"),
+  makeScene("medium2",   "Well-lit #2"),
 ];
 
 const stage   = document.getElementById("stage");
