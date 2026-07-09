@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reconstrucción 3D — Endoscopia | Equipo 52</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      padding: 1.5rem;
+      min-height: 100vh;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #0036a3;
+    }
+    .header h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .header p { font-size: 0.95rem; color: #555; margin-bottom: 0.2rem; }
+    .subtitle { font-size: 0.85rem; color: #E0A800; font-weight: 600; }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .controls {
+      background: white;
+      padding: 1.2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,.12);
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .control-group label {
+      font-weight: 600;
+      color: #333;
+      font-size: 0.95rem;
+      min-width: 100px;
+    }
+
+    select, button {
+      padding: 0.5rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: white;
+      transition: all 0.2s ease;
+    }
+
+    select {
+      min-width: 180px;
+      color: #333;
+    }
+
+    select:hover, select:focus {
+      border-color: #0036a3;
+      box-shadow: 0 0 0 2px rgba(0,54,163,.1);
+    }
+
+    button {
+      background: #f0f0f0;
+      color: #333;
+      font-weight: 600;
+      border: 1px solid #ddd;
+    }
+
+    button:hover {
+      background: #e8e8e8;
+      border-color: #0036a3;
+    }
+
+    button.active {
+      background: #0036a3;
+      color: white;
+      border-color: #0036a3;
+    }
+
+    .rotation-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .canvas-container {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .viewer-wrapper {
+      position: relative;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(0,0,0,.12);
+      flex: 1;
+      min-width: 500px;
+      max-width: 700px;
+    }
+
+    .viewer-label {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(255,255,255,.95);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #0036a3;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 600px;
+    }
+
+    .info-panel {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(0,0,0,.7);
+      color: white;
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-family: monospace;
+      max-width: 300px;
+      z-index: 10;
+    }
+
+    .info-panel div { margin-bottom: 0.3rem; }
+
+    .magnifier {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border: 3px solid rgba(255,255,255,.8);
+      border-radius: 50%;
+      background: rgba(0,0,0,.1);
+      pointer-events: none;
+      display: none;
+      z-index: 11;
+      box-shadow: 0 0 0 2px rgba(0,54,163,.4);
+    }
+
+    .footer {
+      text-align: center;
+      color: #666;
+      font-size: 0.85rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(0,0,0,.1);
+    }
+
+    @media (max-width: 1200px) {
+      .viewer-wrapper {
+        min-width: 100%;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Reconstrucción 3D Interactiva</h1>
+    <p>Comparación: profundidad predicha sin/con enhancement</p>
+    <span class="subtitle">Equipo 52 · TC5035.10 · MNA</span>
+  </div>
+
+  <div class="container">
+    <div class="controls">
+      <div class="control-group">
+        <label for="sceneSelect">Escena:</label>
+        <select id="sceneSelect">
+          <option value="">-- Seleccionar --</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Vista:</label>
+        <div class="rotation-buttons">
+          <button id="btnFront" class="active">Frente</button>
+          <button id="btnTop">Arriba</button>
+          <button id="btnSide">Lado</button>
+          <button id="btnFree">Libre</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label for="zoomRange">Zoom:</label>
+        <input type="range" id="zoomRange" min="10" max="500" value="50" style="width: 150px;">
+      </div>
+
+      <div class="control-group">
+        <label>
+          <input type="checkbox" id="magnifierToggle">
+          Lupa (M)
+        </label>
+      </div>
+    </div>
+
+    <div class="canvas-container">
+      <div class="viewer-wrapper">
+        <div class="viewer-label">MonoIIT (sin enhancement)</div>
+        <canvas id="canvas0"></canvas>
+        <div class="magnifier" id="mag0"></div>
+        <div class="info-panel">
+          <div>Pts: <span id="pts0">-</span></div>
+          <div>Rotacion: <span id="rot0">Frente</span></div>
+        </div>
+      </div>
+
+      <div class="viewer-wrapper">
+        <div class="viewer-label">MonoIIT + IAT</div>
+        <canvas id="canvas1"></canvas>
+        <div class="magnifier" id="mag1"></div>
+        <div class="info-panel">
+          <div>Pts: <span id="pts1">-</span></div>
+          <div>Rotacion: <span id="rot1">Frente</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>💡 Arrastra el ratón para rotar libremente. Usa el zoom o rueda del ratón. Presiona M para activar la lupa.</p>
+      <p style="font-size:0.8rem; color:#888; margin-top:0.5rem;">
+        Nube de puntos 3D retroproyectada desde predicción de profundidad (MonoIIT) con median scaling a mm.
+      </p>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // === CONFIGURACION ===
+    const SCENES = [
+      "under1", "under2", "over1", "over2",
+      "specular1", "specular2", "medium1"
+    ];
+    const METHODS = ["none", "iat"];
+
+    // === ESTADO GLOBAL ===
+    let currentScene = null;
+    let currentRotation = "front";  // front, top, side, free
+    let magnifierActive = false;
+    const viewers = [null, null];   // Three.js scene objects
+    const cameraControls = [null, null];
+
+    // === INICIALIZAR ESCENAS ===
+    const sceneSelect = document.getElementById("sceneSelect");
+    SCENES.forEach(sc => {
+      const opt = document.createElement("option");
+      opt.value = sc;
+      opt.textContent = sc.replace(/(\d)/g, " #$1").toUpperCase();
+      sceneSelect.appendChild(opt);
+    });
+    sceneSelect.addEventListener("change", e => {
+      currentScene = e.target.value;
+      if (currentScene) loadScene(currentScene);
+    });
+
+    // === TRES.JS SETUP ===
+    function createViewer(canvasId, infoPtsId, infoRotId) {
+      const canvas = document.getElementById(canvasId);
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xf5f5f5);
+
+      const camera = new THREE.PerspectiveCamera(
+        75, canvas.clientWidth / canvas.clientHeight, 0.1, 5000
+      );
+      camera.position.set(0, 0, 100);
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+
+      // Iluminacion
+      const light1 = new THREE.DirectionalLight(0xffffff, 0.8);
+      light1.position.set(100, 100, 100);
+      scene.add(light1);
+      const light2 = new THREE.DirectionalLight(0xffffff, 0.4);
+      light2.position.set(-100, -100, 50);
+      scene.add(light2);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
+      // Ejes de referencia (pequenos, en la esquina)
+      const axesHelper = new THREE.AxesHelper(30);
+      axesHelper.position.set(-150, -150, 0);
+      scene.add(axesHelper);
+
+      return { scene, camera, renderer, infoPtsId, infoRotId };
+    }
+
+    // Crear viewers
+    const viewer0 = createViewer("canvas0", "pts0", "rot0");
+    const viewer1 = createViewer("canvas1", "pts1", "rot1");
+    viewers[0] = viewer0;
+    viewers[1] = viewer1;
+
+    // === CARGAR NUBE JSON ===
+    async function loadPointCloud(viewer, method) {
+      if (!currentScene) return;
+      const url = `assets/${currentScene}_${method}.json`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          console.warn(`404 ${url}`);
+          return null;
+        }
+        const data = await response.json();
+        const { vertices, colors } = data;
+
+        // Crear geometry
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(vertices.flat());
+        const colorsArr = new Uint8Array(colors.flat());
+
+        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute("color", new THREE.BufferAttribute(colorsArr, 3, true));
+
+        // Material con vertex colors
+        const material = new THREE.PointsMaterial({
+          size: 0.8,
+          vertexColors: true,
+          sRGBColorSpace: true
+        });
+
+        const points = new THREE.Points(geometry, material);
+        viewer.scene.add(points);
+
+        // Actualizar info
+        document.getElementById(viewer.infoPtsId).textContent = vertices.length;
+
+        // Ajustar camara a los datos
+        geometry.computeBoundingBox();
+        const box = geometry.boundingBox;
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const fov = viewer.camera.fov * (Math.PI / 180);
+        let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+        cameraZ *= 1.5;  // un poco de espacio extra
+        viewer.camera.position.z = cameraZ;
+        viewer.camera.lookAt(box.getCenter(new THREE.Vector3()));
+        viewer.camera.updateProjectionMatrix();
+
+        return points;
+      } catch (err) {
+        console.error(`Error cargando ${url}:`, err);
+        return null;
+      }
+    }
+
+    // === CARGAR ESCENA (ambas nubes) ===
+    async function loadScene(sceneId) {
+      // Limpiar
+      viewers.forEach(v => {
+        const toRemove = v.scene.children.filter(c => c instanceof THREE.Points);
+        toRemove.forEach(c => v.scene.remove(c));
+      });
+
+      // Cargar none y iat en paralelo
+      const pc0 = await loadPointCloud(viewers[0], "none");
+      const pc1 = await loadPointCloud(viewers[1], "iat");
+
+      if (pc0 && pc1) {
+        // Sincronizar camara (usar la escala del viewer0)
+        viewers[1].camera.position.copy(viewers[0].camera.position);
+        viewers[1].camera.fov = viewers[0].camera.fov;
+        viewers[1].camera.updateProjectionMatrix();
+
+        // Aplicar rotacion actual a ambos
+        applyRotation(currentRotation);
+      }
+    }
+
+    // === ROTACIONES FIJAS ===
+    const rotations = {
+      front: () => {
+        viewers.forEach(v => {
+          v.camera.position.set(0, 0, 100);
+        });
+        document.getElementById("rot0").textContent = "Frente";
+        document.getElementById("rot1").textContent = "Frente";
+      },
+      top: () => {
+        viewers.forEach(v => {
+          v.camera.position.set(0, 100, 0);
+        });
+        document.getElementById("rot0").textContent = "Arriba";
+        document.getElementById("rot1").textContent = "Arriba";
+      },
+      side: () => {
+        viewers.forEach(v => {
+          v.camera.position.set(100, 0, 0);
+        });
+        document.getElementById("rot0").textContent = "Lado";
+        document.getElementById("rot1").textContent = "Lado";
+      },
+      free: () => {
+        document.getElementById("rot0").textContent = "Libre";
+        document.getElementById("rot1").textContent = "Libre";
+      }
+    };
+
+    function applyRotation(rot) {
+      currentRotation = rot;
+      if (rot !== "free" && rotations[rot]) {
+        rotations[rot]();
+      }
+    }
+
+    // === CONTROLES ===
+    document.getElementById("btnFront").addEventListener("click", () => {
+      document.querySelectorAll(".rotation-buttons button").forEach(b => b.classList.remove("active"));
+      event.target.classList.add("active");
+      applyRotation("front");
+    });
+
+    document.getElementById("btnTop").addEventListener("click", () => {
+      document.querySelectorAll(".rotation-buttons button").forEach(b => b.classList.remove("active"));
+      event.target.classList.add("active");
+      applyRotation("top");
+    });
+
+    document.getElementById("btnSide").addEventListener("click", () => {
+      document.querySelectorAll(".rotation-buttons button").forEach(b => b.classList.remove("active"));
+      event.target.classList.add("active");
+      applyRotation("side");
+    });
+
+    document.getElementById("btnFree").addEventListener("click", () => {
+      document.querySelectorAll(".rotation-buttons button").forEach(b => b.classList.remove("active"));
+      event.target.classList.add("active");
+      applyRotation("free");
+    });
+
+    // Zoom
+    document.getElementById("zoomRange").addEventListener("input", e => {
+      const z = parseFloat(e.target.value);
+      viewers.forEach(v => {
+        v.camera.fov = z;
+        v.camera.updateProjectionMatrix();
+      });
+    });
+
+    // Lupa
+    document.getElementById("magnifierToggle").addEventListener("change", e => {
+      magnifierActive = e.target.checked;
+      document.getElementById("mag0").style.display = magnifierActive ? "block" : "none";
+      document.getElementById("mag1").style.display = magnifierActive ? "block" : "none";
+    });
+
+    document.addEventListener("keydown", e => {
+      if (e.key.toLowerCase() === "m") {
+        magnifierActive = !magnifierActive;
+        document.getElementById("magnifierToggle").checked = magnifierActive;
+        document.getElementById("mag0").style.display = magnifierActive ? "block" : "none";
+        document.getElementById("mag1").style.display = magnifierActive ? "block" : "none";
+      }
+    });
+
+    // Mouse para lupa
+    document.getElementById("canvas0").addEventListener("mousemove", e => {
+      if (!magnifierActive) return;
+      const rect = e.target.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const mag = document.getElementById("mag0");
+      mag.style.left = (x - 60) + "px";
+      mag.style.top = (y - 60) + "px";
+    });
+
+    document.getElementById("canvas1").addEventListener("mousemove", e => {
+      if (!magnifierActive) return;
+      const rect = e.target.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const mag = document.getElementById("mag1");
+      mag.style.left = (x - 60) + "px";
+      mag.style.top = (y - 60) + "px";
+    });
+
+    // Mouse drag para rotacion libre (simple)
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+
+    document.getElementById("canvas0").addEventListener("mousedown", () => { isDragging = true; });
+    document.getElementById("canvas0").addEventListener("mouseup", () => { isDragging = false; });
+    document.getElementById("canvas0").addEventListener("mousemove", e => {
+      if (!isDragging || currentRotation !== "free") return;
+      const deltaX = e.offsetX - previousMousePosition.x;
+      const deltaY = e.offsetY - previousMousePosition.y;
+
+      viewers.forEach(v => {
+        const euler = new THREE.Euler(0, 0, 0, "YXZ");
+        euler.setFromQuaternion(v.camera.quaternion);
+        euler.rotateY(deltaX * 0.01);
+        euler.rotateX(deltaY * 0.01);
+        v.camera.quaternion.setFromEuler(euler);
+      });
+
+      previousMousePosition = { x: e.offsetX, y: e.offsetY };
+    });
+
+    // Render loop
+    function animate() {
+      requestAnimationFrame(animate);
+      viewers.forEach(v => {
+        v.renderer.render(v.scene, v.camera);
+      });
+    }
+    animate();
+
+    // Handle resize
+    window.addEventListener("resize", () => {
+      viewers.forEach(v => {
+        const canvas = v.renderer.domElement;
+        v.camera.aspect = canvas.clientWidth / canvas.clientHeight;
+        v.camera.updateProjectionMatrix();
+        v.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+      });
+    });
+  </script>
+</body>
+</html>
