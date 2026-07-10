@@ -85,6 +85,7 @@
     display:inline-block; margin-top:.3rem; font-family:Consolas,monospace;
     font-size:.74rem; color:var(--blue); background:#eaf0ff; border-radius:999px; padding:.28rem .8rem;
   }
+  .footer .ref{ margin-top:.5rem; font-size:.72rem; color:#8892a0; }
   @media (max-width:1000px){ .vwrap{ min-width:100%; } }
 </style>
 </head>
@@ -150,8 +151,9 @@
 
     <div class="footer">
       Arrastra para rotar (los dos visores se mueven juntos) · rueda del mouse = zoom · <b>M</b> = lupa simultánea en ambos.<br>
-      Nube de puntos: retroproyección de la profundidad de MonoIIT (median scaling a mm, intrínsecos SCARED). Mismos frames que la demo 2D.
+      Nube de puntos: retroproyección de la profundidad estimada con MonoIIT (Espinosa et al., 2025) (median scaling a mm, intrínsecos SCARED). Mismos frames que la demo 2D.
       <br><span class="hint">tip: en local sirve la carpeta con `python -m http.server` — abrir con doble clic bloquea la carga de los .bin</span>
+      <p class="ref">Espinosa, R., Ochoa-Ruiz, G., &amp; Daul, C. (2025). <i>Transformer-based illumination invariant self-supervised monocular depth estimation in endoscopy</i>. SSRN. https://doi.org/10.2139/ssrn.5189985</p>
     </div>
   </div>
 
