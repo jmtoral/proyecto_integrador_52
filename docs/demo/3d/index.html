@@ -1,545 +1,458 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reconstrucción 3D — Endoscopia | Equipo 52</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      padding: 1.5rem;
-      min-height: 100vh;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 2rem;
-      color: #0036a3;
-    }
-    .header h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.3rem; }
-    .header p { font-size: 0.95rem; color: #555; margin-bottom: 0.2rem; }
-    .subtitle { font-size: 0.85rem; color: #E0A800; font-weight: 600; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reconstrucción 3D — con y sin enhancement | Equipo 52</title>
+<style>
+  :root{ --blue:#0036a3; --gold:#E0A800; --ink:#222; --muted:#667; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    font-family:"Segoe UI",system-ui,sans-serif;
+    background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+    min-height:100vh; padding:1.2rem; color:var(--ink);
+  }
+  .header{ text-align:center; margin-bottom:1.2rem; }
+  .header h1{ font-size:1.7rem; font-weight:700; color:var(--blue); }
+  .header p{ font-size:.9rem; color:var(--muted); }
+  .header .team{ font-size:.8rem; color:var(--gold); font-weight:600; }
 
-    .container {
-      max-width: 1600px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
+  .container{ max-width:1500px; margin:0 auto; display:flex; flex-direction:column; gap:1rem; }
 
-    .controls {
-      background: white;
-      padding: 1.2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 14px rgba(0,0,0,.12);
-      display: flex;
-      gap: 2rem;
-      flex-wrap: wrap;
-      align-items: center;
-    }
+  .controls{
+    background:#fff; padding:.8rem 1.1rem; border-radius:12px;
+    box-shadow:0 4px 14px rgba(0,0,0,.12);
+    display:flex; gap:1.4rem; flex-wrap:wrap; align-items:center; font-size:.88rem;
+  }
+  .cg{ display:flex; align-items:center; gap:.5rem; }
+  .cg > label{ font-weight:600; }
+  select,button{
+    padding:.42rem .8rem; border:1px solid #ccd; border-radius:6px;
+    font-size:.85rem; cursor:pointer; background:#fff; color:var(--ink);
+  }
+  select:hover,button:hover{ border-color:var(--blue); }
+  button.active{ background:var(--blue); color:#fff; border-color:var(--blue); }
+  button.warn.active{ background:#b23a2e; border-color:#b23a2e; }
+  option:disabled{ color:#bbb; }
 
-    .control-group {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
+  .viewers{ display:flex; gap:1rem; flex-wrap:wrap; }
+  .vwrap{
+    position:relative; flex:1; min-width:440px;
+    background:#14171c; border-radius:12px; overflow:hidden;
+    box-shadow:0 4px 14px rgba(0,0,0,.18);
+  }
+  .vwrap canvas{ display:block; width:100%; height:540px; cursor:grab; }
+  .vwrap canvas:active{ cursor:grabbing; }
+  .vlabel{
+    position:absolute; top:10px; left:10px; z-index:5;
+    background:rgba(255,255,255,.93); color:var(--blue);
+    padding:.35rem .8rem; border-radius:6px; font-weight:600; font-size:.85rem;
+    pointer-events:none;
+  }
+  .vpts{
+    position:absolute; bottom:10px; left:10px; z-index:5;
+    background:rgba(0,0,0,.55); color:#cdd3dd;
+    padding:.25rem .6rem; border-radius:6px;
+    font-family:Consolas,monospace; font-size:.72rem; pointer-events:none;
+  }
+  .lens{
+    position:absolute; z-index:6; pointer-events:none; display:none;
+    border:2px solid rgba(255,255,255,.9); border-radius:10px;
+    box-shadow:0 0 0 2px rgba(0,54,163,.5), 0 6px 18px rgba(0,0,0,.4);
+  }
+  .overlay{
+    position:absolute; inset:0; z-index:7; display:none;
+    align-items:center; justify-content:center; text-align:center;
+    background:rgba(20,23,28,.92); color:#cdd3dd;
+    font-size:.92rem; line-height:1.7; padding:2rem;
+  }
+  .overlay b{ color:#fff; }
 
-    .control-group label {
-      font-weight: 600;
-      color: #333;
-      font-size: 0.95rem;
-      min-width: 100px;
-    }
+  .diffbar{
+    background:#fff; padding:.6rem 1.1rem; border-radius:12px;
+    box-shadow:0 4px 14px rgba(0,0,0,.12);
+    display:none; align-items:center; gap:.8rem; font-size:.82rem;
+  }
+  .diffbar.on{ display:flex; }
+  .diffbar .grad{
+    width:220px; height:12px; border-radius:6px;
+    background:linear-gradient(to right,#0d0887,#9c179e,#ed7953,#f0f921);
+  }
+  .diffbar .lab{ font-family:Consolas,monospace; font-weight:600; }
 
-    select, button {
-      padding: 0.5rem 1rem;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      background: white;
-      transition: all 0.2s ease;
-    }
-
-    select {
-      min-width: 180px;
-      color: #333;
-    }
-
-    select:hover, select:focus {
-      border-color: #0036a3;
-      box-shadow: 0 0 0 2px rgba(0,54,163,.1);
-    }
-
-    button {
-      background: #f0f0f0;
-      color: #333;
-      font-weight: 600;
-      border: 1px solid #ddd;
-    }
-
-    button:hover {
-      background: #e8e8e8;
-      border-color: #0036a3;
-    }
-
-    button.active {
-      background: #0036a3;
-      color: white;
-      border-color: #0036a3;
-    }
-
-    .rotation-buttons {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .canvas-container {
-      display: flex;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .viewer-wrapper {
-      position: relative;
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 14px rgba(0,0,0,.12);
-      flex: 1;
-      min-width: 500px;
-      max-width: 700px;
-    }
-
-    .viewer-label {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      background: rgba(255,255,255,.95);
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: #0036a3;
-      z-index: 10;
-      box-shadow: 0 2px 8px rgba(0,0,0,.1);
-    }
-
-    canvas {
-      display: block;
-      width: 100%;
-      height: 600px;
-    }
-
-    .info-panel {
-      position: absolute;
-      bottom: 12px;
-      left: 12px;
-      background: rgba(0,0,0,.7);
-      color: white;
-      padding: 0.8rem 1rem;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-family: monospace;
-      max-width: 300px;
-      z-index: 10;
-    }
-
-    .info-panel div { margin-bottom: 0.3rem; }
-
-    .magnifier {
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      border: 3px solid rgba(255,255,255,.8);
-      border-radius: 50%;
-      background: rgba(0,0,0,.1);
-      pointer-events: none;
-      display: none;
-      z-index: 11;
-      box-shadow: 0 0 0 2px rgba(0,54,163,.4);
-    }
-
-    .footer {
-      text-align: center;
-      color: #666;
-      font-size: 0.85rem;
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid rgba(0,0,0,.1);
-    }
-
-    @media (max-width: 1200px) {
-      .viewer-wrapper {
-        min-width: 100%;
-        max-width: 100%;
-      }
-    }
-  </style>
+  .footer{ text-align:center; color:var(--muted); font-size:.8rem; line-height:1.7; padding:.6rem 0 1rem; }
+  .footer .hint{
+    display:inline-block; margin-top:.3rem; font-family:Consolas,monospace;
+    font-size:.74rem; color:var(--blue); background:#eaf0ff; border-radius:999px; padding:.28rem .8rem;
+  }
+  @media (max-width:1000px){ .vwrap{ min-width:100%; } }
+</style>
 </head>
 <body>
   <div class="header">
-    <h1>Reconstrucción 3D Interactiva</h1>
-    <p>Comparación: profundidad predicha sin/con enhancement</p>
-    <span class="subtitle">Equipo 52 · TC5035.10 · MNA</span>
+    <h1>Reconstrucción 3D — efecto del image enhancement</h1>
+    <p>MonoIIT sobre imagen cruda (izquierda) vs imagen realzada (derecha) · nubes retroproyectadas a mm</p>
+    <span class="team">Equipo 52 · TC5035.10 · MNA</span>
   </div>
 
   <div class="container">
     <div class="controls">
-      <div class="control-group">
-        <label for="sceneSelect">Escena:</label>
-        <select id="sceneSelect">
-          <option value="">-- Seleccionar --</option>
+      <div class="cg">
+        <label for="sceneSel">Escena</label>
+        <select id="sceneSel"></select>
+      </div>
+      <div class="cg">
+        <label for="methodSel">Enhancement</label>
+        <select id="methodSel">
+          <option value="iat">IAT</option>
+          <option value="endolmspec">Endo-LMSPEC</option>
         </select>
       </div>
-
-      <div class="control-group">
-        <label>Vista:</label>
-        <div class="rotation-buttons">
-          <button id="btnFront" class="active">Frente</button>
-          <button id="btnTop">Arriba</button>
-          <button id="btnSide">Lado</button>
-          <button id="btnFree">Libre</button>
-        </div>
+      <div class="cg">
+        <label>Vista</label>
+        <button class="vbtn active" data-view="front">Frente</button>
+        <button class="vbtn" data-view="top">Arriba</button>
+        <button class="vbtn" data-view="side">Lado</button>
+        <button class="vbtn" data-view="free">Libre</button>
       </div>
-
-      <div class="control-group">
-        <label for="zoomRange">Zoom:</label>
-        <input type="range" id="zoomRange" min="10" max="500" value="50" style="width: 150px;">
+      <div class="cg">
+        <button id="lensBtn">Lupa (M)</button>
       </div>
-
-      <div class="control-group">
-        <label>
-          <input type="checkbox" id="magnifierToggle">
-          Lupa (M)
-        </label>
+      <div class="cg">
+        <button id="diffBtn" class="warn">Resaltar diferencias</button>
       </div>
     </div>
 
-    <div class="canvas-container">
-      <div class="viewer-wrapper">
-        <div class="viewer-label">MonoIIT (sin enhancement)</div>
-        <canvas id="canvas0"></canvas>
-        <div class="magnifier" id="mag0"></div>
-        <div class="info-panel">
-          <div>Pts: <span id="pts0">-</span></div>
-          <div>Rotacion: <span id="rot0">Frente</span></div>
-        </div>
-      </div>
+    <div class="diffbar" id="diffBar">
+      <span><b>Diferencia 3D por punto</b> (baseline vs enhancement):</span>
+      <span class="lab">0 mm</span>
+      <div class="grad"></div>
+      <span class="lab" id="diffMax">—</span>
+      <span style="color:var(--muted)">amarillo = donde el enhancement más cambió la geometría</span>
+    </div>
 
-      <div class="viewer-wrapper">
-        <div class="viewer-label">MonoIIT + IAT</div>
-        <canvas id="canvas1"></canvas>
-        <div class="magnifier" id="mag1"></div>
-        <div class="info-panel">
-          <div>Pts: <span id="pts1">-</span></div>
-          <div>Rotacion: <span id="rot1">Frente</span></div>
-        </div>
+    <div class="viewers">
+      <div class="vwrap" id="wrap0">
+        <div class="vlabel">Sin enhancement (none)</div>
+        <canvas id="cv0"></canvas>
+        <div class="lens" id="lens0"></div>
+        <div class="vpts" id="pts0">— pts</div>
+        <div class="overlay" id="ov0"></div>
+      </div>
+      <div class="vwrap" id="wrap1">
+        <div class="vlabel" id="label1">Con enhancement (IAT)</div>
+        <canvas id="cv1"></canvas>
+        <div class="lens" id="lens1"></div>
+        <div class="vpts" id="pts1">— pts</div>
+        <div class="overlay" id="ov1"></div>
       </div>
     </div>
 
     <div class="footer">
-      <p>💡 Arrastra el ratón para rotar libremente. Usa el zoom o rueda del ratón. Presiona M para activar la lupa.</p>
-      <p style="font-size:0.8rem; color:#888; margin-top:0.5rem;">
-        Nube de puntos 3D retroproyectada desde predicción de profundidad (MonoIIT) con median scaling a mm.
-      </p>
+      Arrastra para rotar (los dos visores se mueven juntos) · rueda del mouse = zoom · <b>M</b> = lupa simultánea en ambos.<br>
+      Nube de puntos: retroproyección de la profundidad de MonoIIT (median scaling a mm, intrínsecos SCARED). Mismos frames que la demo 2D.
+      <br><span class="hint">tip: en local sirve la carpeta con `python -m http.server` — abrir con doble clic bloquea la carga de los .bin</span>
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script>
-    // === CONFIGURACION ===
-    const SCENES = [
-      "under1", "under2", "over1", "over2",
-      "specular1", "specular2", "medium1"
-    ];
-    const METHODS = ["none", "iat"];
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+"use strict";
 
-    // === ESTADO GLOBAL ===
-    let currentScene = null;
-    let currentRotation = "front";  // front, top, side, free
-    let magnifierActive = false;
-    const viewers = [null, null];   // Three.js scene objects
-    const cameraControls = [null, null];
+/* ============ configuracion ============ */
+const SCENES = [
+  { id:"under1",    label:"Underexposed #1" },
+  { id:"under2",    label:"Underexposed #2" },
+  { id:"over1",     label:"Overexposed #1" },
+  { id:"over2",     label:"Overexposed #2" },
+  { id:"specular1", label:"Specular #1" },
+  { id:"specular2", label:"Specular #2" },
+  { id:"medium1",   label:"Well-lit #1" },
+  { id:"medium2",   label:"Well-lit #2" },   // se deshabilita solo si el asset no existe
+];
+const METHOD_LABELS = { iat:"IAT", endolmspec:"Endo-LMSPEC" };
+const LENS_SIZE = 150, LENS_ZOOM = 2.6;
 
-    // === INICIALIZAR ESCENAS ===
-    const sceneSelect = document.getElementById("sceneSelect");
-    SCENES.forEach(sc => {
-      const opt = document.createElement("option");
-      opt.value = sc;
-      opt.textContent = sc.replace(/(\d)/g, " #$1").toUpperCase();
-      sceneSelect.appendChild(opt);
-    });
-    sceneSelect.addEventListener("change", e => {
-      currentScene = e.target.value;
-      if (currentScene) loadScene(currentScene);
-    });
+/* ============ estado ============ */
+let sceneId = null, method = "iat";
+let lensOn = false, diffOn = false;
+let lensPos = null;                 // {fx, fy} fraccion 0-1 dentro del canvas
+const orbit = { theta:0, phi:Math.PI/2, dist:100, baseDist:100 };
+const VIEWS = {
+  front:{ theta:0,            phi:Math.PI/2 },
+  top:  { theta:0,            phi:0.12      },
+  side: { theta:Math.PI/2,    phi:Math.PI/2 },
+};
+/* datos por visor: {data:{n,pos,col}, points, geom} */
+const cloud = [null, null];
+let diffColors = null;              // Float32Array compartida (mismo mapa en ambos)
 
-    // === TRES.JS SETUP ===
-    function createViewer(canvasId, infoPtsId, infoRotId) {
-      const canvas = document.getElementById(canvasId);
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xf5f5f5);
+/* ============ visores three.js ============ */
+function makeViewer(canvasId){
+  const canvas = document.getElementById(canvasId);
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x14171c);
+  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 10000);
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.autoClear = false;
+  return { canvas, scene, camera, renderer };
+}
+const V = [ makeViewer("cv0"), makeViewer("cv1") ];
 
-      const camera = new THREE.PerspectiveCamera(
-        75, canvas.clientWidth / canvas.clientHeight, 0.1, 5000
-      );
-      camera.position.set(0, 0, 100);
+function sizeViewers(){
+  V.forEach(v => {
+    const w = v.canvas.clientWidth, h = v.canvas.clientHeight;
+    v.renderer.setSize(w, h, false);
+    v.camera.aspect = w / h;
+    v.camera.updateProjectionMatrix();
+  });
+}
+window.addEventListener("resize", sizeViewers);
 
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-      renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
+/* ============ carga de nubes (.bin: [u32 N][f32 xyz*N][u8 rgb*N]) ============ */
+async function loadBin(url){
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} en ${url}`);
+  const buf = await res.arrayBuffer();
+  const n = new Uint32Array(buf, 0, 1)[0];
+  return { n,
+    pos: new Float32Array(buf, 4, n*3),
+    col: new Uint8Array(buf, 4 + n*12, n*3) };
+}
 
-      // Iluminacion
-      const light1 = new THREE.DirectionalLight(0xffffff, 0.8);
-      light1.position.set(100, 100, 100);
-      scene.add(light1);
-      const light2 = new THREE.DirectionalLight(0xffffff, 0.4);
-      light2.position.set(-100, -100, 50);
-      scene.add(light2);
-      scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+function setCloud(i, data){
+  if (cloud[i]) {
+    V[i].scene.remove(cloud[i].points);
+    cloud[i].geom.dispose(); cloud[i].points.material.dispose();
+  }
+  const geom = new THREE.BufferGeometry();
+  geom.setAttribute("position", new THREE.BufferAttribute(data.pos, 3));
+  geom.setAttribute("color", new THREE.BufferAttribute(data.col, 3, true));
+  const mat = new THREE.PointsMaterial({ size:0.55, vertexColors:true, sizeAttenuation:true });
+  const points = new THREE.Points(geom, mat);
+  V[i].scene.add(points);
+  cloud[i] = { data, geom, points };
+  document.getElementById("pts"+i).textContent = data.n.toLocaleString() + " pts";
+}
 
-      // Ejes de referencia (pequenos, en la esquina)
-      const axesHelper = new THREE.AxesHelper(30);
-      axesHelper.position.set(-150, -150, 0);
-      scene.add(axesHelper);
+function fitCamera(){
+  if (!cloud[0]) return;
+  cloud[0].geom.computeBoundingSphere();
+  const r = cloud[0].geom.boundingSphere.radius;
+  orbit.baseDist = r / Math.tan((V[0].camera.fov/2) * Math.PI/180) * 1.15;
+  orbit.dist = orbit.baseDist;
+}
 
-      return { scene, camera, renderer, infoPtsId, infoRotId };
-    }
+function showOverlay(i, msg){
+  const ov = document.getElementById("ov"+i);
+  ov.innerHTML = msg; ov.style.display = msg ? "flex" : "none";
+}
 
-    // Crear viewers
-    const viewer0 = createViewer("canvas0", "pts0", "rot0");
-    const viewer1 = createViewer("canvas1", "pts1", "rot1");
-    viewers[0] = viewer0;
-    viewers[1] = viewer1;
+const MSG_MISSING = "<div><b>Assets 3D a&uacute;n no generados.</b><br>" +
+  "Corre el notebook <b>Avance10_App_3D</b> en Colab:<br>" +
+  "setup &rarr; celda de exportar nubes &rarr; celda de push.</div>";
 
-    // === CARGAR NUBE JSON ===
-    async function loadPointCloud(viewer, method) {
-      if (!currentScene) return;
-      const url = `assets/${currentScene}_${method}.json`;
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          console.warn(`404 ${url}`);
-          return null;
-        }
-        const data = await response.json();
-        const { vertices, colors } = data;
+async function loadScene(){
+  if (!sceneId) return;
+  diffColors = null;
+  try {
+    setCloud(0, await loadBin(`assets/${sceneId}_none.bin`));
+    showOverlay(0, "");
+    fitCamera();
+  } catch(e){ console.warn(e); showOverlay(0, MSG_MISSING); }
+  await loadMethodCloud();
+}
 
-        // Crear geometry
-        const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(vertices.flat());
-        const colorsArr = new Uint8Array(colors.flat());
+async function loadMethodCloud(){
+  diffColors = null;
+  try {
+    setCloud(1, await loadBin(`assets/${sceneId}_${method}.bin`));
+    showOverlay(1, "");
+  } catch(e){ console.warn(e); showOverlay(1, MSG_MISSING); }
+  document.getElementById("label1").textContent = `Con enhancement (${METHOD_LABELS[method]})`;
+  applyDiff();   // re-aplica (o restaura RGB) tras recargar
+}
 
-        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute("color", new THREE.BufferAttribute(colorsArr, 3, true));
+/* ============ modo diferencias ============ */
+/* El punto i corresponde al mismo pixel en ambas nubes (misma mascara y stride
+   en el notebook), asi que la distancia euclidiana por indice es valida. */
+function computeDiff(){
+  if (!cloud[0] || !cloud[1]) return null;
+  const a = cloud[0].data.pos, b = cloud[1].data.pos;
+  const n = Math.min(cloud[0].data.n, cloud[1].data.n);
+  const d = new Float32Array(n);
+  for (let i=0; i<n; i++){
+    const dx=a[3*i]-b[3*i], dy=a[3*i+1]-b[3*i+1], dz=a[3*i+2]-b[3*i+2];
+    d[i] = Math.sqrt(dx*dx + dy*dy + dz*dz);
+  }
+  const sorted = Float32Array.from(d).sort();
+  const p95 = sorted[Math.floor(0.95*(n-1))] || 1e-6;
+  const cols = new Float32Array(n*3);
+  for (let i=0; i<n; i++){
+    const t = Math.min(d[i]/p95, 1);
+    /* rampa tipo plasma: azul oscuro -> magenta -> naranja -> amarillo */
+    let r,g,bl;
+    if (t < 0.33){ const u=t/0.33;      r=0.05+0.56*u; g=0.03+0.06*u; bl=0.53+0.09*u; }
+    else if (t < 0.66){ const u=(t-0.33)/0.33; r=0.61+0.32*u; g=0.09+0.38*u; bl=0.62-0.29*u; }
+    else { const u=(t-0.66)/0.34;       r=0.93+0.01*u; g=0.47+0.51*u; bl=0.33-0.20*u; }
+    cols[3*i]=r; cols[3*i+1]=g; cols[3*i+2]=bl;
+  }
+  document.getElementById("diffMax").textContent = "≥ " + p95.toFixed(1) + " mm";
+  return cols;
+}
 
-        // Material con vertex colors
-        const material = new THREE.PointsMaterial({
-          size: 0.8,
-          vertexColors: true,
-          sRGBColorSpace: true
-        });
-
-        const points = new THREE.Points(geometry, material);
-        viewer.scene.add(points);
-
-        // Actualizar info
-        document.getElementById(viewer.infoPtsId).textContent = vertices.length;
-
-        // Ajustar camara a los datos
-        geometry.computeBoundingBox();
-        const box = geometry.boundingBox;
-        const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const fov = viewer.camera.fov * (Math.PI / 180);
-        let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-        cameraZ *= 1.5;  // un poco de espacio extra
-        viewer.camera.position.z = cameraZ;
-        viewer.camera.lookAt(box.getCenter(new THREE.Vector3()));
-        viewer.camera.updateProjectionMatrix();
-
-        return points;
-      } catch (err) {
-        console.error(`Error cargando ${url}:`, err);
-        return null;
+function applyDiff(){
+  document.getElementById("diffBar").classList.toggle("on", diffOn);
+  for (let i=0; i<2; i++){
+    if (!cloud[i]) continue;
+    if (diffOn){
+      if (!diffColors) diffColors = computeDiff();
+      if (diffColors && diffColors.length/3 <= cloud[i].data.n){
+        cloud[i].geom.setAttribute("color", new THREE.BufferAttribute(diffColors, 3));
       }
+    } else {
+      cloud[i].geom.setAttribute("color", new THREE.BufferAttribute(cloud[i].data.col, 3, true));
     }
+    cloud[i].geom.attributes.color.needsUpdate = true;
+  }
+}
 
-    // === CARGAR ESCENA (ambas nubes) ===
-    async function loadScene(sceneId) {
-      // Limpiar
-      viewers.forEach(v => {
-        const toRemove = v.scene.children.filter(c => c instanceof THREE.Points);
-        toRemove.forEach(c => v.scene.remove(c));
-      });
+/* ============ camara orbital compartida ============ */
+function updateCameras(){
+  const sp=Math.sin(orbit.phi), cp=Math.cos(orbit.phi);
+  const st=Math.sin(orbit.theta), ct=Math.cos(orbit.theta);
+  V.forEach(v => {
+    v.camera.position.set(orbit.dist*sp*st, orbit.dist*cp, orbit.dist*sp*ct);
+    v.camera.up.set(0,1,0);
+    v.camera.lookAt(0,0,0);
+  });
+}
 
-      // Cargar none y iat en paralelo
-      const pc0 = await loadPointCloud(viewers[0], "none");
-      const pc1 = await loadPointCloud(viewers[1], "iat");
+function setView(name){
+  document.querySelectorAll(".vbtn").forEach(b =>
+    b.classList.toggle("active", b.dataset.view === name));
+  if (VIEWS[name]){ orbit.theta = VIEWS[name].theta; orbit.phi = VIEWS[name].phi; }
+}
+document.querySelectorAll(".vbtn").forEach(b =>
+  b.addEventListener("click", () => setView(b.dataset.view)));
 
-      if (pc0 && pc1) {
-        // Sincronizar camara (usar la escala del viewer0)
-        viewers[1].camera.position.copy(viewers[0].camera.position);
-        viewers[1].camera.fov = viewers[0].camera.fov;
-        viewers[1].camera.updateProjectionMatrix();
+/* drag = rotacion libre (en cualquiera de los dos visores, mueve ambos) */
+let dragging = false, lastX = 0, lastY = 0;
+V.forEach(v => {
+  v.canvas.addEventListener("mousedown", e => {
+    dragging = true; lastX = e.clientX; lastY = e.clientY;
+  });
+  v.canvas.addEventListener("wheel", e => {
+    e.preventDefault();
+    orbit.dist = Math.min(Math.max(orbit.dist * Math.pow(1.0015, e.deltaY),
+                                   orbit.baseDist*0.25), orbit.baseDist*4);
+  }, { passive:false });
+});
+window.addEventListener("mouseup", () => { dragging = false; });
+window.addEventListener("mousemove", e => {
+  if (!dragging) return;
+  const dx = e.clientX - lastX, dy = e.clientY - lastY;
+  lastX = e.clientX; lastY = e.clientY;
+  if (Math.abs(dx) + Math.abs(dy) === 0) return;
+  orbit.theta -= dx * 0.005;
+  orbit.phi   = Math.min(Math.max(orbit.phi - dy * 0.005, 0.08), Math.PI - 0.08);
+  setView("free");
+});
 
-        // Aplicar rotacion actual a ambos
-        applyRotation(currentRotation);
-      }
-    }
+/* ============ lupa simultanea ============ */
+function setLens(on){
+  lensOn = on;
+  document.getElementById("lensBtn").classList.toggle("active", on);
+  if (!on){ lensPos = null;
+    document.getElementById("lens0").style.display = "none";
+    document.getElementById("lens1").style.display = "none"; }
+}
+document.getElementById("lensBtn").addEventListener("click", () => setLens(!lensOn));
+document.addEventListener("keydown", e => {
+  if (e.key.toLowerCase() === "m") setLens(!lensOn);
+});
 
-    // === ROTACIONES FIJAS ===
-    const rotations = {
-      front: () => {
-        viewers.forEach(v => {
-          v.camera.position.set(0, 0, 100);
-        });
-        document.getElementById("rot0").textContent = "Frente";
-        document.getElementById("rot1").textContent = "Frente";
-      },
-      top: () => {
-        viewers.forEach(v => {
-          v.camera.position.set(0, 100, 0);
-        });
-        document.getElementById("rot0").textContent = "Arriba";
-        document.getElementById("rot1").textContent = "Arriba";
-      },
-      side: () => {
-        viewers.forEach(v => {
-          v.camera.position.set(100, 0, 0);
-        });
-        document.getElementById("rot0").textContent = "Lado";
-        document.getElementById("rot1").textContent = "Lado";
-      },
-      free: () => {
-        document.getElementById("rot0").textContent = "Libre";
-        document.getElementById("rot1").textContent = "Libre";
-      }
-    };
+/* mover el mouse sobre cualquiera de los dos fija la lupa en AMBOS (misma fraccion) */
+V.forEach(v => {
+  v.canvas.addEventListener("mousemove", e => {
+    if (!lensOn) return;
+    const r = v.canvas.getBoundingClientRect();
+    lensPos = { fx:(e.clientX - r.left)/r.width, fy:(e.clientY - r.top)/r.height };
+  });
+  v.canvas.addEventListener("mouseleave", () => {
+    if (lensOn) lensPos = null;
+  });
+});
 
-    function applyRotation(rot) {
-      currentRotation = rot;
-      if (rot !== "free" && rotations[rot]) {
-        rotations[rot]();
-      }
-    }
+/* ============ render loop ============ */
+function renderViewer(i){
+  const v = V[i];
+  const w = v.canvas.clientWidth, h = v.canvas.clientHeight;
+  const r = v.renderer;
+  r.setScissorTest(false);
+  r.setViewport(0, 0, w, h);
+  r.clear();
+  r.render(v.scene, v.camera);
 
-    // === CONTROLES ===
-    document.getElementById("btnFront").addEventListener("click", () => {
-      document.querySelectorAll(".rotation-buttons button").forEach(b => b.classList.remove("active"));
-      event.target.classList.add("active");
-      applyRotation("front");
-    });
+  const lensDiv = document.getElementById("lens"+i);
+  if (lensOn && lensPos && cloud[i]){
+    const L = LENS_SIZE, Z = LENS_ZOOM;
+    const lx = lensPos.fx * w, ly = lensPos.fy * h;
+    v.camera.setViewOffset(w, h, lx - L/(2*Z), ly - L/(2*Z), L/Z, L/Z);
+    r.setScissorTest(true);
+    r.setScissor(lx - L/2, h - ly - L/2, L, L);
+    r.setViewport(lx - L/2, h - ly - L/2, L, L);
+    r.clear();
+    r.render(v.scene, v.camera);
+    r.setScissorTest(false);
+    v.camera.clearViewOffset();
+    lensDiv.style.display = "block";
+    lensDiv.style.left = (lx - L/2) + "px";
+    lensDiv.style.top  = (ly - L/2) + "px";
+    lensDiv.style.width = lensDiv.style.height = L + "px";
+  } else {
+    lensDiv.style.display = "none";
+  }
+}
+function animate(){
+  requestAnimationFrame(animate);
+  updateCameras();
+  renderViewer(0);
+  renderViewer(1);
+}
 
-    document.getElementById("btnTop").addEventListener("click", () => {
-      document.querySelectorAll(".rotation-buttons button").forEach(b => b.classList.remove("active"));
-      event.target.classList.add("active");
-      applyRotation("top");
-    });
+/* ============ selectores ============ */
+const sceneSel = document.getElementById("sceneSel");
+SCENES.forEach(s => {
+  const o = document.createElement("option");
+  o.value = s.id; o.textContent = s.label;
+  sceneSel.appendChild(o);
+});
+sceneSel.addEventListener("change", e => { sceneId = e.target.value; loadScene(); });
+document.getElementById("methodSel").addEventListener("change", e => {
+  method = e.target.value; loadMethodCloud();
+});
+document.getElementById("diffBtn").addEventListener("click", () => {
+  diffOn = !diffOn;
+  document.getElementById("diffBtn").classList.toggle("active", diffOn);
+  applyDiff();
+});
 
-    document.getElementById("btnSide").addEventListener("click", () => {
-      document.querySelectorAll(".rotation-buttons button").forEach(b => b.classList.remove("active"));
-      event.target.classList.add("active");
-      applyRotation("side");
-    });
-
-    document.getElementById("btnFree").addEventListener("click", () => {
-      document.querySelectorAll(".rotation-buttons button").forEach(b => b.classList.remove("active"));
-      event.target.classList.add("active");
-      applyRotation("free");
-    });
-
-    // Zoom
-    document.getElementById("zoomRange").addEventListener("input", e => {
-      const z = parseFloat(e.target.value);
-      viewers.forEach(v => {
-        v.camera.fov = z;
-        v.camera.updateProjectionMatrix();
-      });
-    });
-
-    // Lupa
-    document.getElementById("magnifierToggle").addEventListener("change", e => {
-      magnifierActive = e.target.checked;
-      document.getElementById("mag0").style.display = magnifierActive ? "block" : "none";
-      document.getElementById("mag1").style.display = magnifierActive ? "block" : "none";
-    });
-
-    document.addEventListener("keydown", e => {
-      if (e.key.toLowerCase() === "m") {
-        magnifierActive = !magnifierActive;
-        document.getElementById("magnifierToggle").checked = magnifierActive;
-        document.getElementById("mag0").style.display = magnifierActive ? "block" : "none";
-        document.getElementById("mag1").style.display = magnifierActive ? "block" : "none";
-      }
-    });
-
-    // Mouse para lupa
-    document.getElementById("canvas0").addEventListener("mousemove", e => {
-      if (!magnifierActive) return;
-      const rect = e.target.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const mag = document.getElementById("mag0");
-      mag.style.left = (x - 60) + "px";
-      mag.style.top = (y - 60) + "px";
-    });
-
-    document.getElementById("canvas1").addEventListener("mousemove", e => {
-      if (!magnifierActive) return;
-      const rect = e.target.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const mag = document.getElementById("mag1");
-      mag.style.left = (x - 60) + "px";
-      mag.style.top = (y - 60) + "px";
-    });
-
-    // Mouse drag para rotacion libre (simple)
-    let isDragging = false;
-    let previousMousePosition = { x: 0, y: 0 };
-
-    document.getElementById("canvas0").addEventListener("mousedown", () => { isDragging = true; });
-    document.getElementById("canvas0").addEventListener("mouseup", () => { isDragging = false; });
-    document.getElementById("canvas0").addEventListener("mousemove", e => {
-      if (!isDragging || currentRotation !== "free") return;
-      const deltaX = e.offsetX - previousMousePosition.x;
-      const deltaY = e.offsetY - previousMousePosition.y;
-
-      viewers.forEach(v => {
-        const euler = new THREE.Euler(0, 0, 0, "YXZ");
-        euler.setFromQuaternion(v.camera.quaternion);
-        euler.rotateY(deltaX * 0.01);
-        euler.rotateX(deltaY * 0.01);
-        v.camera.quaternion.setFromEuler(euler);
-      });
-
-      previousMousePosition = { x: e.offsetX, y: e.offsetY };
-    });
-
-    // Render loop
-    function animate() {
-      requestAnimationFrame(animate);
-      viewers.forEach(v => {
-        v.renderer.render(v.scene, v.camera);
-      });
-    }
-    animate();
-
-    // Handle resize
-    window.addEventListener("resize", () => {
-      viewers.forEach(v => {
-        const canvas = v.renderer.domElement;
-        v.camera.aspect = canvas.clientWidth / canvas.clientHeight;
-        v.camera.updateProjectionMatrix();
-        v.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-      });
-    });
-  </script>
+/* deshabilitar escenas cuyos assets no existen (p.ej. medium2) y arrancar */
+async function init(){
+  sizeViewers();
+  for (const opt of sceneSel.options){
+    try {
+      const r = await fetch(`assets/${opt.value}_none.bin`, { method:"HEAD" });
+      if (!r.ok) opt.disabled = true;
+    } catch(e){ /* file:// no permite probar; se deja habilitada */ }
+  }
+  const first = Array.from(sceneSel.options).find(o => !o.disabled);
+  if (first){ sceneSel.value = first.value; sceneId = first.value; loadScene(); }
+  animate();
+}
+init();
+</script>
 </body>
 </html>
